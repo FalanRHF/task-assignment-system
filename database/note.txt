@@ -1,0 +1,1 @@
+db related here (tak tahu lagi nak letak paa. for now letak sql query je kot untuk samakan kita punya db setup untuk local testing)
