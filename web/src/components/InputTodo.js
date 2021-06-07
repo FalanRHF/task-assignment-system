@@ -21,16 +21,28 @@ const InputTodo = () => {
 
   return (
     <Fragment>
-      <h1 className="text-center mt-5">Report Complaint </h1>
-      <form className="d-flex mt-5" onSubmit={onSubmitForm}>
-        <input
-          type="text"
-          className="form-control"
-          value={description}
-          onChange={e => setDescription(e.target.value)}
-        />
-        <button className="btn btn-success">Add</button>
-      </form>
+      <div className="card card-body my-3">
+        <h2 className="text-center mt-2">Assign Task</h2>
+        <form onSubmit={onSubmitForm}>
+          <div className="input-group">
+            <div className="input-group-prepend">
+              <div className="input-group-text bg-info text-white">
+                <i className="fas fa-book"></i>
+              </div>
+            </div>
+            
+              <input
+              type="text"
+              className="form-control"
+              placeholder="Create new task"
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              required/>
+          </div>
+
+          <button className="btn btn-block mt-3 btn-success btn-info">Add</button>
+        </form>
+      </div>
     </Fragment>
   );
 };

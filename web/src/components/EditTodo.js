@@ -26,14 +26,13 @@ const EditTodo = ({ todo }) => {
 
   return (
     <Fragment>
-      <button
-        type="button"
-        class="btn btn-warning"
+      <span
+        className="mx-2 text-warning"
         data-toggle="modal"
         data-target={`#id${todo.todo_id}`}
       >
-        Edit
-      </button>
+        <i className="fas fa-pen" />
+      </span>
 
       {/* 
         id = id10

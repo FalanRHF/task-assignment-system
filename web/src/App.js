@@ -1,17 +1,22 @@
 import React, { Fragment } from "react";
+import uuid from 'uuid'
 import "./App.css";
 
 //components
 
-import InputTodo from "F:/Kerja 21/FYP/task-assignment-system/web/src/components/InputTodo";
-import ListTodos from "F:/Kerja 21/FYP/task-assignment-system/web/src/components/ListTodos";
+import InputTodo from "./components/InputTodo";
+import ListTodos from "./components/ListTodos";
 
 function App() {
   return (
     <Fragment>
       <div className="container">
-        <InputTodo />
-        <ListTodos />
+        <div className="row">
+          <div className="col-10 col-md-8 mx-auto mt-4">
+          <InputTodo />
+          <ListTodos />
+          </div>
+        </div>
       </div>
     </Fragment>
   );

@@ -39,40 +39,30 @@ const ListTodos = () => {
   return (
     <Fragment>
       {" "}
-      <table class="table mt-5 text-center">
-        <thead>
-          <tr>
-            <th>Description</th>
-            <th>Edit</th>
-            <th>Delete</th>
-          </tr>
-        </thead>
-        <tbody>
-          {/*<tr>
-            <td>John</td>
-            <td>Doe</td>
-            <td>john@example.com</td>
-          </tr> */}
-          {todos.map(todo => (
-            <tr key={todo.todo_id}>
-              <td>{todo.description}</td>
-              <td>
-                <EditTodo todo={todo} />
-              </td>
-              <td>
-                <button
-                  className="btn btn-danger"
-                  onClick={() => deleteTodo(todo.todo_id)}
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div className="card card-body my-3">
+        <h2 className="text-center mt-2">Task lists</h2>
+        <ul className="list-group my-1">
+        {todos.map(todo => (
+          <div key={todo.todo_id}>
+            <li className="list-group-item list-group-item:hover{ z-index: auto; } d-flex justify-content-between my-2">
+            <h6 className="mt-1 mb-0 align-middle">{todo.description}</h6>
+              <div className="todo-icon">
+                <span>
+                  <EditTodo todo={todo} />
+                </span>
+                  <span
+                    className="mx-2 text-danger"
+                    onClick={() => deleteTodo(todo.todo_id)}
+                  >
+                    <i className="fas fa-trash" />
+                  </span>
+                </div>
+            </li>
+          </div>
+        ))}
+        </ul>
+      </div>
     </Fragment>
   );
 };
-
 export default ListTodos;
