@@ -5,6 +5,7 @@ import { View, Button, TextInput } from 'react-native';
 import firebase from 'firebase/app';
 
 import auth from '@react-native-firebase/auth';
+import { NavigationContainer } from '@react-navigation/native';
 
 
 

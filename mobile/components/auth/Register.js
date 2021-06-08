@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import { View, Button, TextInput } from 'react-native';
+import axios from 'axios';
 
 
 import firebase from 'firebase/app';
@@ -38,6 +39,18 @@ export class Register extends Component {
       .createUserWithEmailAndPassword(email, password)
       .then(() => {
         console.log('User account created & signed in!');
+        axios
+          .post('http://192.168.68.109:5050/client', {
+            uid: auth().currentUser.uid,
+            username: name,
+            email: email
+          })
+          .then(function (response) {
+            console.log("user passed to API");
+          })
+          .catch(function (error) {
+            console.log(error.response.data);
+          });
       })
       .catch(error => {
         if (error.code === 'auth/email-already-in-use') {
@@ -50,7 +63,9 @@ export class Register extends Component {
 
         console.error(error);
       });
+
   }
+
   render() {
     return (
       <View>
@@ -69,7 +84,7 @@ export class Register extends Component {
         />
 
         <Button
-          onPress={() => this.onSignUp()}
+          onPress={() => { this.onSignUp(); }}
           title="Sign Up"
         />
       </View>
