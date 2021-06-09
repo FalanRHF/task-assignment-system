@@ -1,39 +1,35 @@
 import React, { Component } from 'react'
 import { View, Text, Button } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+
 import auth from '@react-native-firebase/auth'
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { fetchClient } from '../redux/actions/index'
 
-const Tab = createBottomTabNavigator()
+import HomeScreen from './main/Home'
+import SettingsScreen from './main/Settings'
+
+
+const Tab = createBottomTabNavigator();
 
 
 export class Main extends Component {
   componentDidMount() {
     this.props.fetchClient();
   }
-  logout() {
-    auth()
-      .signOut()
-      .then(() => console.log('User signed out!'));
-  }
   render() {
-    const { currentUser } = this.props;
-    console.log("Main.js render():");
-    console.log(currentUser);
-    if (currentUser == undefined) {
-      return (
-        <View>
-          <Text>undefined currentUser state</Text>
-        </View>
-      )
-    }
     return (
       <Tab.Navigator>
-        <Tab.Screen />
-        <Tab.Screen />
+        <Tab.Screen name="Home" component={HomeScreen}
+          options={{
+            tabBarIcon: ({ color, size }) => (
+              <MaterialCommunityIcons name="home" size={24} color="black" />
+            ),
+          }} />
+        <Tab.Screen name="Settings" component={SettingsScreen} />
       </Tab.Navigator>
     )
   }

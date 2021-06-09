@@ -10,7 +10,7 @@ export function fetchClient() {
         dispatch({
           type: USER_STATE_CHANGE, currentUser: response.data
         });
-        //console.log('fetchClient() response:');
+        console.log('fetchClient() success');
         //console.log(response.data);
       })
       .catch(function (error) {

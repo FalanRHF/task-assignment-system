@@ -1,13 +1,8 @@
 import React, { Component } from 'react';
 import { View, Button, TextInput } from 'react-native';
 
-
-import firebase from 'firebase/app';
-
 import auth from '@react-native-firebase/auth';
 import { NavigationContainer } from '@react-navigation/native';
-
-
 
 export class Login extends Component {
   constructor(props) {
@@ -18,9 +13,9 @@ export class Login extends Component {
       password: '',
       name: ''
     }
-    this.onSignUp = this.onSignUp.bind(this)
+    this.onLogin = this.onLogin.bind(this)
   }
-  onSignUp() {
+  onLogin() {
     const { email, password } = this.state;
     auth()
       .signInWithEmailAndPassword(email, password)
@@ -53,7 +48,7 @@ export class Login extends Component {
         />
 
         <Button
-          onPress={() => this.onSignUp()}
+          onPress={() => this.onLogin()}
           title="Log In"
         />
       </View>

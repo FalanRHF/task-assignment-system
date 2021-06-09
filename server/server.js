@@ -37,6 +37,62 @@ app.post("/client", async (req, res) => {
   }
 });
 
+app.post("/ticket/new", async (req, res) => {
+  try {
+    //console.log(req.body);
+    const { id, projectname, title, detail, createdAt } = req.body;
+    const query = await db.query("INSERT INTO ticket (tc_id,tc_projectname,tc_title,tc_detail,tc_createdat) VALUES($1,$2,$3,$4,$5) RETURNING *", [id, projectname, title, detail, createdAt]);
+    res.json(query.rows[0]);
+    console.log(req.body);
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+// app.post("/ticket/new", async (req, res) => {
+//   try {
+
+//   } catch (error) {
+// console.error(error.message);
+// }
+// });
+
+app.get("/ticket/getnextid/:tcid", async (req, res) => {
+  try {
+    const { tcid } = req.params;
+    const query = await db.query(`SELECT * FROM ticket WHERE tc_id like '${tcid}%' order by tc_id desc`);
+
+    res.json(query.rows[0]);
+    console.log(res.body);
+
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+app.get("/fx/currentdate", async (req, res) => {
+  try {
+    let today = new Date();
+    let dd = today.getDate();
+    let mm = today.getMonth() + 1;
+    const yyyy = today.getFullYear();
+    if (dd < 10) {
+      dd = `0${dd}`;
+    }
+
+    if (mm < 10) {
+      mm = `0${mm}`;
+    }
+    let todayString = `${yyyy}${mm}${dd}`;
+    todayJSON = { date: todayString };
+    res.json(todayJSON);
+    console.log(res.body);
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+
 app.get("/client/:uid", async (req, res) => {
   try {
     const { uid } = req.params;
