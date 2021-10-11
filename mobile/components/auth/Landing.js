@@ -1,21 +1,37 @@
-import React, { Alert } from 'react'
+import React, { useEffect } from 'react'
 
-import { Text, View, Button } from 'react-native';
+import { Text, View } from 'react-native';
+import { Button } from "react-native-paper";
 
-export default function Landing({ navigation }) {
+const Landing = ({ navigation }) => {
+
+  useEffect(() => {
+    console.log(`Landing.js mounted...`)
+    return () => {
+      console.log(`Landing.js mounted...`)
+
+    }
+  }, [navigation])
+
   {/* navigation passed from App.js */ }
   return (
     <View style={{ flex: 1, justifyContent: 'center' }}>
-      <Button style={{ margin: 2 }}
+      <Button mode="contained" onPress={() => navigation.navigate("Register")}>
+        Register
+      </Button>
+      <Button mode="outlined" onPress={() => navigation.navigate("Login")}>
+        Login
+      </Button>
+      {/* <Button style={{ margin: 2 }}
         title="Register"
         onPress={() => navigation.navigate("Register")} />
-
       <Button style={{ marginTop: 20, padding: 15 }}
         title="Login"
         onPress={() => navigation.navigate("Login")}
         color="#f194ff"
-      //onPress={() => Alert.alert('Button with adjusted color pressed')}
-      />
+      /> */}
     </View>
   );
 }
+
+export default Landing

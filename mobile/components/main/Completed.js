@@ -1,7 +1,6 @@
 import axios from 'axios';
 import React, { Component, useState, useEffect } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity, FlatList } from 'react-native';
-import { Button } from 'react-native-paper';
+import { StyleSheet, Button, View, Text, TouchableOpacity, FlatList } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 
 import { connect } from "react-redux";
@@ -16,57 +15,51 @@ const Separator = () => (
   <View style={styles.separator} />
 );
 
-let pendingTicket = []
-
-
-//     try {
-//       const getPendingResponse = await axios.get(`http://192.168.68.109:5050/ticket/getpending/${this.state.pjcode}`)
-//       pendingTicket = getPendingResponse.data
-//     } catch (error) {
-//       console.log(`getPending(): ${error}`)
-
+let completedTicket = []
 
 
 const Home = ({ navigation }) => {
   const [curpjcode, setcurpjcode] = useState('')
   const [isLoading, setisLoading] = useState(true)
-  const [pendingTicket, setpendingTicket] = useState([])
-
-  //console.log(`Home.js rendering...`)
+  const [completedTicket, setcompletedTicket] = useState([])
 
   useEffect(() => {
-    navigation.setOptions({ title: 'Home' })
-    console.log(`Home.js: useEffect() activated`)
+    navigation.setOptions({ title: 'Resolved Tickets' })
+    console.log(`Completed.js: useEffect() activated`)
     const unsubscribe = navigation.addListener('focus', () => {
-      console.log(`Home.useEffect.addListener.focus triggered`)
+      console.log(`Completed.useEffect.addListener.focus triggered`)
       init()
     });
 
     return unsubscribe;
   }, [navigation]);
 
+  // const init = async () => {
+  //   getCurrentPjcode().then()
+  //   await getPending()
+  // }
+
   const init = async () => {
-    console.log(`Home.init: called`)
+    console.log(`Completed.init: called`)
     try {
       const pjcode = await getCurrentPjcode()
       if (pjcode != null) {
-        navigation.setOptions({ title: `Home (${pjcode})` })
-        const res = await getPending(pjcode)
+        navigation.setOptions({ title: `Resolved (${pjcode})` })
+        const res = await getCompleted(pjcode)
       }
       else {
-        navigation.setOptions({ title: `Home` })
+        navigation.setOptions({ title: `Resolved` })
       }
-      //console.log(`Home.init: pendingticket=${pendingTicket}`)
+      //console.log(`Home.init: pendingticket=${completedTicket}`)
     } catch (error) {
-      console.log(`Home.init: ERROR`)
-      console.log(error.message)
+      console.log(error)
     }
     console.log(`setting isLoading to false...`)
     setisLoading(false)
   }
 
   const getCurrentPjcode = () => {
-    console.log(`Home.init.getCurrentPjcode: called`)
+    console.log(`Completed.init.getCurrentPjcode: called`)
     return new Promise(async (resolve, reject) => {
       const uid = auth().currentUser.uid
       try {
@@ -74,7 +67,7 @@ const Home = ({ navigation }) => {
         console.log(`${JSON.stringify(axiosGetResponse.data)}`)
         const { cl_curpj } = axiosGetResponse.data[0]
         setcurpjcode(cl_curpj)
-        console.log(`Home.init.getCurrentPjcode: calling resolve(${cl_curpj})...`)
+        console.log(`Completed.init.getCurrentPjcode: calling resolve(${cl_curpj})...`)
         resolve(cl_curpj)
       } catch (error) {
         reject(error)
@@ -82,31 +75,30 @@ const Home = ({ navigation }) => {
     })
   }
 
-  const getPending = (pjcode) => {
-    console.log(`Home.init.getPending: called`)
+  const getCompleted = (pjcode) => {
+    console.log(`Completed.init.getCompleted: called`)
     return new Promise(async (resolve, reject) => {
       try {
         console.log(`Project Code: ${pjcode}`)
-        const res = await axios.get(`http://localhost:5050/helpdesk/pendingticket/${pjcode}`)
+        const res = await axios.get(`http://localhost:5050/helpdesk/completedticket/${pjcode}`)
         // let pendingarray = []
         // res.forEach(ticket => {
         //   pendingarray.push(ticket.data())
         // })
-        console.log(`Pending Tickets Data: ${JSON.stringify(res.data)}`)
-        setpendingTicket(res.data)
+        console.log(`Resolved Tickets Data: ${JSON.stringify(res.data)}`)
+        setcompletedTicket(res.data)
         resolve(res)
       } catch (error) {
-        console.log(`Home: getPending error: ${error}`)
+        console.log(`Completed.getCompleted: reject(error)`)
         reject(error)
       }
 
     })
   }
-  console.log(`isLoading: ${isLoading}`)
   if (isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Home is loading...</Text>
+        <Text>Completed is loading...</Text>
       </View>
     )
   } else if (curpjcode == null) {
@@ -120,23 +112,15 @@ const Home = ({ navigation }) => {
   } else {
     return (
       <View style={{ flex: 1, marginHorizontal: 16 }}>
-        <View style={{ alignItems: 'center', paddingVertical: 30 }}>
-          <Button
-            mode="contained"
-            onPress={() => navigation.navigate('NewTicket', {
-              code: curpjcode,
-            })}>Add New Ticket</Button>
-        </View>
-        <Separator />
         <View style={{ paddingTop: 20, paddingBottom: 100 }}>
           <FlatList style={{ paddingBottom: 0 }}
-            data={pendingTicket}
+            data={completedTicket}
             renderItem={({ item }) => (
               <TouchableOpacity
                 onPress={() => navigation.navigate('Ticket', {
                   tc_id: item.tc_id
                 })}
-                style={{ ...styles.item, backgroundColor: item.tc_status == 'IN PROGRESS' ? '#f4b120' : 'white' }}>
+                style={{ ...styles.item, backgroundColor: 'green' }}>
                 <Text style={styles.title}>{item.tc_title}</Text>
               </TouchableOpacity>
             )}

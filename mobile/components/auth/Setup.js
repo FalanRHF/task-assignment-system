@@ -29,14 +29,17 @@ export class Setup extends Component {
       <View>
         <TextInput
           placeholder="Project"
+          mode='outlined'
           onChangeText={(Project) => this.setState({ Project })}
         />
         <TextInput
           placeholder="New"
+          mode='outlined'
           onChangeText={(New) => this.setState({ New })}
         />
         <TextInput
           placeholder="takde"
+          mode='outlined'
           onChangeText={(takde) => this.setState({ takde })}
         />
 
