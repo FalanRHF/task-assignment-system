@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Modal, makeStyles } from "@material-ui/core";
 import { storage, db } from "./firebase";
 import firebase from "firebase";
-import "./ImageUpload.css"
+import "./TaskUpload.css"
 
 function getModalStyle() {
   const top = 50;
@@ -26,22 +26,22 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function ImageUpload({ userAvatar, userName }) {
+function TaskUpload({ userAvatar, userName }) {
   const classes = useStyles();
   const [modalStyle] = React.useState(getModalStyle);
-  const [image, setImage] = useState(null);
+  const [file, setFile] = useState(null);
   const [progress, setProgress] = useState(0);
   const [caption, setCaption] = useState("");
   const [openTask, setOpenTask] = useState(false);
 
   const handleChange = (e) => {
     if (e.target.files[0]) {
-      setImage(e.target.files[0]);
+      setFile(e.target.files[0]);
     }
   };
 
   const handleUpload = () => {
-    const uploadTask = storage.ref(`images/${image.name}`).put(image);
+    const uploadTask = storage.ref(`files/${file.name}`).put(file);
     uploadTask.on(
       "state_changed",
       (snapshot) => {
@@ -58,29 +58,30 @@ function ImageUpload({ userAvatar, userName }) {
       () => {
         //   complete function
         storage
-          .ref("images")
-          .child(image.name)
+          .ref("files")
+          .child(file.name)
           .getDownloadURL()
           .then((url) => {
             db.collection("posts").add({
               createdAt: firebase.firestore.FieldValue.serverTimestamp(),
               caption: caption,
-              imageURL: url,
+              fileURL: url,
               userName: userName,
               userAvatar: userAvatar,
             });
           });
         setProgress(0);
         setCaption("");
-        setImage(null);
+        setFile(null);
+        setOpenTask(false);
       }
     );
   };
 
   return (
-    <div className="imageUpload">
+    <div className="taskUpload">
       <progress
-        className="imageupload_progress"
+        className="taskupload_progress"
         value={progress}
         max="100"
       ></progress>
@@ -91,20 +92,38 @@ function ImageUpload({ userAvatar, userName }) {
         aria-labelledby="simple-modal-title"
       >
         <div style={modalStyle} className={classes.paper}>
-          <div className="task_add">
+          <form className="task_add">
             <input
               type="text"
               placeholder="Enter a Caption..."
               value={caption}
               onChange={(e) => setCaption(e.target.value)}
               />
-              <input type="file" onChange={handleChange} />
+            <input type="file" onChange={handleChange} />
             <Button variant="contained" color="primary" onClick={handleUpload}>
               Upload
             </Button>
-            </div>
+          </form>
         </div>
       </Modal>
+
+      {/* <form className="app_signup">
+            <Input
+              placeholder="email"
+              type="text"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+            <Input
+              placeholder="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <Button type="submit" variant="contained" onClick={signIn}>
+              Sign In
+            </Button>
+          </form> */}
 
       {/* <input
         type="text"
@@ -124,4 +143,4 @@ function ImageUpload({ userAvatar, userName }) {
   );
 }
 
-export default ImageUpload;
+export default TaskUpload;

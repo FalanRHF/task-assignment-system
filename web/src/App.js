@@ -1,13 +1,9 @@
 import React, { useState, useEffect } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import Modal from "@material-ui/core/Modal";
-import Button from "@material-ui/core/Button";
 import "./App.css";
 import Post from "./Post";
 import { db, auth } from "./firebase";
-import { Input } from "@material-ui/core";
-import ImageUpload from "./ImageUpload";
-import InstagramEmbed from "react-instagram-embed";
+import { Input, Modal, Button, makeStyles } from "@material-ui/core";
+import TaskUpload from "./TaskUpload";
 
 function getModalStyle() {
   const top = 50;
@@ -214,29 +210,15 @@ function App() {
                 userAvatar={post.userAvatar}
                 user={user}
                 userName={post.userName}
-                imageURL={post.imageURL}
+                fileURL={post.fileURL}
                 caption={post.caption}
               />
             );
           })}
         </div>
-        <div className="app_rightPosts">
-          <InstagramEmbed
-            url="https://www.instagram.com/p/CCnE7Y1BtFp/"
-            maxWidth={320}
-            hideCaption={false}
-            containerTagName="div"
-            protocol=""
-            injectScript
-            onLoading={() => {}}
-            onSuccess={() => {}}
-            onAfterRender={() => {}}
-            onFailure={() => {}}
-          />
-        </div>
       </div>
       {user?.displayName ? (
-        <ImageUpload
+        <TaskUpload
           userName={user.displayName}
           userAvatar="https://i.pravatar.cc/150?img=10"
         />
