@@ -1,13 +1,38 @@
 import React, { useState, useEffect } from "react";
 import "./Post.css";
-import Avatar from "@material-ui/core/Avatar";
+import { Avatar, Button, Modal, makeStyles } from "@material-ui/core";
 import firebase from "firebase";
 import { db } from "./firebase";
 
+function getModalStyle() {
+  const top = 50;
+  const left = 50;
+
+  return {
+    top: `${top}%`,
+    left: `${left}%`,
+    transform: `translate(-${top}%, -${left}%)`,
+  };
+}
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    position: "absolute",
+    width: 400,
+    backgroundColor: theme.palette.background.paper,
+    border: "2px solid #000",
+    boxShadow: theme.shadows[5],
+    padding: theme.spacing(2, 4, 3),
+  },
+}));
+
 function Post(props) {
-  const { postId, user, userAvatar, userName, imageURL, caption } = props;
+  const classes = useStyles();
+  const [modalStyle] = React.useState(getModalStyle);
+  const { postId, user, userAvatar, userName, fileURL, caption } = props;
   const [comments, setComments] = useState([]);
   const [comment, setComment] = useState("");
+  const [openEdit, setOpenEdit] = useState(false);
 
   useEffect(() => {
     let unsubscribe;
@@ -38,13 +63,35 @@ function Post(props) {
 
   return (
     <div className="post">
+      <Modal
+        open={openEdit}
+        onClose={() => setOpenEdit(false)}
+        aria-labelledby="simple-modal-title"
+      >
+        <div style={modalStyle} className={classes.paper}>
+          <form className="task_add">
+            <input
+              type="text"
+              placeholder="Enter a Caption..."
+              value={caption}
+              onChange={(e) => setCaption(e.target.value)}
+              />
+            <input type="file" onChange={handleChange} />
+            <Button variant="contained" color="primary" onClick={handleUpdate}>
+              Update
+            </Button>
+          </form>
+        </div>
+      </Modal>
       <div className="post_header">
         <Avatar className="post_avatar" alt={userName} src={userAvatar} />
         <h3>{userName}</h3>
         {/* header -> avatar -> username */}
+        <Button color="primary" variant="contained" size="small" onClick={() => setOpenEdit(true)} color="primary">Edit</Button>
+        <Button color="secondary" variant ="contained" size="small" onClick={event => db.collection('posts').doc(postId).delete()}>Delete</Button>
       </div>
 
-      <img className="post_image" src={imageURL} alt="username-avatar" />
+      <img className="post_image" src={fileURL} alt="username-avatar" />
       <h4 className="post_text">
         <strong>{userName}:</strong> {caption}
       </h4>
