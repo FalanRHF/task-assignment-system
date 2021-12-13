@@ -12,14 +12,14 @@ import { TextInput, Button, Text } from 'react-native-paper';
 
 
 const Register = ({ navigation }) => {
-  const [password, setpassword] = useState('')
-  const [client, setclient] = useState({})
-  const [registerStatus, setregisterStatus] = useState({})
+  const [password, setPassword] = useState('')
+  const [client, setClient] = useState({})
+  const [uid, setUid] = useState('')
 
   const setClientData = (key, value) => {
     var data = {};
     data[key] = value;
-    setclient({
+    setClient({
       ...client,
       ...data,
     })
@@ -28,12 +28,6 @@ const Register = ({ navigation }) => {
   //console.log(client)
 
   useEffect(() => {
-    setregisterStatus({
-      ...registerStatus,
-      fb: false,
-      client: false,
-      users: false,
-    })
     return () => {
       console.log(`Unmounting PreRegister.ClientRegister...`)
     }
@@ -46,7 +40,7 @@ const Register = ({ navigation }) => {
       await firebaseSignUp()
       await clientSignUp()
       await usersSignUp()
-      //navigation.popToTop()
+      navigation.navigate('PostRegister')
     } catch (error) {
       console.log(`onClientSignUp() error`)
       console.log(error)
@@ -72,10 +66,6 @@ const Register = ({ navigation }) => {
       try {
         const fbresult = await auth().
           console.log(`firebaseSignUp() success`)
-        setregisterStatus({
-          ...registerStatus,
-          fb: true,
-        })
         resolve(fbresult)
       } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
@@ -96,10 +86,7 @@ const Register = ({ navigation }) => {
         const fbresult = await auth()
           .createUserWithEmailAndPassword(client.email, password)
         console.log(`firebaseSignUp() success`)
-        setregisterStatus({
-          ...registerStatus,
-          fb: true,
-        })
+        const [uid, setUid] = useState('')
         resolve(fbresult)
       } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
@@ -118,18 +105,14 @@ const Register = ({ navigation }) => {
     return new Promise(async (resolve, reject) => {
       try {
         const getPostResponse = await axios.post(`http://localhost:5050/auth/register/client`, {
-          cl_uid: auth().currentUser.uid,
+          cl_uid: uid,
           cl_username: client.username,
           cl_fullname: client.fullname,
-          cl_email: client.email,
+          cl_email: client.email
         })
 
         console.log(`clientSignUp success`)
         console.log(`App.Login.PreRegister.ClientRegister.clientSignUp: ${JSON.stringify(getPostResponse.data)}`)
-        setregisterStatus({
-          ...registerStatus,
-          client: true,
-        })
         resolve(getPostResponse)
       } catch (error) {
         console.log(`ClientRegister.onClientSignUp.axios.post.client(): ${error}`)
@@ -143,15 +126,11 @@ const Register = ({ navigation }) => {
     return new Promise(async (resolve, reject) => {
       try {
         const getPostResponse = await axios.post(`http://localhost:5050/auth/register/users`, {
-          us_uid: auth().currentUser.uid,
+          us_uid: uid,
           us_type: 'client',
         })
         console.log(`userSignUp() success`)
         console.log(`App.Login.PreRegister.ClientRegister.usersSignUp: ${JSON.stringify(getPostResponse.data)}`)
-        setregisterStatus({
-          ...registerStatus,
-          users: true,
-        })
         resolve(getPostResponse)
       } catch (error) {
         console.log(`ClientRegister.onClientSignUp.axios.post(): ${error}`)
@@ -161,34 +140,33 @@ const Register = ({ navigation }) => {
   }
 
   return (
-    <View style={{ flex: 1, paddingHorizontal: 10, backgroundColor: '#232323' }}>
-      <TextInput
-        placeholder="Full Name"
-        label='Full Name'
-        mode='outlined' onChangeText={(fullname) => setClientData('fullname', fullname)}
-      />
-      <TextInput
-        placeholder="Username"
-        mode='outlined' onChangeText={(username) => setClientData('username', username)}
-      />
-      <TextInput
-        placeholder="Email Address"
-        mode='outlined' onChangeText={(email) => setClientData('email', email)}
-      />
-      <TextInput
-        placeholder="Password"
-        secureTextEntry={true}
-        mode='outlined' onChangeText={(password) => setpassword(password)}
-      />
-      {/* <TextInput
-        placeholder="Project Code"
-        mode='outlined' onChangeText={(pjcode) => setpjcode(pjcode)}
-      /> */}
-
-      <Button
-        mode="contained"
-        onPress={(e) => onSignUpButton(e)}
-      >Sign Up</Button>
+    <View style={{ flex: 1, paddingHorizontal: 15, backgroundColor: '#232323' }}>
+      <View style={{ marginVertical: 15 }}>
+        <TextInput
+          placeholder="Full Name"
+          label='Full Name'
+          mode='outlined' onChangeText={(fullname) => setClientData('fullname', fullname)}
+        />
+        <TextInput
+          placeholder="Username"
+          mode='outlined' onChangeText={(username) => setClientData('username', username)}
+        />
+        <TextInput
+          placeholder="Email Address"
+          mode='outlined' onChangeText={(email) => setClientData('email', email)}
+        />
+        <TextInput
+          placeholder="Password"
+          secureTextEntry={true}
+          mode='outlined' onChangeText={(password) => setPassword(password)}
+        />
+      </View>
+      <View style={{ marginVertical: 5 }}>
+        <Button
+          mode="contained"
+          onPress={(e) => onSignUpButton(e)}
+        >Sign Up</Button>
+      </View>
     </View>
   )
 }

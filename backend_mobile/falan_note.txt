@@ -1,0 +1,11 @@
+>> npm init -y //initialize node
+>>npm install expresss //install expresss
+create and config server.js as main connection with db
+>>node server.js //run server, ctrl+c to stop
+>>npm install dotenv //environment manager
+create .env file
+config .env import on server.js
+>>npm install nodemon //to auto restart server whenever save server.js
+config nodemon script in package.json
+now can start server with npm start
+>>npm start
