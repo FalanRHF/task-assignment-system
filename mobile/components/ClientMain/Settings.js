@@ -8,18 +8,29 @@ import firestore from '@react-native-firebase/firestore'
 import DropDownPicker from 'react-native-dropdown-picker';
 import DropdownMenu from 'react-native-dropdown-menu';
 
+import { useDispatch, useSelector } from 'react-redux'
+import { login, logout } from '../../redux/currentUser';
+
 
 const Settings = ({ navigation }) => {
+  console.log('Settings.js render...')
   const [client, setclient] = useState({ isLoading: true })
+  const currentUser = useSelector(state => state.currentUser.value)
+  const dispatch = useDispatch()
 
   useEffect(() => {
     navigation.setOptions({ title: 'Settings' })
     console.log(`Settings.useEffect: activated`)
+
+    // comment [S]
     const unsubscribe = navigation.addListener('focus', () => {
       console.log(`Home.useEffect.addListener.focus triggered`)
       getUserDetails()
     }
     );
+    //comment [E]
+
+    // comment [S]
     // const unsubscribe = () => {
     //   console.log(`${auth().currentUser.email} logging out!`)
     //   auth()
@@ -27,6 +38,7 @@ const Settings = ({ navigation }) => {
     //   getUserProfile()
     // }
     // return unsubscribe;
+    //comment [E]
   }, [navigation]);
 
   const getUserDetails = async () => {
@@ -47,16 +59,21 @@ const Settings = ({ navigation }) => {
   }
 
 
-  const onLogOut = () => {
+  const onLogOutButton = () => {
     auth()
       .signOut()
       .then(() => console.log('Settings.onLogOut: User signed out!'))
+    dispatch(logout())
   }
 
   if (client.isLoading) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Settings is loading...</Text>
+        <Button
+          mode="contained"
+          onPress={() => onLogOut()}
+        >Log Out</Button>
       </View>
     )
   }
@@ -67,36 +84,36 @@ const Settings = ({ navigation }) => {
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ flex: 4 }}>Full Name</Text>
           <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>{client.cl_fullname}</Text>
+          <Text style={{ flex: 13 }}>{currentUser.cl_fullname}</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ flex: 4 }}>Username</Text>
           <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>@{client.cl_username}</Text>
+          <Text style={{ flex: 13 }}>@{currentUser.cl_username}</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ flex: 4 }}>Email</Text>
           <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>{client.cl_email}</Text>
+          <Text style={{ flex: 13 }}>{currentUser.cl_email}</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ flex: 4 }}>Project</Text>
           <Text style={{ flex: 1 }}>||</Text>
           <Text style={{ flex: 13 }}>
-            {client.cl_curpj}
+            {currentUser.cl_curpj}
           </Text>
         </View>
       </View>
       <Button
         mode="outlined"
         onPress={() => navigation.navigate('EditProfile', {
-          username: client.cl_username
+          username: currentUser.cl_username
         })}
       >Edit Profile</Button>
       <View style={{ marginVertical: 2 }} />
       <Button
         mode="contained"
-        onPress={() => onLogOut()}
+        onPress={() => onLogOutButton()}
       >Log Out</Button>
     </View>
   )

@@ -6,7 +6,7 @@ import { TextInput, Text, Chip, FAB, Portal, Modal, Provider, Button } from 'rea
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { fetchClient } from '../../redux/actions';
+import { fetchClient } from '../../oldredux/actions';
 
 import firebase from 'firebase';
 import auth from '@react-native-firebase/auth';

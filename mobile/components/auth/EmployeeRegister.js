@@ -1,48 +1,43 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
+import { TextInput, Button, Text } from 'react-native-paper';
 import axios from 'axios';
 
-
-import firebase from '@react-native-firebase/app';
-
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
-import { TextInput, Button, Text } from 'react-native-paper';
 
+import { useDispatch } from 'react-redux'
+import { login } from '../../redux/currentUser';
 
 
 const Register = ({ navigation }) => {
   const [password, setPassword] = useState('')
-  const [client, setClient] = useState({})
+  const [employee, setEmployee] = useState({})
   const [uid, setUid] = useState('')
-
-  const setClientData = (key, value) => {
+  const setEmployeeData = (key, value) => {
     var data = {};
     data[key] = value;
-    setClient({
-      ...client,
+    setEmployee({
+      ...employee,
       ...data,
     })
   }
 
-  //console.log(client)
-
   useEffect(() => {
     return () => {
-      console.log(`Unmounting PreRegister.ClientRegister...`)
+      console.log(`Unmounting PreRegister.employeeRegister...`)
     }
   }, [])
 
   const onSignUpButton = async (e) => {
-    console.log(`onClientSignUp`)
+    console.log(`EmployeeRegister.onSignUpButton: called`)
     //e.preventDefault() //avoids auto go to App.js
     try {
       await firebaseSignUp()
-      await clientSignUp()
+      await employeeSignUp()
       await usersSignUp()
       navigation.navigate('PostRegister')
     } catch (error) {
-      console.log(`onClientSignUp() error`)
+      console.log(`EmployeeRegister.onSignUpButton: error`)
       console.log(error)
       // failedRegistration()
 
@@ -53,30 +48,11 @@ const Register = ({ navigation }) => {
     console.log(`failedRegistration`)
     try {
       await deleteFirebaseAccount()
-      await deleteClient()
+      await deleteEmployee()
       await deleteUsers()
     } catch (error) {
       console.log(error)
-
     }
-  }
-  const deleteFirebaseAccount = () => {
-    console.log(`deleteFirebaseAccount`)
-    return new Promise(async (resolve, reject) => {
-      try {
-        const fbresult = await auth().
-          console.log(`firebaseSignUp() success`)
-        resolve(fbresult)
-      } catch (error) {
-        if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use!');
-        }
-        if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid!');
-        }
-        reject(error)
-      }
-    });
   }
 
   const firebaseSignUp = () => {
@@ -84,9 +60,9 @@ const Register = ({ navigation }) => {
     return new Promise(async (resolve, reject) => {
       try {
         const fbresult = await auth()
-          .createUserWithEmailAndPassword(client.email, password)
+          .createUserWithEmailAndPassword(employee.email, password)
         console.log(`firebaseSignUp() success`)
-        const [uid, setUid] = useState('')
+        setUid(auth().currentUser.uid)
         resolve(fbresult)
       } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
@@ -100,22 +76,21 @@ const Register = ({ navigation }) => {
     });
   }
 
-  const clientSignUp = () => {
-    console.log(`clientSignUp`)
+  const employeeSignUp = () => {
+    console.log(`EmployeeRegister.employeeSignUp: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const getPostResponse = await axios.post(`http://localhost:5050/auth/register/client`, {
-          cl_uid: uid,
-          cl_username: client.username,
-          cl_fullname: client.fullname,
-          cl_email: client.email
+        const getPostResponse = await axios.post(`http://localhost:5050/auth/register/employee`, {
+          em_uid: uid,
+          em_fullname: 'Employee',
+          em_username: employee.username,
+          em_email: employee.email
         })
 
-        console.log(`clientSignUp success`)
-        console.log(`App.Login.PreRegister.ClientRegister.clientSignUp: ${JSON.stringify(getPostResponse.data)}`)
+        console.log(`App.Login.PreRegister.employeeRegister.employeeSignUp: ${JSON.stringify(getPostResponse.data)}`)
         resolve(getPostResponse)
       } catch (error) {
-        console.log(`ClientRegister.onClientSignUp.axios.post.client(): ${error}`)
+        console.log(`employeeRegister.onemployeeSignUp.axios.post.employee(): ${error}`)
         reject(error)
       }
     });
@@ -127,16 +102,16 @@ const Register = ({ navigation }) => {
       try {
         const getPostResponse = await axios.post(`http://localhost:5050/auth/register/users`, {
           us_uid: uid,
-          us_type: 'client',
+          us_type: 'employee',
         })
-        console.log(`userSignUp() success`)
-        console.log(`App.Login.PreRegister.ClientRegister.usersSignUp: ${JSON.stringify(getPostResponse.data)}`)
+        console.log(`usersSignUp = success`)
+        console.log(`App.Login.PreRegister.employeeRegister.usersSignUp: ${JSON.stringify(getPostResponse.data)}`)
         resolve(getPostResponse)
       } catch (error) {
-        console.log(`ClientRegister.onClientSignUp.axios.post(): ${error}`)
+        console.log(`employeeRegister.onEmployeeSignUp.axios.post(): ${error}`)
         reject(error)
       }
-    });
+    })
   }
 
   return (
@@ -145,15 +120,15 @@ const Register = ({ navigation }) => {
         <TextInput
           placeholder="Full Name"
           label='Full Name'
-          mode='outlined' onChangeText={(fullname) => setClientData('fullname', fullname)}
+          mode='outlined' onChangeText={(fullname) => setEmployeeData('fullname', fullname)}
         />
         <TextInput
           placeholder="Username"
-          mode='outlined' onChangeText={(username) => setClientData('username', username)}
+          mode='outlined' onChangeText={(username) => setEmployeeData('username', username)}
         />
         <TextInput
           placeholder="Email Address"
-          mode='outlined' onChangeText={(email) => setClientData('email', email)}
+          mode='outlined' onChangeText={(email) => setEmployeeData('email', email)}
         />
         <TextInput
           placeholder="Password"

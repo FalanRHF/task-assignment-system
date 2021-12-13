@@ -7,11 +7,11 @@ import auth from '@react-native-firebase/auth'
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
-import { fetchClient } from '../redux/actions/index'
+import { fetchClient } from '../oldredux/actions/index'
 
-import HomeComponent from './main/Home'
-import SettingsComponent from './main/Settings'
-import CompletedComponent from './main/Completed'
+import HomeComponent from './ClientMain/Home'
+import SettingsComponent from './ClientMain/Settings'
+import CompletedComponent from './ClientMain/Completed'
 import { createStackNavigator } from '@react-navigation/stack';
 
 const Tab = createBottomTabNavigator();

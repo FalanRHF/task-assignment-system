@@ -4,13 +4,12 @@ import { StyleSheet, View, Text, TouchableOpacity, FlatList } from 'react-native
 import { Button } from 'react-native-paper';
 import { useFocusEffect } from '@react-navigation/native';
 
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { fetchClient } from '../../redux/actions';
-
 import firebase from 'firebase';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
+
+//redux
+import { useSelector } from 'react-redux'
 
 const Separator = () => (
   <View style={styles.separator} />
@@ -18,21 +17,11 @@ const Separator = () => (
 
 let pendingTicket = []
 
-
-//     try {
-//       const getPendingResponse = await axios.get(`http://192.168.68.109:5050/ticket/getpending/${this.state.pjcode}`)
-//       pendingTicket = getPendingResponse.data
-//     } catch (error) {
-//       console.log(`getPending(): ${error}`)
-
-
-
 const Home = ({ navigation }) => {
   const [curpjcode, setcurpjcode] = useState('')
   const [isLoading, setisLoading] = useState(true)
   const [pendingTicket, setpendingTicket] = useState([])
-
-  //console.log(`Home.js rendering...`)
+  const currentUser = useSelector(state => state.currentUser.value)
 
   useEffect(() => {
     navigation.setOptions({ title: 'Home' })
@@ -49,14 +38,13 @@ const Home = ({ navigation }) => {
     console.log(`Home.init: called`)
     try {
       const pjcode = await getCurrentPjcode()
-      if (pjcode != null) {
+      if (currentUser.cl_curpj != null) {
         navigation.setOptions({ title: `Home (${pjcode})` })
         const res = await getPending(pjcode)
       }
       else {
         navigation.setOptions({ title: `Home` })
       }
-      //console.log(`Home.init: pendingticket=${pendingTicket}`)
     } catch (error) {
       console.log(`Home.init: ERROR`)
       console.log(error.message)
@@ -87,7 +75,7 @@ const Home = ({ navigation }) => {
     return new Promise(async (resolve, reject) => {
       try {
         console.log(`Project Code: ${pjcode}`)
-        const res = await axios.get(`http://localhost:5050/helpdesk/pendingticket/${pjcode}`)
+        const res = await axios.get(`http://localhost:5050/helpdesk/pendingticket/${currentUser.cl_curpj}`)
         // let pendingarray = []
         // res.forEach(ticket => {
         //   pendingarray.push(ticket.data())
