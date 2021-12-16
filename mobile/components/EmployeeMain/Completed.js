@@ -1,23 +1,23 @@
-import axios from 'axios';
-import React, { Component, useState, useEffect } from 'react'
-import { StyleSheet, Button, View, Text, TouchableOpacity, FlatList } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
+import React, { useEffect } from 'react';
+import { View, Button } from 'react-native';
 
-import firebase from 'firebase';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import { utils } from '@react-native-firebase/app';
+import storage from '@react-native-firebase/storage';
 
-const Separator = () => (
-  <View style={styles.separator} />
-);
-
-let completedTicket = []
-
-const Completed = ({ navigation }) => {
+const Completed = () => {
+  // create bucket storage reference to not yet existing image
+  const reference = storage().ref('black-t-shirt-sm.png');
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignContent: 'center' }}>
-      <Text>Employee Completed</Text>
+    <View>
+      <Button
+        onPress={async () => {
+          // path to existing file on filesystem
+          const pathToFile = `${utils.FilePath.PICTURES_DIRECTORY}/black-t-shirt-sm.png`;
+          // uploads file
+          await reference.putFile(pathToFile);
+        }}
+      />
     </View>
   );
 }

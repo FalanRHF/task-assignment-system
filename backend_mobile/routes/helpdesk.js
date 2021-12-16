@@ -19,7 +19,7 @@ routes.get("/pendingticket/:pjcode", async (req, res) => {
   try {
     console.log(`GET url: ${req.originalUrl}`)
     const { pjcode } = req.params;
-    const queryString = `SELECT tc_id,tc_title,tc_status FROM ticket WHERE tc_id LIKE '${pjcode}%' AND (tc_status = 'PENDING' OR tc_status = 'IN PROGRESS') ORDER BY tc_createdat DESC`
+    const queryString = `SELECT tc_id,tc_title,tc_status,tc_createdat FROM ticket WHERE tc_id LIKE '${pjcode}%' AND (tc_status = 'PENDING' OR tc_status = 'IN PROGRESS') ORDER BY tc_createdat DESC`
     console.log(queryString)
     const query = await db.query(queryString);
 
@@ -35,7 +35,7 @@ routes.get("/completedticket/:pjcode", async (req, res) => {
   try {
     console.log(`GET url: ${req.originalUrl}`)
     const { pjcode } = req.params;
-    const queryString = `SELECT tc_id,tc_title,tc_status FROM ticket WHERE tc_id LIKE '${pjcode}%' AND tc_status = 'RESOLVED' ORDER BY tc_createdat DESC`
+    const queryString = `SELECT tc_id,tc_title,tc_createdat,tc_status FROM ticket WHERE tc_id LIKE '${pjcode}%' AND tc_status = 'RESOLVED' ORDER BY tc_createdat DESC`
     console.log(queryString)
     const query = await db.query(queryString);
 

@@ -1,7 +1,8 @@
 import React, { Component, useEffect } from 'react'
 import { View, Text, Button } from 'react-native';
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons'
+import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
 import auth from '@react-native-firebase/auth'
 
@@ -14,7 +15,7 @@ import SettingsComponent from './ClientMain/Settings'
 import CompletedComponent from './ClientMain/Completed'
 import { createStackNavigator } from '@react-navigation/stack';
 
-const Tab = createBottomTabNavigator();
+const Tab = createMaterialBottomTabNavigator();
 const HomeStack = createStackNavigator();
 const CompletedStack = createStackNavigator();
 const SettingsStack = createStackNavigator();
@@ -65,11 +66,30 @@ const Main = ({ navigation }) => {
   }, [])
 
   return (
-    <Tab.Navigator>
+    <Tab.Navigator
+      initialRouteName="Home"
+      activeColor="white"
+      inactiveColor="black"
+      barStyle={{ backgroundColor: '#f4b120' }}>
       <Tab.Screen name="Home" component={HomeScreen}
-        options={{ tabBarLabel: 'Home!' }} icon='home' />
-      <Tab.Screen name="Completed" component={CompletedScreen} />
-      <Tab.Screen name="Settings" component={SettingsScreen} />
+        options={{
+          tabBarLabel: 'HOME',
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons name="home" color={color} size={26} />
+          ),
+        }} />
+      <Tab.Screen name="Completed" component={CompletedScreen} options={{
+        tabBarLabel: 'COMPLETED',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="check-circle" color={color} size={26} />
+        ),
+      }} />
+      <Tab.Screen name="Settings" component={SettingsScreen} options={{
+        tabBarLabel: 'SETTINGS',
+        tabBarIcon: ({ color }) => (
+          <MaterialCommunityIcons name="cog" color={color} size={26} />
+        ),
+      }} />
     </Tab.Navigator>
   )
 }

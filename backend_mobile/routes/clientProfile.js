@@ -18,8 +18,9 @@ routes.get('/dumbo', (req, res) => {
 routes.post("/updatedetails", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
-    const { cl_uid, cl_fullname, cl_username } = req.body
-    const queryString = `UPDATE client SET cl_fullname='${cl_fullname}',cl_username='${cl_username}' WHERE cl_uid='${cl_uid}' RETURNING *`
+    const { cl_uid, cl_fullname, cl_username, cl_curpj, cl_pjcode } = req.body
+    console.log(req.body)
+    const queryString = `UPDATE client SET cl_fullname='${cl_fullname}', cl_username='${cl_username}', cl_curpj='${cl_curpj}',cl_pjcode='${cl_pjcode}' WHERE cl_uid='${cl_uid}' RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);

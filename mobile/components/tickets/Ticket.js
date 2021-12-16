@@ -19,7 +19,6 @@ const Ticket = ({ route, navigation }) => {
     setCreatedat(ticket.tc_createdat)
     setStatus(ticket.tc_status)
     console.log(`init() called`)
-    navigation.setOptions({ title: route.params.tc_id })
   }
 
   // useEffect(() => {
@@ -32,7 +31,11 @@ const Ticket = ({ route, navigation }) => {
   // }, [navigation])
 
   useEffect(() => {
-    navigation.setOptions({ title: route.params.tc_id })
+    navigation.setOptions({
+      title: route.params.tc_id, headerTitleStyle: {
+        fontSize: 16
+      },
+    })
     const unsubscribe = navigation.addListener('focus', loadTicket);
 
     return unsubscribe;
@@ -78,10 +81,6 @@ const Ticket = ({ route, navigation }) => {
   const renderButton = () => {
     if (ticket.tc_status == 'PENDING') {
       return (
-        // <View>
-        //   <Button title='Delete' onPress={() => { console.log('Delete pressed'); deleteTicket(); }} />
-        //   <Button color='#f4b120' title='Change Status to "In Progress" (testing mode)' onPress={() => { console.log('Change pressed'); changeTicketStatus('IN PROGRESS'); }} />
-        // </View>
         <View>
           <Button
             mode="contained"
@@ -92,7 +91,6 @@ const Ticket = ({ route, navigation }) => {
               });
             }}
           >Edit Ticket</Button>
-          {/* <Button color='#f4b120' title='Change Status to "In Progress" (testing mode)' onPress={() => { console.log('Change pressed'); changeTicketStatus('IN PROGRESS'); }} /> */}
           <Button
             mode="outlined"
             onPress={() => { console.log('Change pressed'); changeTicketStatus('IN PROGRESS'); }}
@@ -103,12 +101,10 @@ const Ticket = ({ route, navigation }) => {
     else if (ticket.tc_status == 'IN PROGRESS') {
       return (
         <View>
-          {/* <Button color='#f4b120' title='Change Status to "Pending" (testing mode)' onPress={() => { console.log('Change pressed'); changeTicketStatus('PENDING'); }} /> */}
           <Button
             mode="outlined"
             onPress={() => { console.log('Change pressed'); changeTicketStatus('PENDING'); }}
           >Change Status to "Pending"</Button>
-          {/* <Button color='#123456' title='Change Status to "Resolved" (testing mode)' onPress={() => { console.log('Change pressed'); changeTicketStatus('RESOLVED'); }} /> */}
           <Button
             mode="outlined"
             onPress={() => { console.log('Change pressed'); changeTicketStatus('RESOLVED'); }}
@@ -132,40 +128,36 @@ const Ticket = ({ route, navigation }) => {
   }
 
   return (
-    <View>
-      <View style={{ marginVertical: 20 }}>
+    <View style={{ margin: 10 }}>
+      <View style={{ borderWidth: 0.5, borderRadius: 5, borderColor: 'grey', marginVertical: 5 }}>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 4 }}>Ticket ID</Text>
-          <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>{ticket.tc_id}</Text>
+          <Text style={{ ...styles.tableItem, flex: 1, borderTopLeftRadius: 5 }}>TICKET ID</Text>
+          <Text style={{ ...styles.tableItem, flex: 2, borderTopRightRadius: 5 }}>{ticket.tc_id}</Text>
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
+          <Text style={{ ...styles.tableItem, flex: 1 }}>PROJECT CODE</Text>
+          <Text style={{ ...styles.tableItem, flex: 2 }}>{ticket.tc_pjcode}</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 4 }}>Project Code</Text>
-          <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>{ticket.tc_pjcode}</Text>
+          <Text style={{ ...styles.tableItem, flex: 1 }}>TITLE</Text>
+          <Text style={{ ...styles.tableItem, flex: 2 }}>{ticket.tc_title}</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 4 }}>Title</Text>
-          <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>{ticket.tc_title}</Text>
+          <Text style={{ ...styles.tableItem, flex: 1 }}>DETAILS</Text>
+          <Text style={{ ...styles.tableItem, flex: 2 }}>{ticket.tc_detail}</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 4 }}>Details</Text>
-          <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>{ticket.tc_detail}</Text>
+          <Text style={{ ...styles.tableItem, flex: 1 }}>CREATED AT</Text>
+          <Text style={{ ...styles.tableItem, flex: 2 }}>{ticket.tc_createdat.substr(6, 2)}/{ticket.tc_createdat.substr(4, 2)}/{ticket.tc_createdat.substr(0, 4)} {ticket.tc_createdat.substr(8, 2)}:{ticket.tc_createdat.substr(10, 2)}:{ticket.tc_createdat.substr(12, 2)}</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 4 }}>Created At</Text>
-          <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>{ticket.tc_createdat.substr(6, 2)}/{ticket.tc_createdat.substr(4, 2)}/{ticket.tc_createdat.substr(0, 4)} {ticket.tc_createdat.substr(8, 2)}:{ticket.tc_createdat.substr(10, 2)}:{ticket.tc_createdat.substr(12, 2)}</Text>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 4 }}>Status</Text>
-          <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>{ticket.tc_status}</Text>
+          <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>STATUS</Text>
+          <Text style={{ ...styles.tableItem, flex: 2, borderBottomRightRadius: 5 }}>{ticket.tc_status}</Text>
         </View>
       </View>
-      {renderButton()}
+      <View style={{ marginVertical: 10 }}>
+        {renderButton()}
+      </View>
     </View>
   )
 }
@@ -188,14 +180,11 @@ const styles = StyleSheet.create({
     borderBottomColor: '#737373',
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
-  item: {
-    padding: 20,
-    marginVertical: 8,
-    marginHorizontal: 16,
-    backgroundColor: '#ffffff',
-    borderColor: '#000000',
-    borderWidth: 1,
-    borderRadius: 50
+  tableItem: {
+    padding: 5,
+    borderColor: 'grey',
+    borderWidth: 0.5,
+    fontSize: 12,
   },
   button: {
     marginVertical: 20,
