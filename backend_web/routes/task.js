@@ -120,8 +120,8 @@ routes.post("/deleteticket", async (req, res) => {
 routes.post("/updateticketdetails", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
-    const { tc_id, tc_title, tc_detail } = req.body;
-    const queryString = `UPDATE ticket SET tc_title = '${tc_title}',tc_detail = '${tc_detail}'  WHERE tc_id = '${tc_id}' RETURNING *`
+    const { ta_id, ta_title, ta_description } = req.body;
+    const queryString = `UPDATE ticket SET ta_title = '${ta_title}',ta_description = '${ta_description}'  WHERE ta_id = '${ta_id}' RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);
