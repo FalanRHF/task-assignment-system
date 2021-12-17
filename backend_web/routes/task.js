@@ -61,11 +61,11 @@ routes.get('/dumbo', (req, res) => {
 //   }
 // });
 
-routes.get("/getticketdata/:taid", async (req, res) => {
+routes.get("/gettaskdata/:taid", async (req, res) => {
   try {
     console.log(`GET url: ${req.originalUrl}`)
     const { taid } = req.params;
-    const queryString = `SELECT * FROM ticket WHERE ta_id = '${taid}'`
+    const queryString = `SELECT * FROM task WHERE ta_id = '${taid}'`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);
@@ -75,7 +75,7 @@ routes.get("/getticketdata/:taid", async (req, res) => {
   }
 });
 
-routes.post("/postnewticket", async (req, res) => {
+routes.post("/postnewtask", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
     const { ta_id, ta_title, ta_description, ta_assignto, ta_createdat, ta_status, ta_duedate, ta_fileurl } = req.body;
@@ -89,11 +89,11 @@ routes.post("/postnewticket", async (req, res) => {
   }
 });
 
-routes.post("/updateticketstatus", async (req, res) => {
+routes.post("/updatetaskstatus", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
     const { ta_id, newStatus } = req.body;
-    const queryString = `UPDATE ticket SET ta_status = '${newStatus}' WHERE ta_id = '${ta_id}' RETURNING *`
+    const queryString = `UPDATE task SET ta_status = '${newStatus}' WHERE ta_id = '${ta_id}' RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);
@@ -103,11 +103,11 @@ routes.post("/updateticketstatus", async (req, res) => {
   }
 });
 
-routes.post("/deleteticket", async (req, res) => {
+routes.post("/deletetask", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
     const { ta_id } = req.body;
-    const queryString = `DELETE FROM ticket WHERE ta_id = '${ta_id}' RETURNING *`
+    const queryString = `DELETE FROM task WHERE ta_id = '${ta_id}' RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);
@@ -117,11 +117,11 @@ routes.post("/deleteticket", async (req, res) => {
   }
 });
 
-routes.post("/updateticketdetails", async (req, res) => {
+routes.post("/updatetaskdetails", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
     const { ta_id, ta_title, ta_description } = req.body;
-    const queryString = `UPDATE ticket SET ta_title = '${ta_title}',ta_description = '${ta_description}'  WHERE ta_id = '${ta_id}' RETURNING *`
+    const queryString = `UPDATE task SET ta_title = '${ta_title}',ta_description = '${ta_description}'  WHERE ta_id = '${ta_id}' RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);
