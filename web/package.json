@@ -5,17 +5,10 @@
   "version": "1.0.0",
   "private": false,
   "scripts": {
-    "eslint": "eslint ./src",
-    "eslint-fix": "eslint --fix ./src",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "lint": "eslint ./",
-    "lint-fix": "eslint ./ --fix"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
+    "eject": "react-scripts eject"
   },
   "browserslist": {
     "production": [
@@ -52,8 +45,5 @@
     "react-scripts": "^4.0.3",
     "uuid": "^8.3.0",
     "yup": "^0.32.9"
-  },
-  "devDependencies": {
-    "eslint-config-airbnb": "^18.2.1"
   }
 }
