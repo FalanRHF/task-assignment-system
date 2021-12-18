@@ -18,13 +18,6 @@ import { useSelector } from 'react-redux';
 import { current } from '@reduxjs/toolkit';
 
 
-const Separator = () => (
-  <View style={styles.separator} />
-);
-
-let completedTicket = []
-
-
 const Home = ({ navigation }) => {
   const isFocused = useIsFocused()
   const [curpjcode, setcurpjcode] = useState('')
@@ -138,7 +131,7 @@ const Home = ({ navigation }) => {
                   onPress={() => navigation.navigate('Ticket', {
                     tc_id: item.tc_id
                   })}
-                  style={{ ...styles.item, borderColor: 'green' }}>
+                  style={{ ...styles.item, borderColor: '#4dc43b' }}>
                   <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.tc_title}</Text>
                   <Text style={{ fontSize: 10 }}>{item.tc_createdat.substr(6, 2) + '-' + item.tc_createdat.substr(4, 2) + '-' + item.tc_createdat.substr(0, 4) + ' ' + item.tc_createdat.substr(8, 2) + ':' + item.tc_createdat.substr(10, 2)}</Text>
                 </TouchableOpacity>
@@ -176,7 +169,7 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     marginHorizontal: 16,
     backgroundColor: '#ffffff',
-    borderWidth: 5,
+    borderWidth: 2.5,
     borderRadius: 10,
     elevation: 4,
   },

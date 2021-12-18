@@ -1,6 +1,6 @@
 import axios from 'axios';
 import React, { Component, useState, useEffect } from 'react'
-import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, View, SafeAreaView, TouchableOpacity, FlatList } from 'react-native';
 import { Button, Divider, Text } from 'react-native-paper';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
@@ -115,24 +115,24 @@ const Home = ({ navigation }) => {
         <View style={{ backgroundColor: '#f4b210', alignItems: 'center', paddingVertical: 2 }}>
           <Text style={{ fontSize: 12, fontWeight: 'bold' }}>Project Code: {currentUser.cl_curpj}</Text>
         </View>
-        <View style={{ marginHorizontal: 16 }}>
+        <View style={{ marginHorizontal: 16, flex: 1 }}>
           <View style={{ alignItems: 'center', paddingVertical: 30 }}>
             <Button
               mode="contained"
               onPress={() => navigation.navigate('NewTicket', {
-                code: curpjcode,
+                code: currentUser.cl_curpj,
               })}>Add New Ticket</Button>
           </View>
           <Divider style={{ borderWidth: 0.5, borderColor: 'grey' }} />
-          <View style={{ paddingTop: 20, paddingBottom: 100 }}>
-            <FlatList style={{ paddingBottom: 0 }}
+          <View style={{ flex: 1, marginVertical: 0 }}>
+            <FlatList style={{ flex: 1, marginBottom: 0, borderWidth: 0 }}
               data={pendingTicket}
               renderItem={({ item }) => (
                 <TouchableOpacity
                   onPress={() => navigation.navigate('Ticket', {
                     tc_id: item.tc_id
                   })}
-                  style={{ ...styles.item, borderColor: item.tc_status == 'IN PROGRESS' ? '#f2bc46' : 'white' }}>
+                  style={{ ...styles.item, borderColor: item.tc_status == 'IN PROGRESS' ? '#f2bc46' : '#e0e0e0' }}>
                   <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.tc_title}</Text>
                   <Text style={{ fontSize: 10 }}>{item.tc_createdat.substr(6, 2) + '-' + item.tc_createdat.substr(4, 2) + '-' + item.tc_createdat.substr(0, 4) + ' ' + item.tc_createdat.substr(8, 2) + ':' + item.tc_createdat.substr(10, 2)}</Text>
                 </TouchableOpacity>
@@ -167,10 +167,10 @@ const styles = StyleSheet.create({
   },
   item: {
     padding: 10,
-    marginVertical: 8,
-    marginHorizontal: 16,
+    marginVertical: 7.5,
+    marginHorizontal: 5,
     backgroundColor: '#ffffff',
-    borderWidth: 5,
+    borderWidth: 2.5,
     borderRadius: 10,
     elevation: 4,
   },
