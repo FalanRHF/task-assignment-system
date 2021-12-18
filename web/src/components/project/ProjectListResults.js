@@ -1,4 +1,3 @@
-import "./TaskListResults.css"
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
@@ -45,45 +44,45 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TaskListResults = ({ tasks, ...rest }) => {
-  // const [selectedtaskIds, setSelectedtaskIds] = useState([]);
+const ProjectListResults = ({ projects, ...rest }) => {
+  // const [selectedprojectIds, setSelectedprojectIds] = useState([]);
   const classes = useStyles();
   const [modalStyle] = React.useState(getModalStyle);
-  const [selectedtaskIds] = useState([]);
+  const [selectedprojectIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  const [openTask, setOpenTask] = useState(false);
+  const [openproject, setOpenproject] = useState(false);
 
   // const handleSelectAll = (event) => {
-  //   let newSelectedtaskIds;
+  //   let newSelectedprojectIds;
 
   //   if (event.target.checked) {
-  //     newSelectedtaskIds = tasks.map((task) => task.id);
+  //     newSelectedprojectIds = projects.map((project) => project.id);
   //   } else {
-  //     newSelectedtaskIds = [];
+  //     newSelectedprojectIds = [];
   //   }
 
-  //   setSelectedtaskIds(newSelectedtaskIds);
+  //   setSelectedprojectIds(newSelectedprojectIds);
   // };
 
   // const handleSelectOne = (event, id) => {
-  //   const selectedIndex = selectedtaskIds.indexOf(id);
-  //   let newSelectedtaskIds = [];
+  //   const selectedIndex = selectedprojectIds.indexOf(id);
+  //   let newSelectedprojectIds = [];
 
   //   if (selectedIndex === -1) {
-  //     newSelectedtaskIds = newSelectedtaskIds.concat(selectedtaskIds, id);
+  //     newSelectedprojectIds = newSelectedprojectIds.concat(selectedprojectIds, id);
   //   } else if (selectedIndex === 0) {
-  //     newSelectedtaskIds = newSelectedtaskIds.concat(selectedtaskIds.slice(1));
-  //   } else if (selectedIndex === selectedtaskIds.length - 1) {
-  //     newSelectedtaskIds = newSelectedtaskIds.concat(selectedtaskIds.slice(0, -1));
+  //     newSelectedprojectIds = newSelectedprojectIds.concat(selectedprojectIds.slice(1));
+  //   } else if (selectedIndex === selectedprojectIds.length - 1) {
+  //     newSelectedprojectIds = newSelectedprojectIds.concat(selectedprojectIds.slice(0, -1));
   //   } else if (selectedIndex > 0) {
-  //     newSelectedtaskIds = newSelectedtaskIds.concat(
-  //       selectedtaskIds.slice(0, selectedIndex),
-  //       selectedtaskIds.slice(selectedIndex + 1)
+  //     newSelectedprojectIds = newSelectedprojectIds.concat(
+  //       selectedprojectIds.slice(0, selectedIndex),
+  //       selectedprojectIds.slice(selectedIndex + 1)
   //     );
   //   }
 
-  //   setSelectedtaskIds(newSelectedtaskIds);
+  //   setSelectedprojectIds(newSelectedprojectIds);
   // };
 
   const handleLimitChange = (event) => {
@@ -97,30 +96,22 @@ const TaskListResults = ({ tasks, ...rest }) => {
   return (
   <div>
     <Modal
-        open={openTask}
-        onClose={() => setOpenTask(false)}
+        open={openproject}
+        onClose={() => setOpenproject(false)}
         aria-labelledby="simple-modal-title"
       >
       <div style={modalStyle} className={classes.paper}>
-        <FormControl className="add_task">
-          <input type="text" placeholder="Enter task title"/>
-          <label>
-            Assign To:
-            <select value='Ahmad'>
-              <option value='Ali'>Ali</option>
-              <option value='Abu'>Abu</option>
-              <option value='Ah Chong'>Ah Chong</option>
-            </select>
-          </label>
-          <input type="text" placeholder="Enter task description"/>
-          <input type="file"/>
+        <FormControl className="add_project">
+          <input type="text" placeholder="Enter project name"/>
+          <input type="text" placeholder="Enter client name"/>
+          <input type="text" placeholder="Enter client contact number"/>
           <Button variant="contained" color="primary">Upload</Button>
         </FormControl>
       </div>
     </Modal>
 
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
-    <Button variant="contained" onClick={() => setOpenTask(true)} color="primary">Add Task</Button>
+    <Button variant="contained" onClick={() => setOpenproject(true)} color="primary">Add Project</Button>
     </Box>
 
       <Card {...rest}>
@@ -131,40 +122,40 @@ const TaskListResults = ({ tasks, ...rest }) => {
                 <TableRow>
                   <TableCell padding="checkbox">
                     {/* <Checkbox
-                      checked={selectedtaskIds.length === tasks.length}
+                      checked={selectedprojectIds.length === projects.length}
                       color="primary"
                       indeterminate={
-                        selectedtaskIds.length > 0
-                        && selectedtaskIds.length < tasks.length
+                        selectedprojectIds.length > 0
+                        && selectedprojectIds.length < projects.length
                       }
                       onChange={handleSelectAll}
                     /> */}
                   </TableCell>
                   <TableCell>
-                    Title
+                    Project Name
                   </TableCell>
                   <TableCell>
-                    Assigned to
+                    Client Name
                   </TableCell>
                   <TableCell>
-                    Status
+                    Contact Number
                   </TableCell>
                   <TableCell>
-                    Due Date
+                    Date Created
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {tasks.slice(0, limit).map((task) => (
+                {projects.slice(0, limit).map((project) => (
                   <TableRow
                     hover
-                    key={task.id}
-                    selected={selectedtaskIds.indexOf(task.id) !== -1}
+                    key={project.id}
+                    selected={selectedprojectIds.indexOf(project.id) !== -1}
                   >
                     <TableCell padding="checkbox">
                       {/* <Checkbox
-                        checked={selectedtaskIds.indexOf(task.id) !== -1}
-                        onChange={(event) => handleSelectOne(event, task.id)}
+                        checked={selectedprojectIds.indexOf(project.id) !== -1}
+                        onChange={(event) => handleSelectOne(event, project.id)}
                         value="true"
                       /> */}
                     </TableCell>
@@ -176,27 +167,27 @@ const TaskListResults = ({ tasks, ...rest }) => {
                         }}
                       >
                         {/* <Avatar
-                          src={task.avatarUrl}
+                          src={project.avatarUrl}
                           sx={{ mr: 2 }}
                         >
-                          {getInitials(task.name)}
+                          {getInitials(project.name)}
                         </Avatar> */}
                         <Typography
                           color="textPrimary"
                           variant="body1"
                         >
-                          {task.name}
+                          {project.name}
                         </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
-                      {task.email}
+                      {project.email}
                     </TableCell>
                     <TableCell>
-                      {task.status}
+                      {project.phone}
                     </TableCell>
                     <TableCell>
-                      {moment(task.createdAt).format('DD/MM/YYYY')}
+                      {moment(project.createdAt).format('DD/MM/YYYY')}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -206,7 +197,7 @@ const TaskListResults = ({ tasks, ...rest }) => {
         </PerfectScrollbar>
         <TablePagination
           component="div"
-          count={tasks.length}
+          count={projects.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -218,8 +209,8 @@ const TaskListResults = ({ tasks, ...rest }) => {
   );
 };
 
-TaskListResults.propTypes = {
-  tasks: PropTypes.array.isRequired
+ProjectListResults.propTypes = {
+  projects: PropTypes.array.isRequired
 };
 
-export default TaskListResults;
+export default ProjectListResults;
