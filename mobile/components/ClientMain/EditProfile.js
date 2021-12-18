@@ -1,6 +1,8 @@
 import axios from 'axios';
 import React, { Component, useState, useEffect } from 'react'
-import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, FlatList, useIsFocus } from 'react-native';
+
+import { useIsFocused } from '@react-navigation/native';
 
 import { TextInput, Text, Chip, FAB, Portal, Modal, Provider, Button } from 'react-native-paper';
 
@@ -8,30 +10,37 @@ import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
 import { fetchClient } from '../../oldredux/actions';
 
+import { useSelector, useDispatch } from 'react-redux';
+import { setUser } from '../../redux/currentUser';
+
 import firebase from 'firebase';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 import Ticket from '../tickets/Ticket';
 
-const EditProfile = ({ route, navigation, __filename }) => {
+const EditProfile = ({ navigation }) => {
   console.log(`EditProfile rendering...`)
-  const [client, setclient] = useState({ isLoading: true })
-  const [pjcode, setpjcode] = useState([])
-  const uid = auth().currentUser.uid
+  const isFocused = useIsFocused()
+  const currentUser = useSelector(state => state.currentUser.value)
+  const dispatch = useDispatch()
+  const [loaded, setIsLoaded] = useState(false)
+  const [client, setClient] = useState(currentUser)
+  const [projectCodes, setProjectCodes] = useState(currentUser.cl_pjcode)
+  const [currentCode, setcurrentCode] = useState(currentUser.cl_curpj)
   const [rerender, setrerender] = useState(false)
-  const [modalVisible, setModalVisible] = React.useState(false);
-  const [newProject, setnewProject] = useState('')
+  const [modalVisible, setModalVisible] = useState(false);
+  const [newProject, setNewProject] = useState('')
 
   const showModal = () => setModalVisible(true);
   const hideModal = () => setModalVisible(false);
   const containerStyle = { backgroundColor: 'white', padding: 10 };
 
-
   useEffect(() => {
-    navigation.setOptions({ title: `@${route.params.username}` })
-    const unsubscribe = navigation.addListener('focus', getUserDetails);
-    return unsubscribe;
-  }, [navigation]);
+    setIsLoaded(true)
+    // navigation.setOptions({ title: `@${route.params.username}` })
+    // const unsubscribe = navigation.addListener('focus', getUserDetails);
+    // return setIsLoaded(false);
+  }, [isFocused]);
 
   const getUserDetails = async () => {
     console.log(`EditProfile.getUserDetails: called`)
@@ -39,10 +48,9 @@ const EditProfile = ({ route, navigation, __filename }) => {
     try {
       const axiosGetResponse = await axios.get(`http://localhost:5050/auth/getdata/client/${uid}`)
       console.log(`${JSON.stringify(axiosGetResponse.data[0])}`)
-      setclient({
+      setClient({
         ...client,
         ...axiosGetResponse.data[0],
-        isLoading: false,
       })
       console.log(`EditProfile.getUserDetails: PJCodes=${JSON.stringify(axiosGetResponse.data[0].cl_pjcode)}`)
       setpjcode(axiosGetResponse.data[0].cl_pjcode)
@@ -58,11 +66,14 @@ const EditProfile = ({ route, navigation, __filename }) => {
     console.log(`EditProfile.updateUserProfile: called`)
     try {
       const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/updatedetails`, {
-        cl_uid: uid,
+        cl_uid: client.cl_uid,
         cl_fullname: client.cl_fullname,
         cl_username: client.cl_username,
+        cl_curpj: client.cl_curpj,
+        cl_pjcode: `{${JSON.stringify(client.cl_pjcode).slice(1, -1)}}`
       })
       console.log(`EditProfile.updateUserProfile`)
+      dispatch(setUser(client))
     } catch (error) {
       console.log(`EditProfile.updateUserProfile: [ERROR] ${error}`)
     }
@@ -71,152 +82,163 @@ const EditProfile = ({ route, navigation, __filename }) => {
 
   const changeCurrentPjcode = async (pjcode) => {
     console.log(`EditProfile.changeCurrentPjcode: called`)
-    try {
-      const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/changeproject`, {
-        cl_uid: uid,
-        cl_curpj: pjcode,
-      })
-      console.log(`EditProfile.changeCurrentPjcode: axiosPostResponse=${axiosPostResponse.data[0]}`)
-    } catch (error) {
-      console.log(`EditProfile.changeCurrentPjcode: [ERROR] ${error}`)
-    }
-    getUserDetails()
-
+    setClient({
+      ...client,
+      cl_curpj: pjcode
+    })
+    // try {
+    //   const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/changeproject`, {
+    //     cl_uid: uid,
+    //     cl_curpj: pjcode,
+    //   })
+    //   console.log(`EditProfile.changeCurrentPjcode: axiosPostResponse=${axiosPostResponse.data[0]}`)
+    //   dispatch(setUser({ cl_curpj: pjcode }))
+    // } catch (error) {
+    //   console.log(`EditProfile.changeCurrentPjcode: [ERROR] ${error}`)
+    // }
+    // getUserDetails()
   }
 
   const addNewProject = async () => {
     console.log(`EditProfile.addNewProject: called`)
-    const newArrayProject = [...client.cl_pjcode, newProject]
-    try {
-      const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/updateproject`, {
-        cl_uid: uid,
-        cl_pjcode: newArrayProject,
-      })
-      console.log(`EditProfile.addNewProject: axiosPostResponse=${axiosPostResponse.data[0]}`)
-      setnewProject('')
-    } catch (error) {
-      console.log(`EditProfile.addNewProject: [ERROR] ${error}`)
-    }
+    const newArray = [...client.cl_pjcode, newProject]
+    newArray.sort()
+    setClient({
+      ...client,
+      cl_pjcode: newArray
+    })
+    // setNewProject('')
+    // try {
+    //   const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/updateproject`, {
+    //     cl_uid: uid,
+    //     cl_pjcode: newArrayProject,
+    //   })
+    //   console.log(`EditProfile.addNewProject: axiosPostResponse=${axiosPostResponse.data[0]}`)
+    //   setNewProject('')
+    // } catch (error) {
+    //   console.log(`EditProfile.addNewProject: [ERROR] ${error}`)
+    // }
     hideModal()
-    getUserDetails()
+    // getUserDetails()
   }
-
-  const name = (params) => {
-
-  }
-
 
   const deleteProject = async (e) => {
     console.log(`EditProfile.deleteProject: called`)
-    let oldArray = [...client.cl_pjcode,]
+    var oldArray = [...client.cl_pjcode,]
+    var newArray = []
     var index = oldArray.indexOf(e)
     if (index !== -1) {
       oldArray.splice(index, 1);
       newArray = [...oldArray,]
     }
-    try {
-      const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/updateproject`, {
-        cl_uid: uid,
-        cl_pjcode: newArray,
-      })
-      console.log(`EditProfile.deleteProject: axiosPostResponse=${axiosPostResponse.data[0]}`)
-    } catch (error) {
-      console.log(`EditProfile.deleteProject: [ERROR] ${error}`)
-    }
-    getUserDetails()
+    setClient({
+      ...client,
+      cl_pjcode: newArray
+    })
+    // try {
+    //   const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/updateproject`, {
+    //     cl_uid: uid,
+    //     cl_pjcode: newArray,
+    //   })
+    //   console.log(`EditProfile.deleteProject: axiosPostResponse=${axiosPostResponse.data[0]}`)
+    //   dispatch(setUser({ cl_pjcode: newArray }))
+    // } catch (error) {
+    //   console.log(`EditProfile.deleteProject: [ERROR] ${error}`)
+    // }
+    // getUserDetails()
   }
 
-
   return (
-    <Provider>
+    <View style={{ flex: 1, margin: 10 }}>
+      {/* </Provider> */}
       <View>
-        <View>
-          <View style={styles.row}>
-            <Text style={{
-              flex: 2, alignSelf: 'center'
-            }}>Full Name</Text>
-            <TextInput
-              style={{ flex: 7 }}
-              placeholder="Full Name"
-              mode='outlined'
-              value={client.cl_fullname}
-              onChangeText={(fullname) => setclient({
-                ...client,
-                cl_fullname: fullname,
-              })}
-            />
-          </View>
-          <View style={styles.row}>
-            <Text style={{
-              flex: 2, alignSelf: 'center'
-            }}>Username</Text>
-            <TextInput
-              placeholder="Username"
-              style={{ flex: 7, marginBottom: 4 }}
-              mode='outlined'
-              value={client.cl_username}
-              onChangeText={(username) => setclient({
-                ...client,
-                cl_username: username,
-              })}
-            />
-          </View>
-          <View style={styles.row}>
-            <Text style={{
-              flex: 2, alignSelf: 'center'
-            }}>Projects</Text>
-            <View style={{ flex: 7, flexDirection: 'row', flexWrap: 'wrap' }}>
-              {
-                pjcode.map((pj, index) => {
-                  return (
-                    <Chip
-                      style={{ ...styles.chip, alignItems: 'center' }}
-                      key={index}
-                      mode='flat'
-                      selected={pj == client.cl_curpj}
-                      disabled={pj == client.cl_curpj}
-                      onPress={() => changeCurrentPjcode(pj)}
-                      onClose={() => { pj == client.cl_curpj ? console.log(`close pressed`) : deleteProject(pj) }}
-                    >
-                      {/* <Text style={styles.chipText}>{pj}</Text> */}
-                      {pj}
-                    </Chip>
+        <View style={{ marginVertical: 5 }}>
+          <TextInput
+            label='FULL NAME'
+            placeholder="FULL NAME"
+            mode='outlined'
+            value={client.cl_fullname}
+            onChangeText={(fullname) => setClient({
+              ...client,
+              cl_fullname: fullname,
+            })}
+          />
+        </View>
+        <View style={{ marginVertical: 5 }}>
+          <TextInput
+            label='USERNAME'
+            placeholder="USERNAME"
+            mode='outlined'
+            value={client.cl_username}
+            onChangeText={(username) => setClient({
+              ...client,
+              cl_username: username,
+            })}
+          />
+        </View>
+        <View style={{ marginVertical: 10 }}><Text style={{
+          alignSelf: 'center'
+        }}>PROJECTS</Text>
 
-                  )
-                })
-              }
+          {/* <View style={{ ...styles.row, marginVertical: 5 }}> */}
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+            {
+              client.cl_pjcode.map((pj, index) => {
+                return (
+                  <Chip
+                    style={{ ...styles.chip }}
+                    key={index}
+                    mode='flat'
+                    selected={pj == client.cl_curpj}
+                    disabled={pj == client.cl_curpj}
+                    onPress={() => changeCurrentPjcode(pj)}
+                    onClose={() => { pj == client.cl_curpj ? console.log(`close pressed`) : deleteProject(pj) }}
+                  >
+                    {/* <Text style={styles.chipText}>{pj}</Text> */}
+                    {pj}
+                  </Chip>
 
-              <FAB
-                style={{ ...styles.chip, ...styles.fab }}
-                small icon='plus' onPress={showModal} />
-
-            </View>
+                )
+              })
+            }
+            <FAB
+              style={{ ...styles.chip, ...styles.fab }}
+              small icon='plus' onPress={showModal} />
+            {/* </View> */}
           </View>
         </View>
-
-        <Button
-          mode="contained"
-          onPress={() => updateUserProfile()}>Update Profile
-        </Button>
       </View>
+      <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 10 }}><Button
+        mode="contained"
+        onPress={() => updateUserProfile()}>Update Profile
+      </Button>
+      </View>
+
+
       <Portal>
         <Modal visible={modalVisible} onDismiss={hideModal} contentContainerStyle={containerStyle}>
-          <View style={{ flexDirection: 'column' }}>
-            <TextInput
-              style={{ marginBottom: 10 }}
-              placeholder="Project Code"
-              mode='outlined'
-              onChangeText={(newpj) => setnewProject(newpj)}
-            />
-            <Button
-              mode="contained"
-              onPress={() => addNewProject()}>Add Project</Button>
+          <View style={{ margin: 1 }}>
+            <View style={{ marginVertical: 3 }}>
+              <TextInput
+                label='PROJECT CODE'
+                placeholder="PROJECT CODE"
+                mode='outlined'
+                onChangeText={(newpj) => setNewProject(newpj)}
+              />
+            </View>
+            <View style={{ marginVertical: 3 }}>
+              <Button
+                mode="contained"
+                onPress={() => addNewProject()}>Add Project</Button>
+            </View>
           </View>
         </Modal>
       </Portal>
-    </Provider>
+      {/* </Provider> */}
+    </View >
   )
 }
+
 
 const styles = StyleSheet.create({
   container: {
@@ -232,16 +254,16 @@ const styles = StyleSheet.create({
   chip: {
     borderColor: "#000000",
     borderWidth: 1,
-    marginVertical: 2,
-    marginHorizontal: 2
+    marginVertical: 1,
+    marginHorizontal: 1
   },
   chipText: {
     color: "#000000"
   },
   fab: {
-    backgroundColor: '#56b7cc',
-    height: 35,
-    width: 35,
+    backgroundColor: '#56b700',
+    height: 30,
+    width: 30,
     alignItems: 'center',
     justifyContent: 'center'
   }

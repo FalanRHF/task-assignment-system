@@ -5,9 +5,6 @@ import axios from 'axios';
 
 import auth from '@react-native-firebase/auth';
 
-import { useDispatch } from 'react-redux'
-import { login } from '../../redux/currentUser';
-
 
 const Register = ({ navigation }) => {
   const [password, setPassword] = useState('')

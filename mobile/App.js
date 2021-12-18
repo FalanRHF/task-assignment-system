@@ -11,7 +11,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import { configureStore } from "@reduxjs/toolkit";
 import { Provider, useSelector, useDispatch } from "react-redux"
-import currentUserReducer, { logout } from "./redux/currentUser"
+import currentUserReducer, { resetUser } from "./redux/currentUser"
 
 import LandingScreen from './components/auth/Landing';
 import PreRegisterScreen from './components/auth/PreRegister';
@@ -68,14 +68,14 @@ const NetsinityApp = () => {
         auth()
           .signOut()
           .then(() => console.log('App.signOut: User signed out!'))
-        dispatch(logout())
+        dispatch(resetUser())
       }
       else {
         console.log(`No users currently logged in...`)
       }
     }
     setLoaded(true)
-  }, [loaded])
+  }, [])
 
 
   if (!loaded) {
@@ -96,7 +96,6 @@ const NetsinityApp = () => {
         <Stack.Screen name="ClientRegister" component={ClientRegisterScreen} options={{ headerTitle: 'Client Registration' }} />
         <Stack.Screen name="EmployeeRegister" component={EmployeeRegisterScreen} options={{ headerTitle: 'Employee Registration' }} />
         <Stack.Screen name="PostRegister" component={PostRegisterScreen} options={{ headerShown: false }} />
-        {/* <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} /> */}
       </Stack.Navigator>
     )
   }

@@ -13,27 +13,28 @@ import firestore from '@react-native-firebase/firestore';
 const NewTicket = ({ route, navigation }) => {
   const [title, settitle] = useState('')
   const [detail, setdetail] = useState('')
-  const [pjcode, setpjcode] = useState(route.params.code)
-  const [ticket, setTicket] = useState([])
+  const pjcode = route.params.code
+  // const [ticket, setTicket] = useState([])
 
   // useEffect(() => {
   //   return () => {}
   // }, [])
 
-  const setTicketData = (key, value) => {
-    var data = {};
-    data[key] = value;
-    setTicket({
-      ...ticket,
-      ...data,
-    })
-  }
+  // const setTicketData = (key, value) => {
+  //   var data = {};
+  //   data[key] = value;
+  //   setTicket({
+  //     ...ticket,
+  //     ...data,
+  //   })
+  // }
 
   const getCurrentDate = () => {
     console.log(`NewTicket.onSubmitTicket.getCurrentDate: called`)
     return new Promise((resolve, reject) => {
       var now = new Date()
-      now.setTime(now.getTime() + 8 * 60 * 60 * 1000)
+      var additionalHours = 0
+      now.setTime(now.getTime() + (additionalHours * 60 * 60 * 1000))
       var y = now.getFullYear()
       var m = now.getMonth() + 1
       var d = now.getDate()
@@ -108,21 +109,29 @@ const NewTicket = ({ route, navigation }) => {
 
 
   return (
-    <View>
-      <TextInput
-        placeholder="Title"
-        mode='outlined'
-        onChangeText={(title) => settitle(title)}
-      />
-      <TextInput
-        placeholder="Detail"
-        mode='outlined'
-        onChangeText={(detail) => setdetail(detail)}
-      />
-      <Button
-        mode="contained"
-        onPress={() => onSubmitTicket()}
-      >Submit</Button>
+    <View style={{ flex: 1, margin: 10 }}>
+      <View style={{ marginVertical: 5 }}>
+        <TextInput
+          label='TITLE'
+          placeholder="TITLE"
+          mode='outlined'
+          onChangeText={(title) => settitle(title)}
+        />
+      </View>
+      <View style={{ marginVertical: 5 }}>
+        <TextInput
+          label='DETAILS'
+          placeholder="DETAILS"
+          mode='outlined'
+          onChangeText={(detail) => setdetail(detail)}
+        />
+      </View>
+      <View style={{ marginVertical: 10 }}>
+        <Button
+          mode="contained"
+          onPress={() => onSubmitTicket()}
+        >Submit</Button>
+      </View>
     </View>
   )
 }

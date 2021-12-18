@@ -9,7 +9,7 @@ import firestore from '@react-native-firebase/firestore';
 import { NavigationContainer } from '@react-navigation/native';
 
 import { useDispatch } from 'react-redux'
-import { login } from '../../redux/currentUser';
+import { setUser } from '../../redux/currentUser';
 
 
 const Login = ({ navigation }) => {
@@ -30,7 +30,7 @@ const Login = ({ navigation }) => {
       } else {
         console.log(`Login.onLoginButton.userType error: neither 'client' nor 'employee`)
       }
-      dispatch(login({ ...userDetails, type: userType, loggedin: true }))
+      dispatch(setUser({ ...userDetails, type: userType, loggedin: true }))
     } catch (error) {
       console.log(error)
     }

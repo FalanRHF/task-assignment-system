@@ -1,5 +1,5 @@
 import React, { Component, useState, useEffect } from 'react'
-import { View, Text } from 'react-native';
+import { StyleSheet, View, Text } from 'react-native';
 import { Button } from 'react-native-paper';
 import axios from 'axios'
 import auth from '@react-native-firebase/auth'
@@ -9,37 +9,38 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import DropdownMenu from 'react-native-dropdown-menu';
 
 import { useDispatch, useSelector } from 'react-redux'
-import { login, logout } from '../../redux/currentUser';
+import { setUser, resetUser } from '../../redux/currentUser';
 
 
 const Settings = ({ navigation }) => {
   console.log('Settings.js render...')
-  const [client, setclient] = useState({ isLoading: true })
   const currentUser = useSelector(state => state.currentUser.value)
   const dispatch = useDispatch()
+  const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
     navigation.setOptions({ title: 'Settings' })
     console.log(`Settings.useEffect: activated`)
 
     // comment [S]
-    const unsubscribe = navigation.addListener('focus', () => {
-      console.log(`Home.useEffect.addListener.focus triggered`)
-      getUserDetails()
-    }
-    );
-    //comment [E]
-
-    // comment [S]
-    // const unsubscribe = () => {
-    //   console.log(`${auth().currentUser.email} logging out!`)
-    //   auth()
-    //     .signOut()
-    //   getUserProfile()
+    // const unsubscribe = navigation.addListener('focus', () => {
+    //   console.log(`Home.useEffect.addListener.focus triggered`)
+    //   getUserDetails
     // }
+    // );
+    // //comment [E]
+
+    // // comment [S]
+    // // const unsubscribe = () => {
+    // //   console.log(`${auth().currentUser.email} logging out!`)
+    // //   auth()
+    // //     .signOut()
+    // //   getUserProfile()
+    // // }
     // return unsubscribe;
-    //comment [E]
-  }, [navigation]);
+    // //comment [E]
+    setLoaded(true)
+  }, []);
 
   const getUserDetails = async () => {
     console.log(`Settings.getUserDetails: called`)
@@ -58,67 +59,80 @@ const Settings = ({ navigation }) => {
     }
   }
 
-
   const onLogOutButton = () => {
     auth()
       .signOut()
       .then(() => console.log('Settings.onLogOut: User signed out!'))
-    dispatch(logout())
+    dispatch(resetUser())
   }
 
-  if (client.isLoading) {
+  if (!loaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Settings is loading...</Text>
         <Button
           mode="contained"
-          onPress={() => onLogOut()}
+          onPress={() => onLogOutButton()}
         >Log Out</Button>
+      </View>
+    )
+  } else {
+    return (
+      <View style={{ flex: 1, margin: 10 }}>
+        <View style={{ borderWidth: 0.5, borderRadius: 5, borderColor: 'grey', marginVertical: 5 }}>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.tableItem, flex: 1, borderTopLeftRadius: 5 }}>FULL NAME</Text>
+            <Text style={{ ...styles.tableItem, flex: 2, borderTopRightRadius: 5 }}>{currentUser.cl_fullname}</Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.tableItem, flex: 1 }}>USERNAME</Text>
+            <Text style={{ ...styles.tableItem, flex: 2 }}>@{currentUser.cl_username}</Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.tableItem, flex: 1 }}>EMAIL</Text>
+            <Text style={{ ...styles.tableItem, flex: 2 }}>{currentUser.cl_email}</Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>CURRENT PROJECT CODE</Text>
+            <Text style={{ ...styles.tableItem, flex: 2, borderBottomRightRadius: 5 }}>
+              {currentUser.cl_curpj}
+            </Text>
+          </View>
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 10 }}>
+          <Button
+            mode="contained"
+            onPress={() => navigation.navigate('EditProfile', {
+              username: currentUser.cl_username
+            })}
+          >Edit Profile</Button>
+          <Button
+            mode="contained"
+            onPress={() => onLogOutButton()}
+          >Log Out</Button>
+        </View>
       </View>
     )
   }
 
-  return (
-    <View style={{ flex: 1 }}>
-      <View style={{ marginVertical: 20 }}>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 4 }}>Full Name</Text>
-          <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>{currentUser.cl_fullname}</Text>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 4 }}>Username</Text>
-          <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>@{currentUser.cl_username}</Text>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 4 }}>Email</Text>
-          <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>{currentUser.cl_email}</Text>
-        </View>
-        <View style={{ flexDirection: 'row' }}>
-          <Text style={{ flex: 4 }}>Project</Text>
-          <Text style={{ flex: 1 }}>||</Text>
-          <Text style={{ flex: 13 }}>
-            {currentUser.cl_curpj}
-          </Text>
-        </View>
-      </View>
-      <Button
-        mode="outlined"
-        onPress={() => navigation.navigate('EditProfile', {
-          username: currentUser.cl_username
-        })}
-      >Edit Profile</Button>
-      <View style={{ marginVertical: 2 }} />
-      <Button
-        mode="contained"
-        onPress={() => onLogOutButton()}
-      >Log Out</Button>
-    </View>
-  )
-
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    marginHorizontal: 16,
+  },
+  title: {
+    fontSize: 22,
+  },
+  tableItem: {
+    padding: 5,
+    borderColor: 'grey',
+    borderWidth: 0.5,
+    fontSize: 12,
+  },
+});
 
 export default Settings
 
