@@ -6,7 +6,7 @@ import TaskList from './pages/TaskList';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
-import ProductList from './pages/ProductList';
+import ProjectList from './pages/ProjectList';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
 
@@ -18,7 +18,7 @@ const routes = [
       { path: 'account', element: <Account /> },
       { path: 'tasks', element: <TaskList /> },
       { path: 'dashboard', element: <Dashboard /> },
-      { path: 'products', element: <ProductList /> },
+      { path: 'projects', element: <ProjectList /> },
       { path: 'settings', element: <Settings /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]

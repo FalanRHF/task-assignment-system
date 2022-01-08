@@ -15,6 +15,7 @@ import {
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
   Typography,
   Modal,
 } from '@material-ui/core';
@@ -36,7 +37,7 @@ function getModalStyle() {
 const useStyles = makeStyles((theme) => ({
   paper: {
     position: "absolute",
-    width: 500,
+    width: 700,
     backgroundColor: theme.palette.background.paper,
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
@@ -44,46 +45,57 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CustomerListResults = ({ customers, ...rest }) => {
-  // const [selectedCustomerIds, setSelectedCustomerIds] = useState([]);
+const TaskListResults = ({ tasks, ...rest }) => {
+  // const [selectedtaskIds, setSelectedtaskIds] = useState([]);
   const classes = useStyles();
   const [modalStyle] = React.useState(getModalStyle);
-  const [selectedCustomerIds] = useState([]);
+  const [selectedtaskIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [openTask, setOpenTask] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [assignTo, setAssignTo] = useState('');
+  const [filePath, setFilepath] = useState(null);
+  const [duedate, setDuedate] = useState('');
 
   // const handleSelectAll = (event) => {
-  //   let newSelectedCustomerIds;
+  //   let newSelectedtaskIds;
 
   //   if (event.target.checked) {
-  //     newSelectedCustomerIds = customers.map((customer) => customer.id);
+  //     newSelectedtaskIds = tasks.map((task) => task.id);
   //   } else {
-  //     newSelectedCustomerIds = [];
+  //     newSelectedtaskIds = [];
   //   }
 
-  //   setSelectedCustomerIds(newSelectedCustomerIds);
+  //   setSelectedtaskIds(newSelectedtaskIds);
   // };
 
   // const handleSelectOne = (event, id) => {
-  //   const selectedIndex = selectedCustomerIds.indexOf(id);
-  //   let newSelectedCustomerIds = [];
+  //   const selectedIndex = selectedtaskIds.indexOf(id);
+  //   let newSelectedtaskIds = [];
 
   //   if (selectedIndex === -1) {
-  //     newSelectedCustomerIds = newSelectedCustomerIds.concat(selectedCustomerIds, id);
+  //     newSelectedtaskIds = newSelectedtaskIds.concat(selectedtaskIds, id);
   //   } else if (selectedIndex === 0) {
-  //     newSelectedCustomerIds = newSelectedCustomerIds.concat(selectedCustomerIds.slice(1));
-  //   } else if (selectedIndex === selectedCustomerIds.length - 1) {
-  //     newSelectedCustomerIds = newSelectedCustomerIds.concat(selectedCustomerIds.slice(0, -1));
+  //     newSelectedtaskIds = newSelectedtaskIds.concat(selectedtaskIds.slice(1));
+  //   } else if (selectedIndex === selectedtaskIds.length - 1) {
+  //     newSelectedtaskIds = newSelectedtaskIds.concat(selectedtaskIds.slice(0, -1));
   //   } else if (selectedIndex > 0) {
-  //     newSelectedCustomerIds = newSelectedCustomerIds.concat(
-  //       selectedCustomerIds.slice(0, selectedIndex),
-  //       selectedCustomerIds.slice(selectedIndex + 1)
+  //     newSelectedtaskIds = newSelectedtaskIds.concat(
+  //       selectedtaskIds.slice(0, selectedIndex),
+  //       selectedtaskIds.slice(selectedIndex + 1)
   //     );
   //   }
 
-  //   setSelectedCustomerIds(newSelectedCustomerIds);
+  //   setSelectedtaskIds(newSelectedtaskIds);
   // };
+
+  const handleChange = (e) => {
+    if (e.target.files[0]) {
+      setFilepath(e.target.files[0]);
+    }
+  };
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -91,6 +103,44 @@ const CustomerListResults = ({ customers, ...rest }) => {
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
+  };
+
+  const getCurrentDate = () => {
+    console.log(`NewTicket.onSubmitTicket.getCurrentDate: called`)
+    return new Promise((resolve, reject) => {
+      var now = new Date()
+      now.setTime(now.getTime() + 8 * 60 * 60 * 1000)
+      var y = now.getFullYear()
+      var m = now.getMonth() + 1
+      var d = now.getDate()
+      var hh = now.getHours()
+      var mm = now.getMinutes()
+      var ss = now.getSeconds()
+      var date = '' + y + (m < 10 ? '0' : '') + m + (d < 10 ? '0' : '') + d + (hh < 10 ? '0' : '') + hh + (mm < 10 ? '0' : '') + mm + (ss < 10 ? '0' : '') + ss
+      if (date.length == 14) {
+        console.log(`NewTicket.onSubmitTicket.getCurrentDate: resolve(${date})`)
+        resolve(date)
+      } else {
+        reject(new Error('date.length != 14'))
+      }
+    })
+  }
+
+  const submitForm = async e => {
+    e.preventDefault();
+    try {
+      const body = { title, description, assignTo, duedate, filePath };
+      const response = await fetch("http://localhost:5000/postnewtask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      window.location = "/";
+    } catch (err) {
+      console.error(err.message);
+    }
+    setOpenTask(false);
   };
 
   return (
@@ -102,24 +152,30 @@ const CustomerListResults = ({ customers, ...rest }) => {
       >
       <div style={modalStyle} className={classes.paper}>
         <form className="add_task">
-          <input type="text" placeholder="Enter task title"/>
+          <label>Task Title:</label>
+          <input type="text" placeholder="Enter task title" value={title} onChange={e => setTitle(e.target.value)}/>
           <label>
             Assign To:
-            <select value='Ahmad'>
-              <option value='Ali'>Ali</option>
-              <option value='Abu'>Abu</option>
-              <option value='Ah Chong'>Ah Chong</option>
+            <select value={assignTo} onChange={e => setAssignTo(e.target.value)}>
+              <option value={'Ali'}>Ali</option>
+              <option value={'Abu'}>Abu</option>
+              <option value={'Ah Chong'}>Ah Chong</option>
             </select>
           </label>
-          <input type="text" placeholder="Status"/>
-          <input type="text" placeholder="Enter task description"/>
-          <input type="file"/>
-          <Button variant="contained" color="primary">Upload</Button>
+          <label>Task Description:</label>
+          <input type="text" placeholder="Enter task description" value={description} onChange={e => setDescription(e.target.value)}/>
+          <label>Attachment:</label>
+          <input type="file" value={filePath} onChange={handleChange}/>
+          <label>Due Date:</label>
+          <input type="date" value={duedate} onChange={e => setDuedate(e.target.value)}/>
+          <Button variant="contained" color="primary" onClick={submitForm}>Upload</Button>
         </form>
       </div>
     </Modal>
 
+    <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
     <Button variant="contained" onClick={() => setOpenTask(true)} color="primary">Add Task</Button>
+    </Box>
 
       <Card {...rest}>
         <PerfectScrollbar>
@@ -129,11 +185,11 @@ const CustomerListResults = ({ customers, ...rest }) => {
                 <TableRow>
                   <TableCell padding="checkbox">
                     {/* <Checkbox
-                      checked={selectedCustomerIds.length === customers.length}
+                      checked={selectedtaskIds.length === tasks.length}
                       color="primary"
                       indeterminate={
-                        selectedCustomerIds.length > 0
-                        && selectedCustomerIds.length < customers.length
+                        selectedtaskIds.length > 0
+                        && selectedtaskIds.length < tasks.length
                       }
                       onChange={handleSelectAll}
                     /> */}
@@ -153,16 +209,16 @@ const CustomerListResults = ({ customers, ...rest }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {customers.slice(0, limit).map((customer) => (
+                {tasks.slice(0, limit).map((task) => (
                   <TableRow
                     hover
-                    key={customer.id}
-                    selected={selectedCustomerIds.indexOf(customer.id) !== -1}
+                    key={task.id}
+                    selected={selectedtaskIds.indexOf(task.id) !== -1}
                   >
                     <TableCell padding="checkbox">
                       {/* <Checkbox
-                        checked={selectedCustomerIds.indexOf(customer.id) !== -1}
-                        onChange={(event) => handleSelectOne(event, customer.id)}
+                        checked={selectedtaskIds.indexOf(task.id) !== -1}
+                        onChange={(event) => handleSelectOne(event, task.id)}
                         value="true"
                       /> */}
                     </TableCell>
@@ -174,27 +230,27 @@ const CustomerListResults = ({ customers, ...rest }) => {
                         }}
                       >
                         {/* <Avatar
-                          src={customer.avatarUrl}
+                          src={task.avatarUrl}
                           sx={{ mr: 2 }}
                         >
-                          {getInitials(customer.name)}
+                          {getInitials(task.name)}
                         </Avatar> */}
                         <Typography
                           color="textPrimary"
                           variant="body1"
                         >
-                          {customer.name}
+                          {task.name}
                         </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
-                      {customer.email}
+                      {task.email}
                     </TableCell>
                     <TableCell>
-                      {customer.status}
+                      {task.status}
                     </TableCell>
                     <TableCell>
-                      {moment(customer.createdAt).format('DD/MM/YYYY')}
+                      {moment(task.createdAt).format('DD/MM/YYYY')}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -204,7 +260,7 @@ const CustomerListResults = ({ customers, ...rest }) => {
         </PerfectScrollbar>
         <TablePagination
           component="div"
-          count={customers.length}
+          count={tasks.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -216,8 +272,8 @@ const CustomerListResults = ({ customers, ...rest }) => {
   );
 };
 
-CustomerListResults.propTypes = {
-  customers: PropTypes.array.isRequired
+TaskListResults.propTypes = {
+  tasks: PropTypes.array.isRequired
 };
 
-export default CustomerListResults;
+export default TaskListResults;

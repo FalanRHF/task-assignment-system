@@ -1,12 +1,12 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
-import TaskListResults from '../components/task/TaskListResults';
-import tasks from '../__mocks__/tasks';
+import ProjectListResults from '../components/project/ProjectListResults';
+import projects from '../__mocks__/projects';
 
-const TaskList = () => (
+const ProjectList = () => (
   <>
     <Helmet>
-      <title>Task</title>
+      <title>Project</title>
     </Helmet>
     <Box
       sx={{
@@ -17,11 +17,11 @@ const TaskList = () => (
     >
       <Container maxWidth={false}>
         <Box sx={{ pt: 3 }}>
-          <TaskListResults tasks={tasks} />
+          <ProjectListResults projects={projects} />
         </Box>
       </Container>
     </Box>
   </>
 );
 
-export default TaskList;
+export default ProjectList;

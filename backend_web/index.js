@@ -9,25 +9,25 @@ app.use(express.json()); //req.body
 
 //ROUTES//
 
-//create a todo
+//create a task
 
-app.post("/todos", async (req, res) => {
+app.post("/postnewtask", async (req, res) => {
     try {
-        const { description } = req.body;
-        const newTodo = await pool.query(
-        "INSERT INTO todo (description) VALUES($1) RETURNING *",
-        [description]
-        );
-
-        res.json(newTodo.rows[0]);
+      const { title, description, assignTo, duedate, filePath } = req.body;
+      const newTask = await pool.query(
+        "INSERT INTO task (ta_title,ta_description,ta_assignto,ta_duedate,ta_fileurl) VALUES($1,$2,$3,$4,$5,$6,$7) RETURNING *",
+        [title, description, assignTo, duedate, filePath]
+      );
+  
+      res.json(newTask.rows[0]);
     } catch (err) {
-        console.error(err.message);
+      console.error(err.message);
     }
-});
+  });
 
- //get all todos
+ //get all tasks
 
-app.get("/todos", async (req, res) => {
+app.get("/tasks", async (req, res) => {
     try {
         const allTodos = await pool.query("SELECT * FROM todo");
         res.json(allTodos.rows);
@@ -36,9 +36,9 @@ app.get("/todos", async (req, res) => {
     }
 });
 
- //get a todo
+ //get a task
 
-app.get("/todos/:id", async (req, res) => {
+app.get("/tasks/:id", async (req, res) => {
     try {
         const { id } = req.params;
         const todo = await pool.query("SELECT * FROM todo WHERE todo_id = $1", [
@@ -51,7 +51,7 @@ app.get("/todos/:id", async (req, res) => {
     }
 });
 
- //update a todo
+ //update a task
 
 app.put("/todos/:id", async (req, res) => {
     try {
@@ -68,7 +68,7 @@ app.put("/todos/:id", async (req, res) => {
     }
     });
 
- //delete a todo
+ //delete a task
 
 app.delete("/todos/:id", async (req, res) => {
     try {
@@ -81,10 +81,6 @@ app.delete("/todos/:id", async (req, res) => {
         console.log(err.message);
     }
 });
-
-//done todo
-
-
 
 app.listen(5000, () => {
     console.log("server has started on port 5000");
