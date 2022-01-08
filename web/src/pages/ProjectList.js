@@ -6,7 +6,7 @@ import projects from '../__mocks__/projects';
 const ProjectList = () => (
   <>
     <Helmet>
-      <title>Task</title>
+      <title>Project</title>
     </Helmet>
     <Box
       sx={{

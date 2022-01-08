@@ -1,3 +1,4 @@
+import "./ProjectListResults.css"
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
@@ -105,7 +106,7 @@ const ProjectListResults = ({ projects, ...rest }) => {
           <input type="text" placeholder="Enter project name"/>
           <input type="text" placeholder="Enter client name"/>
           <input type="text" placeholder="Enter client contact number"/>
-          <Button variant="contained" color="primary">Upload</Button>
+          <Button variant="contained" color="primary">Add</Button>
         </FormControl>
       </div>
     </Modal>

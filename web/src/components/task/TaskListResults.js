@@ -9,13 +9,13 @@ import {
   Button,
   Card,
   // Checkbox,
-  FormControl,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
   Typography,
   Modal,
 } from '@material-ui/core';
@@ -37,7 +37,7 @@ function getModalStyle() {
 const useStyles = makeStyles((theme) => ({
   paper: {
     position: "absolute",
-    width: 500,
+    width: 700,
     backgroundColor: theme.palette.background.paper,
     border: "2px solid #000",
     boxShadow: theme.shadows[5],
@@ -53,6 +53,11 @@ const TaskListResults = ({ tasks, ...rest }) => {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
   const [openTask, setOpenTask] = useState(false);
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [assignTo, setAssignTo] = useState('');
+  const [filePath, setFilepath] = useState(null);
+  const [duedate, setDuedate] = useState('');
 
   // const handleSelectAll = (event) => {
   //   let newSelectedtaskIds;
@@ -86,12 +91,56 @@ const TaskListResults = ({ tasks, ...rest }) => {
   //   setSelectedtaskIds(newSelectedtaskIds);
   // };
 
+  const handleChange = (e) => {
+    if (e.target.files[0]) {
+      setFilepath(e.target.files[0]);
+    }
+  };
+
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
   };
 
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
+  };
+
+  const getCurrentDate = () => {
+    console.log(`NewTicket.onSubmitTicket.getCurrentDate: called`)
+    return new Promise((resolve, reject) => {
+      var now = new Date()
+      now.setTime(now.getTime() + 8 * 60 * 60 * 1000)
+      var y = now.getFullYear()
+      var m = now.getMonth() + 1
+      var d = now.getDate()
+      var hh = now.getHours()
+      var mm = now.getMinutes()
+      var ss = now.getSeconds()
+      var date = '' + y + (m < 10 ? '0' : '') + m + (d < 10 ? '0' : '') + d + (hh < 10 ? '0' : '') + hh + (mm < 10 ? '0' : '') + mm + (ss < 10 ? '0' : '') + ss
+      if (date.length == 14) {
+        console.log(`NewTicket.onSubmitTicket.getCurrentDate: resolve(${date})`)
+        resolve(date)
+      } else {
+        reject(new Error('date.length != 14'))
+      }
+    })
+  }
+
+  const submitForm = async e => {
+    e.preventDefault();
+    try {
+      const body = { title, description, assignTo, duedate, filePath };
+      const response = await fetch("http://localhost:5000/postnewtask", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+
+      window.location = "/";
+    } catch (err) {
+      console.error(err.message);
+    }
+    setOpenTask(false);
   };
 
   return (
@@ -102,20 +151,25 @@ const TaskListResults = ({ tasks, ...rest }) => {
         aria-labelledby="simple-modal-title"
       >
       <div style={modalStyle} className={classes.paper}>
-        <FormControl className="add_task">
-          <input type="text" placeholder="Enter task title"/>
+        <form className="add_task">
+          <label>Task Title:</label>
+          <input type="text" placeholder="Enter task title" value={title} onChange={e => setTitle(e.target.value)}/>
           <label>
             Assign To:
-            <select value='Ahmad'>
-              <option value='Ali'>Ali</option>
-              <option value='Abu'>Abu</option>
-              <option value='Ah Chong'>Ah Chong</option>
+            <select value={assignTo} onChange={e => setAssignTo(e.target.value)}>
+              <option value={'Ali'}>Ali</option>
+              <option value={'Abu'}>Abu</option>
+              <option value={'Ah Chong'}>Ah Chong</option>
             </select>
           </label>
-          <input type="text" placeholder="Enter task description"/>
-          <input type="file"/>
-          <Button variant="contained" color="primary">Upload</Button>
-        </FormControl>
+          <label>Task Description:</label>
+          <input type="text" placeholder="Enter task description" value={description} onChange={e => setDescription(e.target.value)}/>
+          <label>Attachment:</label>
+          <input type="file" value={filePath} onChange={handleChange}/>
+          <label>Due Date:</label>
+          <input type="date" value={duedate} onChange={e => setDuedate(e.target.value)}/>
+          <Button variant="contained" color="primary" onClick={submitForm}>Upload</Button>
+        </form>
       </div>
     </Modal>
 
