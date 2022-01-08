@@ -1,22 +1,31 @@
-import React, { useState } from 'react';
-import { View } from 'react-native';
+import React, { useState, useCallback, useEffect } from 'react';
+import { View, Image } from 'react-native';
 import axios from 'axios';
 
 import { TextInput, Button, Text } from 'react-native-paper';
 
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 import { useDispatch } from 'react-redux'
 import { setUser } from '../../redux/currentUser';
 
+const logo1 = require('../../../mobile/files/logo/netsinity1.png')
+
 
 const Login = ({ navigation }) => {
-  console.log(`Login.js render...`)
+  console.log(logo1)
+  const isFocused = useIsFocused()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const dispatch = useDispatch()
+
+  useEffect(() => {
+    if (isFocused) {
+      console.log(`Login: rendering...`)
+    }
+  }, [isFocused])
 
   const onLoginButton = async () => {
     try {
@@ -48,7 +57,7 @@ const Login = ({ navigation }) => {
           reject('There is no account associated with this email!')
         }
         if (error.code === 'auth/invalid-email') {
-          reject('That email address is invalid!');
+          reject('That email address is invalid!')
         }
       }
     })
@@ -113,35 +122,59 @@ const Login = ({ navigation }) => {
   // }
 
   return (
-    <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 10, backgroundColor: '#232323' }}>
-      <View>
-        <TextInput
-          placeholder='Email'
-          mode='outlined'
-          onChangeText={(email) => setEmail(email)}
-        />
-        <TextInput
-          placeholder='Password'
-          mode='outlined'
-          secureTextEntry={true}
-          onChangeText={(password) => setPassword(password)}
-        />
-      </View>
-      <View style={{ marginVertical: 20 }}>
-        <Button
-          mode="contained"
-          onPress={() => onLoginButton()}
-        >Log In</Button>
-      </View>
-      <View style={{ flexDirection: 'row', alignSelf: 'center', textColor: 'white' }}>
-        <Text style={{ color: 'white' }}>Don't have an account? </Text>
-        <Text
+    <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 16, backgroundColor: '#232323' }}>
+      <View style={{ flex: 2, justifyContent: 'center', paddingHorizontal: 60 }}>
+        <Image
+          source={logo1}
           style={{
-            textDecorationLine: 'underline',
-            fontWeight: 'bold',
-            color: '#f4b210'
+            flex: 2,
+            width: null,
+            height: null,
+            resizeMode: 'contain',
+            marginTop: 75
           }}
-          onPress={() => toRegister()}>Register</Text>
+        />
+        <Image
+          source={require('../../files/logo/netsinity2.png')}
+          style={{
+            flex: 1,
+            width: null,
+            height: null,
+            resizeMode: 'contain',
+            marginBottom: 20
+          }}
+        />
+      </View>
+      <View style={{ flex: 3 }}>
+        <View>
+          <TextInput
+            placeholder='Email'
+            mode='outlined'
+            onChangeText={(email) => setEmail(email)}
+          />
+          <TextInput
+            placeholder='Password'
+            mode='outlined'
+            secureTextEntry={true}
+            onChangeText={(password) => setPassword(password)}
+          />
+        </View>
+        <View style={{ marginVertical: 20 }}>
+          <Button
+            mode="contained"
+            onPress={() => onLoginButton()}
+          >Log In</Button>
+        </View>
+        <View style={{ flexDirection: 'row', alignSelf: 'center', textColor: 'white' }}>
+          <Text style={{ color: 'white' }}>Don't have an account? </Text>
+          <Text
+            style={{
+              textDecorationLine: 'underline',
+              fontWeight: 'bold',
+              color: '#f4b210'
+            }}
+            onPress={() => toRegister()}>Register</Text>
+        </View>
       </View>
     </View>
   )

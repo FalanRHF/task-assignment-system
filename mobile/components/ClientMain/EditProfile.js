@@ -19,15 +19,11 @@ import firestore from '@react-native-firebase/firestore';
 import Ticket from '../tickets/Ticket';
 
 const EditProfile = ({ navigation }) => {
-  console.log(`EditProfile rendering...`)
   const isFocused = useIsFocused()
   const currentUser = useSelector(state => state.currentUser.value)
   const dispatch = useDispatch()
   const [loaded, setIsLoaded] = useState(false)
   const [client, setClient] = useState(currentUser)
-  const [projectCodes, setProjectCodes] = useState(currentUser.cl_pjcode)
-  const [currentCode, setcurrentCode] = useState(currentUser.cl_curpj)
-  const [rerender, setrerender] = useState(false)
   const [modalVisible, setModalVisible] = useState(false);
   const [newProject, setNewProject] = useState('')
 
@@ -36,11 +32,12 @@ const EditProfile = ({ navigation }) => {
   const containerStyle = { backgroundColor: 'white', padding: 10 };
 
   useEffect(() => {
-    setIsLoaded(true)
-    // navigation.setOptions({ title: `@${route.params.username}` })
-    // const unsubscribe = navigation.addListener('focus', getUserDetails);
-    // return setIsLoaded(false);
-  }, [isFocused]);
+    const unsubscribe = navigation.addListener('focus', () => {
+      console.log(`EditProfile rendering...`)
+      setIsLoaded(true)
+    })
+    return unsubscribe
+  }, [navigation]);
 
   const getUserDetails = async () => {
     console.log(`EditProfile.getUserDetails: called`)
@@ -67,10 +64,11 @@ const EditProfile = ({ navigation }) => {
     try {
       const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/updatedetails`, {
         cl_uid: client.cl_uid,
-        cl_fullname: client.cl_fullname,
+        cl_fullname: client.cl_fullname.toUpperCase(),
         cl_username: client.cl_username,
         cl_curpj: client.cl_curpj,
-        cl_pjcode: `{${JSON.stringify(client.cl_pjcode).slice(1, -1)}}`
+        cl_pjcode: `{${JSON.stringify(client.cl_pjcode).slice(1, -1)}}`,
+        cl_phonenum: client.cl_phonenum
       })
       console.log(`EditProfile.updateUserProfile`)
       dispatch(setUser(client))
@@ -128,24 +126,13 @@ const EditProfile = ({ navigation }) => {
     var newArray = []
     var index = oldArray.indexOf(e)
     if (index !== -1) {
-      oldArray.splice(index, 1);
+      oldArray.splice(index, 1)
       newArray = [...oldArray,]
     }
     setClient({
       ...client,
       cl_pjcode: newArray
     })
-    // try {
-    //   const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/updateproject`, {
-    //     cl_uid: uid,
-    //     cl_pjcode: newArray,
-    //   })
-    //   console.log(`EditProfile.deleteProject: axiosPostResponse=${axiosPostResponse.data[0]}`)
-    //   dispatch(setUser({ cl_pjcode: newArray }))
-    // } catch (error) {
-    //   console.log(`EditProfile.deleteProject: [ERROR] ${error}`)
-    // }
-    // getUserDetails()
   }
 
   return (
@@ -174,6 +161,32 @@ const EditProfile = ({ navigation }) => {
               ...client,
               cl_username: username,
             })}
+          />
+        </View>
+        <View style={{ marginVertical: 5 }}>
+          <TextInput
+            label='PHONE NUMBER'
+            placeholder="PHONE NUMBER"
+            mode='outlined'
+            value={client.cl_phonenum}
+            onChangeText={(phonenum) => setClient({
+              ...client,
+              cl_phonenum: phonenum,
+            })}
+          />
+          <Text style={{ fontSize: 10 }}>Your phone number will be public. Leave empty for privacy.</Text>
+        </View>
+        <View style={{ marginVertical: 5 }}>
+          <TextInput
+            label='EMAIL'
+            placeholder="EMAIL"
+            mode='outlined'
+            value={client.cl_email}
+            onChangeText={(email) => setClient({
+              ...client,
+              cl_email: email,
+            })}
+            disabled='true'
           />
         </View>
         <View style={{ marginVertical: 10 }}><Text style={{

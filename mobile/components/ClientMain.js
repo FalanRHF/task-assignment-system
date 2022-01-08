@@ -1,14 +1,7 @@
 import React, { Component, useEffect } from 'react'
-import { View, Text, Button } from 'react-native';
-import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
 import MaterialCommunityIcons from 'react-native-vector-icons/MaterialCommunityIcons';
 
-import auth from '@react-native-firebase/auth'
-
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { fetchClient } from '../oldredux/actions/index'
 
 import HomeComponent from './ClientMain/Home'
 import SettingsComponent from './ClientMain/Settings'
@@ -58,13 +51,6 @@ function SettingsScreen() {
 
 const Main = ({ navigation }) => {
 
-  useEffect(() => {
-    console.log(`Main.js mounted`)
-    return () => {
-      console.log(`Main.js unmounted`)
-    }
-  }, [])
-
   return (
     <Tab.Navigator
       initialRouteName="Home"
@@ -93,25 +79,5 @@ const Main = ({ navigation }) => {
     </Tab.Navigator>
   )
 }
-
-// export class Main extends Component {
-//   componentDidMount() {
-//     //this.props.fetchClient();
-//   }
-//   componentWillUnmount() {
-//     console.log(`Main.js unmounted`)
-//   }
-//   render() {
-//     return (
-//       <Tab.Navigator>
-//         <Tab.Screen name="Home" component={HomeScreen}
-//           options={{ tabBarLabel: 'Home!' }} icon='home' />
-//         <Tab.Screen name="Completed" component={CompletedScreen} />
-//         <Tab.Screen name="Settings" component={SettingsScreen} />
-//       </Tab.Navigator>
-//     )
-//   }
-// }
-
 
 export default Main
