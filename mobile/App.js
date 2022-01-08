@@ -8,21 +8,24 @@ import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-//import { Provider } from "react-redux";
-import { createStore, applyMiddleware } from "redux";
-import rootReducer from './redux/reducers'
-import thunk from 'redux-thunk'
-const store = createStore(rootReducer, applyMiddleware(thunk))
+
+import { configureStore } from "@reduxjs/toolkit";
+import { Provider, useSelector, useDispatch } from "react-redux"
+import currentUserReducer, { resetUser } from "./redux/currentUser"
 
 import LandingScreen from './components/auth/Landing';
-import ClientRegisterScreen from './components/auth/ClientRegister';
 import PreRegisterScreen from './components/auth/PreRegister';
+import ClientRegisterScreen from './components/auth/ClientRegister';
+import EmployeeRegisterScreen from './components/auth/EmployeeRegister';
+import PostRegisterScreen from './components/auth/PostRegister';
 import LoginScreen from './components/auth/Login';
-import MainScreen from './components/Main';
+import ClientMainScreen from './components/ClientMain';
+import EmployeeMainScreen from './components/EmployeeMain';
+import LoadingScreen from './components/Loading';
 import NewTicketScreen from './components/tickets/NewTicket';
 import TicketScreen from './components/tickets/Ticket';
 import UpdateTicketScreen from './components/tickets/UpdateTicket';
-import EditProfileScreen from './components/main/EditProfile';
+import EditProfileScreen from './components/ClientMain/EditProfile';
 
 
 const Stack = createStackNavigator();
@@ -35,131 +38,124 @@ const theme = {
     // primary: '#3498db',
     // accent: '#f1c40f',
     primary: '#f4b210', //netsinity code: f4b210
-    accent: '232323',
-    surface: '232323'
+    accent: '#232323',
+    surface: '#232323'
   },
 };
 
-const App = () => {
+//redux
+const store = configureStore({
+  reducer: {
+    currentUser: currentUserReducer,
+  }
+})
+
+const NetsinityApp = () => {
   const [loaded, setLoaded] = useState(false)
-  const [loggedIn, setLoggedIn] = useState(false)
+  // const [loggedIn, setLoggedIn] = useState(false)
+  // const [isEmployee, setisEmployee] = useState(false)
+
+  const currentUser = useSelector(state => state.currentUser.value)
+  const dispatch = useDispatch()
 
   console.log(`App.js render...`)
+  console.log(`currentUser.loggedin= ${currentUser.loggedin}`)
 
   useEffect(() => {
-    auth().onAuthStateChanged((user) => {
-      if (!user) {
-        setLoaded(true)
-        setLoggedIn(false)
-      } else {
-        setLoaded(true)
-        setLoggedIn(true)
+    if (!currentUser.loggedin) {
+      const user = auth().currentUser;
+      if (user) {
+        auth()
+          .signOut()
+          .then(() => console.log('App.signOut: User signed out!'))
+        dispatch(resetUser())
       }
-    });
+      else {
+        console.log(`No users currently logged in...`)
+      }
+    }
+    setLoaded(true)
   }, [])
+
 
   if (!loaded) {
     console.log("App.loaded==false")
     return (
-      <View style={{ flex: 1, justifyContent: 'center' }}>
-        <Text>Loading</Text>
-      </View>
+      <Stack.Navigator>
+        <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />
+      </Stack.Navigator>
     )
   }
-  if (!loggedIn) {
+
+  if (!currentUser.loggedin) {
     console.log("App.loggedIn==false")
     return (
-      <PaperProvider theme={theme}>
-        <NavigationContainer>
-          <Stack.Navigator initialRouteName="Login">
-            <Stack.Screen name="ClientRegister" component={ClientRegisterScreen} options={{ headerTitle: 'Client Registration' }} />
-            <Stack.Screen name="PreRegister" component={PreRegisterScreen} options={{ headerTitle: 'Category' }} />
-            <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
-            {/* <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} /> */}
-          </Stack.Navigator>
-        </NavigationContainer>
-      </PaperProvider>
-    );
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
+        <Stack.Screen name="PreRegister" component={PreRegisterScreen} options={{ headerTitle: 'Category', headerTitleStyle: { color: 'white' }, headerTitleAlign: 'center', headerTransparent: true, headerShown: false }} />
+        <Stack.Screen name="ClientRegister" component={ClientRegisterScreen} options={{ headerTitle: 'Client Registration' }} />
+        <Stack.Screen name="EmployeeRegister" component={EmployeeRegisterScreen} options={{ headerTitle: 'Employee Registration' }} />
+        <Stack.Screen name="PostRegister" component={PostRegisterScreen} options={{ headerShown: false }} />
+      </Stack.Navigator>
+    )
   }
+
   console.log("App.loggedIn==true")
   console.log(`${auth().currentUser.email} logged in!`)
+
+  if (currentUser.type == 'client') {
+    return (
+      <Stack.Navigator initialRouteName="ClientMain">
+        <Stack.Screen name="ClientMain" component={ClientMainScreen} options={{ headerShown: false, headerTitleAlign: 'center' }} />
+        <Stack.Screen name="NewTicket" component={NewTicketScreen} options={{ title: 'Add New Ticket', headerTitleAlign: 'center' }} />
+        <Stack.Screen name="Ticket" component={TicketScreen} options={{ title: 'Ticket', headerTitleAlign: 'center' }} />
+        <Stack.Screen name="UpdateTicket" component={UpdateTicketScreen} options={{ title: 'Update Ticket', headerTitleAlign: 'center' }} />
+        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerTitleAlign: 'center' }} />
+      </Stack.Navigator>
+    )
+  }
   return (
-    <PaperProvider theme={theme}>
-      {/* <Provider store={store}> */}
-      <NavigationContainer>
-        <Stack.Navigator initialRouteName="Main">
-          <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false, headerTitleAlign: 'center' }} />
-          <Stack.Screen name="NewTicket" component={NewTicketScreen} options={{ title: 'Add New Ticket', headerTitleAlign: 'center' }} />
-          <Stack.Screen name="Ticket" component={TicketScreen} options={{ title: 'Ticket', headerTitleAlign: 'center' }} />
-          <Stack.Screen name="UpdateTicket" component={UpdateTicketScreen} options={{ title: 'Update Ticket', headerTitleAlign: 'center' }} />
-          <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerTitleAlign: 'center' }} />
-        </Stack.Navigator>
-      </NavigationContainer>
-    </PaperProvider>
+    <Stack.Navigator>
+      <Stack.Screen name="EmployeeMain" component={EmployeeMainScreen} options={{ headerShown: false, headerTitleAlign: 'center' }} />
+    </Stack.Navigator>
   )
 }
 
-// export class meow extends Component {
-//   constructor(props) {
-//     super(props);
-//     this.state = {
-//       loaded: false,
-//     }
-//   }
+// import userReducer from "./reduxtestfeatures/user"
+// import themeReducer from "./reduxtestfeatures/theme"
+// import Profile from "./reduxtestcomponents/Profile"
+// import Login from "./reduxtestcomponents/Login"
+// import ChangeColour from "./reduxtestcomponents/ChangeColour"
 
-//   componentDidMount() {
-//     auth().onAuthStateChanged((user) => {
-//       if (!user) {
-//         this.setState({
-//           loggedIn: false,
-//           loaded: true
-//         })
-//       } else {
-//         this.setState({
-//           loggedIn: true,
-//           loaded: true
-//         });
-//       }
-//     });
+// const store = configureStore({
+//   reducer: {
+//     user: userReducer,
+//     theme: themeReducer,
 //   }
+// })
 
-//   render() {
-//     const { loggedIn, loaded } = this.state;
-//     if (!loaded) {
-//       return (
-//         <View style={{ flex: 1, justifyContent: 'center' }}>
-//           <Text>Loading</Text>
-//         </View>
-//       )
-//     }
-//     if (!loggedIn) {
-//       return (
-//         <PaperProvider theme={theme}>
-//           <NavigationContainer>
-//             <Stack.Navigator initialRouteName="Landing">
-//               <Stack.Screen name="Register" component={RegisterScreen} />
-//               <Stack.Screen name="Login" component={LoginScreen} />
-//               <Stack.Screen name="Landing" component={LandingScreen} options={{ headerShown: false }} />
-//             </Stack.Navigator>
-//           </NavigationContainer>
-//         </PaperProvider>
-//       );
-//     }
-//     return (
-//       // <Provider store={store}>
-//       <NavigationContainer>
-//         <Stack.Navigator initialRouteName="Main">
-//           <Stack.Screen name="Main" component={MainScreen} options={{ headerShown: false, headerTitleAlign: 'center' }} />
-//           <Stack.Screen name="NewTicket" component={NewTicketScreen} options={{ title: 'Add New Ticket', headerTitleAlign: 'center' }} />
-//           <Stack.Screen name="Ticket" component={TicketScreen} options={{ title: 'Ticket', headerTitleAlign: 'center' }} />
-//           <Stack.Screen name="UpdateTicket" component={UpdateTicketScreen} options={{ title: 'Update Ticket', headerTitleAlign: 'center' }} />
-//           <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerTitleAlign: 'center' }} />
-//         </Stack.Navigator>
-//       </NavigationContainer>
-//       //</Provider>
-//     )
-//   }
+// const ReduxApp = () => {
+//   console.log('ReduxApp')
+//   return (
+//     <View style={{ backgroundColor: 'white' }}>
+//       <Profile />
+//       <Login />
+//       <ChangeColour />
+//     </View>
+//   )
 // }
+
+const App = () => {
+  return (
+    <Provider store={store}>
+      <PaperProvider theme={theme}>
+        <NavigationContainer>
+          <NetsinityApp />
+        </NavigationContainer>
+      </PaperProvider>
+    </Provider>
+  )
+}
 
 export default App
 

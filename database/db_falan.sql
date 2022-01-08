@@ -6,6 +6,17 @@ create table client (
   cl_curpj VARCHAR(10),
   cl_pjcode text[]
 );
+
+create table employee (
+  em_uid VARCHAR(100) NOT NULL,
+  em_username VARCHAR(25) NOT NULL,
+  em_fullname VARCHAR(25) NOT NULL,
+  em_email VARCHAR(25) NOT NULL,
+  em_emcode VARCHAR(10)
+);
+
+--create table employee (em_uid VARCHAR(100) NOT NULL,em_username VARCHAR(25) NOT NULL,em_fullname VARCHAR(25) NOT NULL,em_email VARCHAR(25) NOT NULL,em_emcode VARCHAR(10));
+
 -- create table client (cl_uid VARCHAR(100) NOT NULL,cl_username VARCHAR(25) NOT NULL,cl_fullname VARCHAR(25) NOT NULL,cl_email VARCHAR(25) NOT NULL,cl_curpj VARCHAR(10),cl_pjcode text[]);
 create table users (
   us_uid VARCHAR(100) NOT NULL,

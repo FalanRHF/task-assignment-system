@@ -11,14 +11,14 @@ import firestore from '@react-native-firebase/firestore';
 
 
 
-const Register = ({ navigation }) => {
+const PreRegister = ({ navigation, route }) => {
 
   const toClientRegister = () => {
     navigation.navigate("ClientRegister")
   }
 
   const toEmployeeRegister = () => {
-    console.log("Employee Registration is unavailable.")
+    navigation.navigate("EmployeeRegister")
   }
 
 
@@ -40,4 +40,4 @@ const Register = ({ navigation }) => {
   )
 }
 
-export default Register
+export default PreRegister

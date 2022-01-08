@@ -15,7 +15,11 @@ const Ticket = ({ route, navigation }) => {
 
   useEffect(() => {
     loadTicket()
-    navigation.setOptions({ title: tc_id })
+    navigation.setOptions({
+      title: route.params.tc_id, headerTitleStyle: {
+        fontSize: 16
+      },
+    })
     return () => {
       setisLoading(true)
     }
@@ -75,28 +79,32 @@ const Ticket = ({ route, navigation }) => {
     )
   } else {
     return (
-      <View>
-        <Text>Title</Text>
-        <TextInput
-          placeholder="title"
-          mode='outlined'
-          value={title}
-          onChangeText={(title) => settitle(title)}
-        />
-        <Text>Detail</Text>
-        <TextInput
-          placeholder="detail"
-          mode='outlined'
-          value={detail}
-          onChangeText={(detail) => setdetail(detail)}
-        />
+      <View style={{ flex: 1, margin: 10 }}>
         <View style={{ marginVertical: 5 }}>
+          <TextInput
+            label='TITLE'
+            placeholder='TITLE'
+            mode='outlined'
+            value={title}
+            onChangeText={(title) => settitle(title)}
+          />
+        </View>
+        <View style={{ marginVertical: 5 }}>
+          <TextInput
+            label='DETAILS'
+            placeholder="DETAILS"
+            mode='outlined'
+            value={detail}
+            onChangeText={(detail) => setdetail(detail)}
+          />
+        </View>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 10 }}>
           <Button
             mode="contained"
-            onPress={() => updateTicketDetail()}>Update Ticket</Button></View>
-        <View style={{ marginVertical: 5 }}>
+            onPress={() => updateTicketDetail()}>Update Ticket</Button>
           <Button
             mode="contained"
+            style={{ backgroundColor: 'red', textColor: 'white' }}
             onPress={() => deleteTicket()}>Delete Ticket</Button></View>
       </View>
     )
