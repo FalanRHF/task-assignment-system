@@ -24,6 +24,7 @@
     "@reduxjs/toolkit": "^1.6.0",
     "axios": "^0.21.4",
     "firebase": "^8.6.5",
+    "form-data": "^4.0.0",
     "react": "17.0.1",
     "react-native": "0.64.2",
     "react-native-dropdown-menu": "^2.0.0",

@@ -1,7 +1,7 @@
 import axios from 'axios';
-import React, { Component, useState, useEffect } from 'react'
+import React, { Component, useState, useEffect, useCallback } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native';
-import { useIsFocused } from '@react-navigation/native';
+import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
 import { connect } from "react-redux";
 import { bindActionCreators } from "redux";
@@ -18,90 +18,41 @@ import { useSelector } from 'react-redux';
 import { current } from '@reduxjs/toolkit';
 
 
-const Home = ({ navigation }) => {
+const Completed = ({ navigation }) => {
   const isFocused = useIsFocused()
   const [curpjcode, setcurpjcode] = useState('')
   const [isLoaded, setIsLoaded] = useState(false)
   const [completedTicket, setCompletedTicket] = useState([])
   const currentUser = useSelector(state => state.currentUser.value)
+  navigation.setOptions({ title: 'Resolved Tickets' })
 
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', () => {
+
+  //   })
+  //   return unsubscribe
+  // }, [navigation])
 
   useEffect(() => {
-    // setIsLoaded(false)
-    navigation.setOptions({ title: 'Resolved Tickets' })
-    // console.log(`Completed.js: useEffect() activated`)
-    // const unsubscribe = navigation.addListener('focus', () => {
-    //   console.log(`Completed.useEffect.addListener.focus triggered`)
-    //   init()
-    // });
+    if (isFocused) {
+      // console.log(`Client.Completed.useEffect: called`)
+      getCompleted(currentUser.cl_curpj)
+    }
+  }, [isFocused])
 
-    getCompleted()
-
-    // return unsubscribe;
-  }, [isFocused]);
-
-  // const init = async () => {
-  //   getCurrentPjcode().then()
-  //   await getPending()
-  // }
-
-  // const init = async () => {
-  //   console.log(`Completed.init: called`)
-  //   try {
-  //     const pjcode = await getCurrentPjcode()
-  //     if (pjcode != null) {
-  //       navigation.setOptions({ title: `Resolved (${pjcode})` })
-  //       const res = await getCompleted(pjcode)
-  //     }
-  //     else {
-  //       navigation.setOptions({ title: `Resolved` })
-  //     }
-  //     //console.log(`Home.init: pendingticket=${completedTicket}`)
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  //   console.log(`setting isLoading to false...`)
-  //   setisLoading(false)
-  // }
-
-  // const getCurrentPjcode = () => {
-  //   console.log(`Completed.init.getCurrentPjcode: called`)
-  //   return new Promise(async (resolve, reject) => {
-  //     const uid = auth().currentUser.uid
-  //     try {
-  //       const axiosGetResponse = await axios.get(`http://localhost:5050/auth/getdata/client/${uid}`)
-  //       console.log(`${JSON.stringify(axiosGetResponse.data)}`)
-  //       const { cl_curpj } = axiosGetResponse.data[0]
-  //       setcurpjcode(cl_curpj)
-  //       console.log(`Completed.init.getCurrentPjcode: calling resolve(${cl_curpj})...`)
-  //       resolve(cl_curpj)
-  //     } catch (error) {
-  //       reject(error)
-  //     }
-  //   })
-  // }
-
-  const getCompleted = async () => {
+  const getCompleted = async (pjcode) => {
     console.log(`Completed.getCompleted: called`)
-    // return new Promise(async (resolve, reject) => {
     try {
       console.log(`Project Code: ${currentUser.cl_curpj}`)
-      const res = await axios.get(`http://localhost:5050/helpdesk/completedticket/${currentUser.cl_curpj}`)
-      // let pendingarray = []
-      // res.forEach(ticket => {
-      //   pendingarray.push(ticket.data())
-      // })
+      const res = await axios.get(`http://localhost:5050/helpdesk/completedticket/${pjcode}`)
       console.log(`Resolved Tickets Data: ${JSON.stringify(res.data)}`)
       setCompletedTicket(res.data)
       setIsLoaded(true)
-      // resolve(res)
     } catch (error) {
-      console.log(`Completed.getCompleted: reject(error)`)
-      // reject(error)
+      console.log(`Completed.getCompleted: reject(${error})`)
     }
-
-    // })
   }
+
   if (!isLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -123,7 +74,7 @@ const Home = ({ navigation }) => {
           <Text style={{ fontSize: 12, fontWeight: 'bold' }}>Project Code: {currentUser.cl_curpj}</Text>
         </View>
         <View style={{ marginHorizontal: 16 }}>
-          <View style={{ paddingTop: 20, paddingBottom: 100 }}>
+          <View style={{ paddingVertical: 20 }}>
             <FlatList style={{ paddingBottom: 0 }}
               data={completedTicket}
               renderItem={({ item }) => (
@@ -175,4 +126,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Home
+export default Completed
