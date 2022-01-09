@@ -3,7 +3,7 @@ import { View, Text, Button } from 'react-native';
 
 //import firebase from 'firebase/app';
 import auth from '@react-native-firebase/auth';
-import { DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
+import { ActivityIndicator, DefaultTheme, Provider as PaperProvider } from 'react-native-paper';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -13,19 +13,26 @@ import { configureStore } from "@reduxjs/toolkit";
 import { Provider, useSelector, useDispatch } from "react-redux"
 import currentUserReducer, { resetUser } from "./redux/currentUser"
 
-import LandingScreen from './components/auth/Landing';
+
+import LoadingScreen from './components/Loading';
+
+//Auth Screens
 import PreRegisterScreen from './components/auth/PreRegister';
 import ClientRegisterScreen from './components/auth/ClientRegister';
 import EmployeeRegisterScreen from './components/auth/EmployeeRegister';
 import PostRegisterScreen from './components/auth/PostRegister';
 import LoginScreen from './components/auth/Login';
+
+//Client Screens
 import ClientMainScreen from './components/ClientMain';
-import EmployeeMainScreen from './components/EmployeeMain';
-import LoadingScreen from './components/Loading';
 import NewTicketScreen from './components/tickets/NewTicket';
 import TicketScreen from './components/tickets/Ticket';
 import UpdateTicketScreen from './components/tickets/UpdateTicket';
 import EditProfileScreen from './components/ClientMain/EditProfile';
+
+//Employee Screens
+import EmployeeMainScreen from './components/EmployeeMain';
+import TaskScreen from './components/tasks/Task';
 
 
 const Stack = createStackNavigator();
@@ -51,44 +58,41 @@ const store = configureStore({
 })
 
 const NetsinityApp = () => {
-  const [loaded, setLoaded] = useState(false)
-  // const [loggedIn, setLoggedIn] = useState(false)
-  // const [isEmployee, setisEmployee] = useState(false)
-
+  const [isLoaded, setIsLoaded] = useState(false)
   const currentUser = useSelector(state => state.currentUser.value)
   const dispatch = useDispatch()
 
-  console.log(`App.js render...`)
-  console.log(`currentUser.loggedin= ${currentUser.loggedin}`)
+  // console.log(`App.js render...`)
+  // console.log(`currentUser.loggedin= ${currentUser.loggedin}`)
 
   useEffect(() => {
+    console.log(`App.useEffect: rendering...`)
     if (!currentUser.loggedin) {
       const user = auth().currentUser;
       if (user) {
         auth()
           .signOut()
-          .then(() => console.log('App.signOut: User signed out!'))
+        // .then(() => console.log('App.signOut: User signed out!'))
         dispatch(resetUser())
       }
       else {
-        console.log(`No users currently logged in...`)
+        // console.log(`No users currently logged in...`)
       }
     }
-    setLoaded(true)
+    setIsLoaded(true)
   }, [])
 
 
-  if (!loaded) {
-    console.log("App.loaded==false")
+  if (!isLoaded) {
     return (
-      <Stack.Navigator>
-        <Stack.Screen name="Loading" component={LoadingScreen} options={{ headerShown: false }} />
-      </Stack.Navigator>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#232323' }}>
+        <Text style={{ marginBottom: 20, color: '#f4b210' }}>Loading...</Text>
+        <ActivityIndicator animating={true} color={"#f4b210"} />
+      </View>
     )
   }
 
   if (!currentUser.loggedin) {
-    console.log("App.loggedIn==false")
     return (
       <Stack.Navigator initialRouteName="Login">
         <Stack.Screen name="Login" component={LoginScreen} options={{ headerShown: false }} />
@@ -99,9 +103,6 @@ const NetsinityApp = () => {
       </Stack.Navigator>
     )
   }
-
-  console.log("App.loggedIn==true")
-  console.log(`${auth().currentUser.email} logged in!`)
 
   if (currentUser.type == 'client') {
     return (
@@ -117,33 +118,10 @@ const NetsinityApp = () => {
   return (
     <Stack.Navigator>
       <Stack.Screen name="EmployeeMain" component={EmployeeMainScreen} options={{ headerShown: false, headerTitleAlign: 'center' }} />
+      <Stack.Screen name="Task" component={TaskScreen} options={{ title: 'Task', headerTitleAlign: 'center' }} />
     </Stack.Navigator>
   )
 }
-
-// import userReducer from "./reduxtestfeatures/user"
-// import themeReducer from "./reduxtestfeatures/theme"
-// import Profile from "./reduxtestcomponents/Profile"
-// import Login from "./reduxtestcomponents/Login"
-// import ChangeColour from "./reduxtestcomponents/ChangeColour"
-
-// const store = configureStore({
-//   reducer: {
-//     user: userReducer,
-//     theme: themeReducer,
-//   }
-// })
-
-// const ReduxApp = () => {
-//   console.log('ReduxApp')
-//   return (
-//     <View style={{ backgroundColor: 'white' }}>
-//       <Profile />
-//       <Login />
-//       <ChangeColour />
-//     </View>
-//   )
-// }
 
 const App = () => {
   return (
@@ -158,12 +136,3 @@ const App = () => {
 }
 
 export default App
-
-
-/**
- * npm i react-native-screens
- * npm i @react-native-community/masked-view
- * npm i react-native-gesture-handler
- */
-
-

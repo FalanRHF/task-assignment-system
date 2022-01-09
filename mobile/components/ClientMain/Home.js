@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { Component, useState, useEffect } from 'react'
+import React, { useCallback, useState, useEffect } from 'react'
 import { StyleSheet, View, SafeAreaView, TouchableOpacity, FlatList } from 'react-native';
 import { Button, Divider, Text } from 'react-native-paper';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
@@ -8,14 +8,15 @@ import firebase from 'firebase';
 import auth from '@react-native-firebase/auth';
 import firestore from '@react-native-firebase/firestore';
 
+import Loading from '../Loading'
+
 //redux
 import { useSelector } from 'react-redux'
 
 const Separator = () => (
   <View style={styles.separator} />
-);
+)
 
-let pendingTicket = []
 
 const Home = ({ navigation }) => {
   const isFocused = useIsFocused()
@@ -25,81 +26,27 @@ const Home = ({ navigation }) => {
   const currentUser = useSelector(state => state.currentUser.value)
 
   useEffect(() => {
-    // setIsLoaded(false)
-    // navigation.setOptions({ title: 'Home' })
-    console.log(`Home.js: useEffect() activated`)
-    // const unsubscribe = navigation.addListener('focus', () => {
-    //   console.log(`Home.useEffect.addListener.focus triggered`)
-    getPending()
-    // });
+    if (isFocused) {
+      // console.log(`Client.Home.useEffect: called`)
+      getPending(currentUser.cl_curpj)
+    }
+  }, [isFocused])
 
-    // return unsubscribe;
-  }, [isFocused]);
-
-  // const init = async () => {
-  //   console.log(`Home.init: called`)
-  //   try {
-  //     const pjcode = await getCurrentPjcode()
-  //     navigation.setOptions({ title: `Home` })
-  //     if (currentUser.cl_curpj != null) {
-  //       // navigation.setOptions({ title: `Home (${pjcode})` })
-  //       const res = await getPending(pjcode)
-  //     }
-  //     // else {
-  //     //   navigation.setOptions({ title: `Home` })
-  //     // }
-  //   } catch (error) {
-  //     console.log(`Home.init: ERROR`)
-  //     console.log(error.message)
-  //   }
-  //   console.log(`setting isLoaded to false...`)
-  //   setIsLoaded(false)
-  // }
-
-  // const getCurrentPjcode = () => {
-  //   console.log(`Home.init.getCurrentPjcode: called`)
-  //   return new Promise(async (resolve, reject) => {
-  //     const uid = auth().currentUser.uid
-  //     try {
-  //       const axiosGetResponse = await axios.get(`http://localhost:5050/auth/getdata/client/${uid}`)
-  //       console.log(`${JSON.stringify(axiosGetResponse.data)}`)
-  //       const { cl_curpj } = axiosGetResponse.data[0]
-  //       setcurpjcode(cl_curpj)
-  //       console.log(`Home.init.getCurrentPjcode: calling resolve(${cl_curpj})...`)
-  //       resolve(cl_curpj)
-  //     } catch (error) {
-  //       reject(error)
-  //     }
-  //   })
-  // }
-
-  const getPending = async () => {
-    // console.log(`Home.getPending: called`)
-    // return new Promise(async (resolve, reject) => {
+  const getPending = async (pjcode) => {
     try {
       console.log(`Project Code: ${currentUser.cl_curpj}`)
-      const res = await axios.get(`http://localhost:5050/helpdesk/pendingticket/${currentUser.cl_curpj}`)
-      // let pendingarray = []
-      // res.forEach(ticket => {
-      //   pendingarray.push(ticket.data())
-      // })
+      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/pendingticket/${pjcode}`)
       console.log(`Pending Tickets Data: ${JSON.stringify(res.data)}`)
       setpendingTicket(res.data)
       setIsLoaded(true)
-      // resolve(res)
     } catch (error) {
       console.log(`Home: getPending error: ${error}`)
-      // reject(error)
     }
-
-    // })
   }
-  console.log(`isLoaded: ${isLoaded}`)
+
   if (!isLoaded) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text>Home is loading...</Text>
-      </View>
+      <Loading />
     )
   } else if (curpjcode == null) {
     return (

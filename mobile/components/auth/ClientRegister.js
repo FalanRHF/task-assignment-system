@@ -14,7 +14,7 @@ import { TextInput, Button, Text } from 'react-native-paper';
 const Register = ({ navigation }) => {
   const [password, setPassword] = useState('')
   const [client, setClient] = useState({})
-  const [uid, setUid] = useState('')
+  // const [uid, setUid] = useState('')
 
   const setClientData = (key, value) => {
     var data = {};
@@ -37,9 +37,9 @@ const Register = ({ navigation }) => {
     console.log(`onClientSignUp`)
     //e.preventDefault() //avoids auto go to App.js
     try {
-      await firebaseSignUp()
-      await clientSignUp()
-      await usersSignUp()
+      const fbUID = await firebaseSignUp()
+      await clientSignUp(fbUID)
+      await usersSignUp(fbUID)
       navigation.navigate('PostRegister')
     } catch (error) {
       console.log(`onClientSignUp() error`)
@@ -86,8 +86,8 @@ const Register = ({ navigation }) => {
         const fbresult = await auth()
           .createUserWithEmailAndPassword(client.email, password)
         console.log(`firebaseSignUp() success`)
-        const [uid, setUid] = useState('')
-        resolve(fbresult)
+        // setUid(auth().currentUser.uid)
+        resolve(auth().currentUser.uid)
       } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
           console.log('That email address is already in use!');
@@ -100,15 +100,19 @@ const Register = ({ navigation }) => {
     });
   }
 
-  const clientSignUp = () => {
+  const clientSignUp = (fbUID) => {
     console.log(`clientSignUp`)
     return new Promise(async (resolve, reject) => {
       try {
-        const getPostResponse = await axios.post(`http://localhost:5050/auth/register/client`, {
-          cl_uid: uid,
+        console.log(`uid: ${fbUID}`)
+        const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/client`, {
+          cl_uid: fbUID,
           cl_username: client.username,
-          cl_fullname: client.fullname,
-          cl_email: client.email
+          cl_fullname: client.fullname.toUpperCase(),
+          cl_email: client.email,
+          cl_curpj: client.pjcode,
+          cl_pjcode: `{${client.pjcode}}`
+
         })
 
         console.log(`clientSignUp success`)
@@ -121,12 +125,12 @@ const Register = ({ navigation }) => {
     });
   }
 
-  const usersSignUp = () => {
+  const usersSignUp = (fbUID) => {
     console.log(`usersSignUp`)
     return new Promise(async (resolve, reject) => {
       try {
-        const getPostResponse = await axios.post(`http://localhost:5050/auth/register/users`, {
-          us_uid: uid,
+        const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/users`, {
+          us_uid: fbUID,
           us_type: 'client',
         })
         console.log(`userSignUp() success`)
@@ -159,6 +163,10 @@ const Register = ({ navigation }) => {
           placeholder="Password"
           secureTextEntry={true}
           mode='outlined' onChangeText={(password) => setPassword(password)}
+        />
+        <TextInput
+          placeholder="Project Code"
+          mode='outlined' onChangeText={(pjcode) => setClientData('pjcode', pjcode)}
         />
       </View>
       <View style={{ marginVertical: 5 }}>

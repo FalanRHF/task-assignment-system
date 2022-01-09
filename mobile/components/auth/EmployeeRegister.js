@@ -9,7 +9,7 @@ import auth from '@react-native-firebase/auth';
 const Register = ({ navigation }) => {
   const [password, setPassword] = useState('')
   const [employee, setEmployee] = useState({})
-  const [uid, setUid] = useState('')
+  // const [uid, setUid] = useState('')
   const setEmployeeData = (key, value) => {
     var data = {};
     data[key] = value;
@@ -29,9 +29,9 @@ const Register = ({ navigation }) => {
     console.log(`EmployeeRegister.onSignUpButton: called`)
     //e.preventDefault() //avoids auto go to App.js
     try {
-      await firebaseSignUp()
-      await employeeSignUp()
-      await usersSignUp()
+      const fbUID = await firebaseSignUp()
+      await employeeSignUp(fbUID)
+      await usersSignUp(fbUID)
       navigation.navigate('PostRegister')
     } catch (error) {
       console.log(`EmployeeRegister.onSignUpButton: error`)
@@ -59,8 +59,8 @@ const Register = ({ navigation }) => {
         const fbresult = await auth()
           .createUserWithEmailAndPassword(employee.email, password)
         console.log(`firebaseSignUp() success`)
-        setUid(auth().currentUser.uid)
-        resolve(fbresult)
+        // setUid(auth().currentUser.uid)
+        resolve(auth().currentUser.uid)
       } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
           console.log('That email address is already in use!');
@@ -73,13 +73,14 @@ const Register = ({ navigation }) => {
     });
   }
 
-  const employeeSignUp = () => {
+  const employeeSignUp = (fbUID) => {
     console.log(`EmployeeRegister.employeeSignUp: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const getPostResponse = await axios.post(`http://localhost:5050/auth/register/employee`, {
-          em_uid: uid,
-          em_fullname: 'Employee',
+        console.log(`uid: ${fbUID}`)
+        const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/employee`, {
+          em_uid: fbUID,
+          em_fullname: employee.fullname.toUpperCase(),
           em_username: employee.username,
           em_email: employee.email
         })
@@ -93,12 +94,12 @@ const Register = ({ navigation }) => {
     });
   }
 
-  const usersSignUp = () => {
+  const usersSignUp = (fbUID) => {
     console.log(`usersSignUp`)
     return new Promise(async (resolve, reject) => {
       try {
-        const getPostResponse = await axios.post(`http://localhost:5050/auth/register/users`, {
-          us_uid: uid,
+        const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/users`, {
+          us_uid: fbUID,
           us_type: 'employee',
         })
         console.log(`usersSignUp = success`)

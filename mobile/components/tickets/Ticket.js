@@ -2,33 +2,15 @@ import firestore from '@react-native-firebase/firestore';
 
 import axios from 'axios';
 import React, { useState, useEffect } from 'react'
-import { StyleSheet, View, Text, TouchableOpacity, FlatList } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, FlatList, Image } from 'react-native';
 import { Button } from 'react-native-paper';
 
 const Ticket = ({ route, navigation }) => {
   const { tc_id } = route.params
-  const [ticket, setTicket] = useState({ isLoading: true })
-  const [rerender, setrerender] = useState(false)
-  //console.log(`Rerender: ${rerender}`)
-
-  const init = (ticket) => {
-    setId(ticket.tc_id)
-    setPjcode(ticket.tc_pjcode)
-    setTitle(ticket.tc_title)
-    setDetail(ticket.tc_detail)
-    setCreatedat(ticket.tc_createdat)
-    setStatus(ticket.tc_status)
-    console.log(`init() called`)
-  }
-
-  // useEffect(() => {
-  //   loadTicket()
-  //   navigation.setOptions({ title: route.params.tc_id })
-  //   return () => {
-  //     setTicket({ isLoading: true })
-  //     console.log(`Ticket.js unmounted`)
-  //   }
-  // }, [navigation])
+  const [ticket, setTicket] = useState({})
+  const [imagePath, setImagePath] = useState('')
+  const [isLoaded, setIsLoaded] = useState(false)
+  const [image, setImage] = useState('')
 
   useEffect(() => {
     navigation.setOptions({
@@ -42,21 +24,56 @@ const Ticket = ({ route, navigation }) => {
   }, [navigation]);
 
   const loadTicket = async () => {
-    console.log(`Ticket.loadTicket: ticketID=${tc_id}`)
     try {
-      const axiosGetResponse = await axios.get(`http://localhost:5050/helpdesk/getticketdata/${tc_id}`)
-      console.log(`Ticket Data: \n${JSON.stringify(axiosGetResponse.data[0])}`)
-      setTicket({
-        ...ticket,
-        ...axiosGetResponse.data[0],
-        isLoading: false,
-      })
-      //init(res.data)
-      console.log(`Ticket.js > useEffect(): Successful`)
+      const filepath = await getTicket(tc_id)
+      if (filepath != '' && filepath != null) {
+        // const res = await getImage(filepath)
+      }
     } catch (error) {
-      console.log(`Ticket.js > useEffect(): Error: ${error}`)
+      console.error(error)
     }
   }
+
+  const getTicket = (ticketID) => {
+    console.info(`Ticket.getTicket(): called`)
+    console.log(`ticketID=${ticketID}`)
+    return new Promise(async (resolve, reject) => {
+      try {
+        const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/getticketdata/${ticketID}`)
+        console.log(`Ticket Data: \n${JSON.stringify(res.data[0])}`)
+        setTicket({
+          ...ticket,
+          ...res.data[0]
+        })
+        setIsLoaded(true)
+        console.info(`Ticket.getTicket(): success`)
+        resolve(res.data[0].tc_filepath)
+      } catch (error) {
+        // console.log(`Ticket.getTicket(): Error: ${error}`)
+        console.error(`Ticket.getTicket(): ERROR`)
+        reject(error)
+      }
+    })
+  }
+
+  const getImage = (filePath) => {
+    console.info(`Ticket.getImage(): called`)
+    console.log(`filePath=${filePath}`)
+    return new Promise(async (resolve, reject) => {
+      try {
+        const res = await axios.post(`http://localhost:5050/api/mobile/helpdesk/getfile`, {
+          filePath: filePath
+        })
+        console.log(`res: ${JSON.stringify(res)}`)
+        setImage(res.data)
+        resolve('')
+      } catch (error) {
+        console.error(`Ticket.getImage(): ERROR`)
+        reject(error)
+      }
+    })
+  }
+
 
   const changeTicketStatus = async (update) => {
     console.log(`Ticket.changeTicketStatus: called`)
@@ -65,7 +82,7 @@ const Ticket = ({ route, navigation }) => {
       // const res = (await firestore().collection('Ticket').where('tc_id', '==', tc_id).get()).docs[0].ref.update({
       //   'tc_status': update,
       // })
-      const res = await axios.post(`http://localhost:5050/helpdesk/updateticketstatus`, {
+      const res = await axios.post(`http://localhost:5050/api/mobile/helpdesk/updateticketstatus`, {
         tc_id: tc_id,
         newStatus: update,
       })
@@ -75,7 +92,6 @@ const Ticket = ({ route, navigation }) => {
     } catch (error) {
       console.log(`Ticket.js > changeTicketStatus(): Error: ${error}`)
     }
-    //rerender ? setrerender(false) : setrerender(true)
   }
 
   const renderButton = () => {
@@ -119,12 +135,42 @@ const Ticket = ({ route, navigation }) => {
     )
   }
 
-  if (ticket.isLoading) {
+  const hasImage = () => {
+    if (ticket.tc_filepath == null || ticket.tc_filepath == "") {
+      return (
+        <View></View>
+      )
+    } else {
+      console.log(ticket.tc_filepath)
+      return (
+        <View style={{ height: 200, padding: 0 }}>
+          <Image
+            source={{ uri: `http://localhost:5050/api/mobile/uploads/${ticket.tc_filepath}` }}
+            style={{ aspectRatio: 1, resizeMode: 'contain', maxHeight: 200 }}
+          />
+        </View>
+      )
+    }
+  }
+
+  if (!isLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Ticket data is loading...</Text>
       </View>
     )
+    // }
+    // if (image != null) {
+    //   console.log(`image type: ${image}`)
+    //   return (
+    //     <View>
+    //       <Text>LMAO</Text>
+    //       <Image
+    //         source={{ uri: `http://localhost:5050/api/mobile/uploads/${ticket.tc_filepath}` }}
+    //       />
+    //     </View>
+    //   )
+    // }
   }
 
   return (
@@ -151,10 +197,21 @@ const Ticket = ({ route, navigation }) => {
           <Text style={{ ...styles.tableItem, flex: 2 }}>{ticket.tc_createdat.substr(6, 2)}/{ticket.tc_createdat.substr(4, 2)}/{ticket.tc_createdat.substr(0, 4)} {ticket.tc_createdat.substr(8, 2)}:{ticket.tc_createdat.substr(10, 2)}:{ticket.tc_createdat.substr(12, 2)}</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...styles.tableItem, flex: 1 }}>FILE</Text>
+          <View style={{ ...styles.tableItem, flex: 2 }}>{hasImage()}</View>
+
+        </View>
+        <View style={{ flexDirection: 'row' }}>
           <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>STATUS</Text>
           <Text style={{ ...styles.tableItem, flex: 2, borderBottomRightRadius: 5 }}>{ticket.tc_status}</Text>
         </View>
       </View>
+      {/* <Image
+        source={require('../../../backend_mobile/uploads/helpdesk/fanihehe.jpg')}
+
+      /> */}
+
+
       <View style={{ marginVertical: 10 }}>
         {renderButton()}
       </View>

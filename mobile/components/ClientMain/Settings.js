@@ -11,16 +11,21 @@ import DropdownMenu from 'react-native-dropdown-menu';
 import { useDispatch, useSelector } from 'react-redux'
 import { setUser, resetUser } from '../../redux/currentUser';
 
+import { useIsFocused } from '@react-navigation/native';
+
 
 const Settings = ({ navigation }) => {
-  console.log('Settings.js render...')
+  const isFocused = useIsFocused()
   const currentUser = useSelector(state => state.currentUser.value)
   const dispatch = useDispatch()
-  const [loaded, setLoaded] = useState(false)
+  const [isLoaded, setIsLoaded] = useState(false)
 
   useEffect(() => {
-    navigation.setOptions({ title: 'Settings' })
-    console.log(`Settings.useEffect: activated`)
+    if (isFocused) {
+      // console.log('Client.Settings.useEffect: called')
+      navigation.setOptions({ title: 'Settings' })
+      setIsLoaded(true)
+    }
 
     // comment [S]
     // const unsubscribe = navigation.addListener('focus', () => {
@@ -39,14 +44,18 @@ const Settings = ({ navigation }) => {
     // // }
     // return unsubscribe;
     // //comment [E]
-    setLoaded(true)
-  }, []);
+    return () => {
+      setIsLoaded(false)
+    }
+  }, [isFocused])
+
+
 
   const getUserDetails = async () => {
     console.log(`Settings.getUserDetails: called`)
     const uid = auth().currentUser.uid
     try {
-      const axiosGetResponse = await axios.get(`http://localhost:5050/auth/getdata/client/${uid}`)
+      const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/client/${uid}`)
       console.log(`${JSON.stringify(axiosGetResponse.data[0])}`)
       setclient({
         ...client,
@@ -66,7 +75,7 @@ const Settings = ({ navigation }) => {
     dispatch(resetUser())
   }
 
-  if (!loaded) {
+  if (!isLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Settings is loading...</Text>
@@ -77,6 +86,7 @@ const Settings = ({ navigation }) => {
       </View>
     )
   } else {
+    console.log(typeof currentUser.cl_pjcode)
     return (
       <View style={{ flex: 1, margin: 10 }}>
         <View style={{ borderWidth: 0.5, borderRadius: 5, borderColor: 'grey', marginVertical: 5 }}>
@@ -89,8 +99,18 @@ const Settings = ({ navigation }) => {
             <Text style={{ ...styles.tableItem, flex: 2 }}>@{currentUser.cl_username}</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.tableItem, flex: 1 }}>PHONE NO.</Text>
+            <Text style={{ ...styles.tableItem, flex: 2 }}>{currentUser.cl_phonenum}</Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
             <Text style={{ ...styles.tableItem, flex: 1 }}>EMAIL</Text>
             <Text style={{ ...styles.tableItem, flex: 2 }}>{currentUser.cl_email}</Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>PROJECT CODES</Text>
+            <Text style={{ ...styles.tableItem, flex: 2, borderBottomRightRadius: 5 }}>
+              {JSON.stringify(currentUser.cl_pjcode).slice(1, -1).replace(/\,/g, ", ").replace(/\"/g, "")}
+            </Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
             <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>CURRENT PROJECT CODE</Text>

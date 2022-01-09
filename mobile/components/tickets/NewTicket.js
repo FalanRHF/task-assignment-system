@@ -1,33 +1,138 @@
 import React, { Component, useState, useEffect } from 'react';
-import { View } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
-import { DropdownMenu } from 'react-native-dropdown-menu';
+import { View, Image } from 'react-native';
+import { TextInput, Button, Text, Chip } from 'react-native-paper';
 
 import auth from '@react-native-firebase/auth';
 import axios from 'axios';
 
-
-import firestore from '@react-native-firebase/firestore';
-
+import ImagePicker, { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 
 const NewTicket = ({ route, navigation }) => {
   const [title, settitle] = useState('')
   const [detail, setdetail] = useState('')
   const pjcode = route.params.code
   // const [ticket, setTicket] = useState([])
+  // const [imageExist, setImageExist] = useState(false)
+  const [imageAsset, setImageAsset] = useState({ imageExist: false })
+  const [uri, setUri] = useState('')
+  const [uploadedFile, setUploadedFile] = useState(null)
 
   // useEffect(() => {
   //   return () => {}
   // }, [])
 
   // const setTicketData = (key, value) => {
-  //   var data = {};
-  //   data[key] = value;
+  //   var data = {}
+  //   data[key] = value
   //   setTicket({
   //     ...ticket,
   //     ...data,
   //   })
   // }
+  const submitButton = () => {
+    if (title.trim() != '' && detail.trim() != '') {
+      return (
+        <View>
+          <Button
+            mode="contained"
+            onPress={() => onSubmitTicket()}
+          >Submit</Button>
+        </View>
+      )
+    } else {
+      return (
+        <View>
+          <Button
+            mode="contained"
+            onPress={() => onSubmitTicket()}
+            disabled='true'
+          >Submit</Button>
+        </View>
+      )
+    }
+  }
+
+
+  const uploadImage = (imageURI, ticketID) => {
+    console.log(`NewTicket.uploadImage: called`)
+    console.log(`imageURI: ${imageURI}`)
+    let fd = new FormData()
+    const fileName = ticketID + '.jpg'
+    fd.append('ticketImage', { uri: imageURI, type: 'image/jpg', name: fileName })
+    return new Promise(async (resolve, reject) => {
+      try {
+        const res = axios.post(`http://localhost:5050/api/mobile/helpdesk/uploadfile`, fd)
+        console.log(`NewTicket.uploadImage: success`)
+        console.log(JSON.stringify(res))
+        resolve('helpdesk/' + fileName)
+      } catch (error) {
+        console.log(`NewTicket.uploadImage: error= ${error}`)
+        reject(error)
+      }
+    })
+  }
+
+  const pickImageHandler = async () => {
+    // ImagePicker.showImagePicker({ title: 'Pick an Image', maxWidth: 800, maxHeight: 600 },
+    //   response => {
+    //     if (response.error) {
+    //       console.log("image error");
+    //     } else {
+    //       console.log("Image: " + response.uri)
+    //     }
+    //   }
+    // )
+    try {
+      const res = await launchImageLibrary()
+      console.log(`result: ${JSON.stringify(res.assets[0])}`)
+      // const res = await launchImageLibrary()
+      // console.log(`result: ${JSON.stringify(res)}`)
+      setImageAsset({
+        ...res.assets[0],
+        imageExist: true
+      })
+      // setUri(res.assets[0].uri)
+      // setUploadedFile(res)
+      // setUri('meow')
+      // setImageExist(true)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const showImage = () => {
+    if (imageAsset.imageExist) {
+      return (
+        <View style={{ flex: 1 }}>
+          {/* <Chip
+            style={{ backgroundColor: 'red', paddingTop: 30, margin: 0, height: 90, borderColor: 'yellow', borderWidth: 2 }}
+            // key={ }
+            mode='outlined'
+            // selected={ }
+            // disabled={ }
+            // onPress={ }
+            onClose={() => console.log('closing?')}
+          > */}
+          <View style={{ flex: 1, borderColor: 'black', borderWidth: 0 }}>
+            <Image
+              style={{ flex: 1 }}
+              resizeMode='contain'
+              source={{
+                uri: imageAsset.uri
+              }}
+            />
+          </View>
+          {/* </Chip> */}
+        </View>
+      )
+    }
+    else {
+      return (
+        <View>
+        </View>
+      )
+    }
+  }
 
   const getCurrentDate = () => {
     console.log(`NewTicket.onSubmitTicket.getCurrentDate: called`)
@@ -55,7 +160,7 @@ const NewTicket = ({ route, navigation }) => {
     console.log(`NewTicket.onSubmitTicket.getLatestTicketID(${projectID}): called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`http://localhost:5050/helpdesk/lastid/${projectID}`)
+        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/helpdesk/lastid/${projectID}`)
 
         console.log(`NewTicket.onSubmitTicket.getLatestTicketID(${projectID}).axiosGetResponse: ${JSON.stringify(axiosGetResponse.data)}`)
         if (axiosGetResponse.data == "") {
@@ -75,14 +180,36 @@ const NewTicket = ({ route, navigation }) => {
     console.log(`NewTicket.onSubmitTicket.createNewTicket: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post(`http://localhost:5050/helpdesk/postnewticket`, {
+        const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/postnewticket`, {
           tc_id: ticketID,
           tc_pjcode: pjcode,
-          tc_title: title,
-          tc_detail: detail,
+          tc_title: title.trim(),
+          tc_detail: detail.trim(),
+          tc_createdat: date,
+          tc_status: 'PENDING'
+        })
+
+        resolve(axiosPostResponse)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  }
+
+  const createNewTicketWithImage = (ticketID, date, filePath) => {
+    console.log(`NewTicket.onSubmitTicket.createNewTicket: called`)
+    return new Promise(async (resolve, reject) => {
+      try {
+        const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/postnewticketwithimage`, {
+          tc_id: ticketID,
+          tc_pjcode: pjcode,
+          tc_title: title.trim(),
+          tc_detail: detail.trim(),
           tc_createdat: date,
           tc_status: 'PENDING',
+          tc_filepath: filePath
         })
+
         resolve(axiosPostResponse)
       } catch (error) {
         reject(error)
@@ -100,7 +227,12 @@ const NewTicket = ({ route, navigation }) => {
       console.log(`NewTicket.onSubmitTicket: latestID=${latestID}`)
       ticketID = ticketID + (++latestID < 10 ? '0' : '') + latestID
       console.log(`NewTicket.onSubmitTicket: next projectID=${ticketID}`)
-      const nice = await createNewTicket(ticketID, date)
+      if (imageAsset.imageExist) {
+        const filePath = await uploadImage(imageAsset.uri, ticketID)
+        const nice = await createNewTicketWithImage(ticketID, date, filePath)
+      } else {
+        const nice = await createNewTicket(ticketID, date)
+      }
       navigation.popToTop()
     } catch (error) {
       console.log(error)
@@ -123,15 +255,30 @@ const NewTicket = ({ route, navigation }) => {
           label='DETAILS'
           placeholder="DETAILS"
           mode='outlined'
+          style={{ height: 135 }}
           onChangeText={(detail) => setdetail(detail)}
         />
       </View>
+      <View style={{ marginVertical: 10, flexDirection: 'row', alignItems: 'center' }}>
+        <View style={{ marginRight: 10 }}>
+          <Button style={{ marginVertical: 5 }} onPress={() => pickImageHandler()}
+            mode='contained'>UPLOAD IMAGE</Button>
+          <Button style={{ backgroundColor: 'red', marginVertical: 5 }} onPress={() => setImageAsset({ imageExist: false })}
+            mode='contained'>REMOVE IMAGE</Button>
+        </View>
+        <View style={{ borderColor: 'grey', borderWidth: 1, flex: 1, padding: 5, height: 135 }}>
+          {showImage()}
+        </View>
+      </View>
       <View style={{ marginVertical: 10 }}>
+        {submitButton()}
+      </View>
+      {/* <View style={{ marginVertical: 10 }}>
         <Button
           mode="contained"
-          onPress={() => onSubmitTicket()}
-        >Submit</Button>
-      </View>
+          onPress={() => uploadImage(imageAsset.uri)}
+        >UPLOAD FILE</Button>
+      </View> */}
     </View>
   )
 }
