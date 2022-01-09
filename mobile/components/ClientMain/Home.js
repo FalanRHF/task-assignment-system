@@ -35,7 +35,7 @@ const Home = ({ navigation }) => {
   const getPending = async (pjcode) => {
     try {
       console.log(`Project Code: ${currentUser.cl_curpj}`)
-      const res = await axios.get(`http://localhost:5050/helpdesk/pendingticket/${pjcode}`)
+      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/pendingticket/${pjcode}`)
       console.log(`Pending Tickets Data: ${JSON.stringify(res.data)}`)
       setpendingTicket(res.data)
       setIsLoaded(true)

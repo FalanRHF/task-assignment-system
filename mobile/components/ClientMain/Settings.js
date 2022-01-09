@@ -15,9 +15,7 @@ import { useIsFocused } from '@react-navigation/native';
 
 
 const Settings = ({ navigation }) => {
-  console.log('Settings.js rendered')
   const isFocused = useIsFocused()
-  // const [currentUser, setCurrentUser] = useState({})
   const currentUser = useSelector(state => state.currentUser.value)
   const dispatch = useDispatch()
   const [isLoaded, setIsLoaded] = useState(false)
@@ -26,7 +24,6 @@ const Settings = ({ navigation }) => {
     if (isFocused) {
       // console.log('Client.Settings.useEffect: called')
       navigation.setOptions({ title: 'Settings' })
-      // setCurrentUser()
       setIsLoaded(true)
     }
 
@@ -58,7 +55,7 @@ const Settings = ({ navigation }) => {
     console.log(`Settings.getUserDetails: called`)
     const uid = auth().currentUser.uid
     try {
-      const axiosGetResponse = await axios.get(`http://localhost:5050/auth/getdata/client/${uid}`)
+      const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/client/${uid}`)
       console.log(`${JSON.stringify(axiosGetResponse.data[0])}`)
       setclient({
         ...client,

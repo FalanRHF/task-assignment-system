@@ -31,7 +31,7 @@ const Task = ({ route, navigation }) => {
   const loadTask = async () => {
     console.log(`taskID: ${taskID}`)
     try {
-      const axiosGetResponse = await axios.get(`http://localhost:5050/task/gettaskdata/${taskID}`)
+      const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/task/gettaskdata/${taskID}`)
       setTask({
         ...axiosGetResponse.data[0]
       })
@@ -46,7 +46,7 @@ const Task = ({ route, navigation }) => {
   const changeTaskStatus = async (newStatus) => {
     console.log(`changeTaskStatus(${taskID}, ${newStatus}): called`)
     try {
-      const res = await axios.post(`http://localhost:5050/task/updatetaskstatus`, {
+      const res = await axios.post(`http://localhost:5050/api/mobile/task/updatetaskstatus`, {
         ta_id: taskID,
         newStatus: newStatus,
       })

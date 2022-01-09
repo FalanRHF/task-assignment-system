@@ -43,7 +43,7 @@ const EditProfile = ({ navigation }) => {
     console.log(`EditProfile.getUserDetails: called`)
     const uid = auth().currentUser.uid
     try {
-      const axiosGetResponse = await axios.get(`http://localhost:5050/auth/getdata/client/${uid}`)
+      const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/client/${uid}`)
       console.log(`${JSON.stringify(axiosGetResponse.data[0])}`)
       setClient({
         ...client,
@@ -62,7 +62,7 @@ const EditProfile = ({ navigation }) => {
   const updateUserProfile = async () => {
     console.log(`EditProfile.updateUserProfile: called`)
     try {
-      const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/updatedetails`, {
+      const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/clientprofile/updatedetails`, {
         cl_uid: client.cl_uid,
         cl_fullname: client.cl_fullname.toUpperCase(),
         cl_username: client.cl_username,
@@ -85,7 +85,7 @@ const EditProfile = ({ navigation }) => {
       cl_curpj: pjcode
     })
     // try {
-    //   const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/changeproject`, {
+    //   const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/clientprofile/changeproject`, {
     //     cl_uid: uid,
     //     cl_curpj: pjcode,
     //   })
@@ -107,7 +107,7 @@ const EditProfile = ({ navigation }) => {
     })
     // setNewProject('')
     // try {
-    //   const axiosPostResponse = await axios.post(`http://localhost:5050/clientprofile/updateproject`, {
+    //   const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/clientprofile/updateproject`, {
     //     cl_uid: uid,
     //     cl_pjcode: newArrayProject,
     //   })

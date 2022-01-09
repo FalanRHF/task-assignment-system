@@ -30,7 +30,7 @@ const Home = ({ navigation }) => {
 
   const getAllPendingTask = async () => {
     try {
-      const res = await axios.get(`http://localhost:5050/task/pendingtask`)
+      const res = await axios.get(`http://localhost:5050/api/mobile/task/pendingtask`)
       console.log(`Pending Task Data: ${JSON.stringify(res.data)}`)
       setAllPendingTask(res.data)
       setIsLoaded(true)

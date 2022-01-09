@@ -39,7 +39,7 @@ const Ticket = ({ route, navigation }) => {
     console.log(`ticketID=${ticketID}`)
     return new Promise(async (resolve, reject) => {
       try {
-        const res = await axios.get(`http://localhost:5050/helpdesk/getticketdata/${ticketID}`)
+        const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/getticketdata/${ticketID}`)
         console.log(`Ticket Data: \n${JSON.stringify(res.data[0])}`)
         setTicket({
           ...ticket,
@@ -61,7 +61,7 @@ const Ticket = ({ route, navigation }) => {
     console.log(`filePath=${filePath}`)
     return new Promise(async (resolve, reject) => {
       try {
-        const res = await axios.post(`http://localhost:5050/helpdesk/getfile`, {
+        const res = await axios.post(`http://localhost:5050/api/mobile/helpdesk/getfile`, {
           filePath: filePath
         })
         console.log(`res: ${JSON.stringify(res)}`)
@@ -82,7 +82,7 @@ const Ticket = ({ route, navigation }) => {
       // const res = (await firestore().collection('Ticket').where('tc_id', '==', tc_id).get()).docs[0].ref.update({
       //   'tc_status': update,
       // })
-      const res = await axios.post(`http://localhost:5050/helpdesk/updateticketstatus`, {
+      const res = await axios.post(`http://localhost:5050/api/mobile/helpdesk/updateticketstatus`, {
         tc_id: tc_id,
         newStatus: update,
       })
@@ -145,7 +145,7 @@ const Ticket = ({ route, navigation }) => {
       return (
         <View style={{ height: 200, padding: 0 }}>
           <Image
-            source={{ uri: `http://localhost:5050/uploads/${ticket.tc_filepath}` }}
+            source={{ uri: `http://localhost:5050/api/mobile/uploads/${ticket.tc_filepath}` }}
             style={{ aspectRatio: 1, resizeMode: 'contain', maxHeight: 200 }}
           />
         </View>
@@ -166,7 +166,7 @@ const Ticket = ({ route, navigation }) => {
     //     <View>
     //       <Text>LMAO</Text>
     //       <Image
-    //         source={{ uri: `http://localhost:5050/uploads/${ticket.tc_filepath}` }}
+    //         source={{ uri: `http://localhost:5050/api/mobile/uploads/${ticket.tc_filepath}` }}
     //       />
     //     </View>
     //   )

@@ -105,7 +105,7 @@ const Register = ({ navigation }) => {
     return new Promise(async (resolve, reject) => {
       try {
         console.log(`uid: ${fbUID}`)
-        const getPostResponse = await axios.post(`http://localhost:5050/auth/register/client`, {
+        const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/client`, {
           cl_uid: fbUID,
           cl_username: client.username,
           cl_fullname: client.fullname.toUpperCase(),
@@ -129,7 +129,7 @@ const Register = ({ navigation }) => {
     console.log(`usersSignUp`)
     return new Promise(async (resolve, reject) => {
       try {
-        const getPostResponse = await axios.post(`http://localhost:5050/auth/register/users`, {
+        const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/users`, {
           us_uid: fbUID,
           us_type: 'client',
         })

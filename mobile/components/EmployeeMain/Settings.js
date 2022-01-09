@@ -31,7 +31,7 @@ const Settings = ({ navigation }) => {
     console.log(`Settings.getUserDetails: called`)
     const uid = auth().currentUser.uid
     try {
-      const axiosGetResponse = await axios.get(`http://localhost:5050/auth/getdata/client/${uid}`)
+      const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/client/${uid}`)
       console.log(`${JSON.stringify(axiosGetResponse.data[0])}`)
       setclient({
         ...client,

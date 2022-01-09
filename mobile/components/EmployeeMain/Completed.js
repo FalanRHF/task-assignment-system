@@ -80,7 +80,7 @@ const Completed = ({ navigation }) => {
 
   const getCompletedTask = async () => {
     try {
-      const res = await axios.get(`http://localhost:5050/task/completedtask/${currentUser.em_fullname}`)
+      const res = await axios.get(`http://localhost:5050/api/mobile/task/completedtask/${currentUser.em_fullname}`)
       console.log(`Completed Task Data: ${JSON.stringify(res.data)}`)
       setCompletedTask(res.data)
       setIsLoaded(true)

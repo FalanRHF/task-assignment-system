@@ -58,10 +58,10 @@ const NewTicket = ({ route, navigation }) => {
     console.log(`imageURI: ${imageURI}`)
     let fd = new FormData()
     const fileName = ticketID + '.jpg'
-    fd.append('image', { uri: imageURI, type: 'image/jpg', name: fileName })
+    fd.append('ticketImage', { uri: imageURI, type: 'image/jpg', name: fileName })
     return new Promise(async (resolve, reject) => {
       try {
-        const res = axios.post(`http://localhost:5050/helpdesk/uploadfile`, fd)
+        const res = axios.post(`http://localhost:5050/api/mobile/helpdesk/uploadfile`, fd)
         console.log(`NewTicket.uploadImage: success`)
         console.log(JSON.stringify(res))
         resolve('helpdesk/' + fileName)
@@ -160,7 +160,7 @@ const NewTicket = ({ route, navigation }) => {
     console.log(`NewTicket.onSubmitTicket.getLatestTicketID(${projectID}): called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`http://localhost:5050/helpdesk/lastid/${projectID}`)
+        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/helpdesk/lastid/${projectID}`)
 
         console.log(`NewTicket.onSubmitTicket.getLatestTicketID(${projectID}).axiosGetResponse: ${JSON.stringify(axiosGetResponse.data)}`)
         if (axiosGetResponse.data == "") {
@@ -180,7 +180,7 @@ const NewTicket = ({ route, navigation }) => {
     console.log(`NewTicket.onSubmitTicket.createNewTicket: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post(`http://localhost:5050/helpdesk/postnewticket`, {
+        const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/postnewticket`, {
           tc_id: ticketID,
           tc_pjcode: pjcode,
           tc_title: title.trim(),
@@ -200,7 +200,7 @@ const NewTicket = ({ route, navigation }) => {
     console.log(`NewTicket.onSubmitTicket.createNewTicket: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post(`http://localhost:5050/helpdesk/postnewticketwithimage`, {
+        const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/postnewticketwithimage`, {
           tc_id: ticketID,
           tc_pjcode: pjcode,
           tc_title: title.trim(),

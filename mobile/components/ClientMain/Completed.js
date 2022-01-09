@@ -44,7 +44,7 @@ const Completed = ({ navigation }) => {
     console.log(`Completed.getCompleted: called`)
     try {
       console.log(`Project Code: ${currentUser.cl_curpj}`)
-      const res = await axios.get(`http://localhost:5050/helpdesk/completedticket/${pjcode}`)
+      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/completedticket/${pjcode}`)
       console.log(`Resolved Tickets Data: ${JSON.stringify(res.data)}`)
       setCompletedTicket(res.data)
       setIsLoaded(true)

@@ -67,7 +67,7 @@ const Login = ({ navigation }) => {
     console.log(`Login.getUserType: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`http://localhost:5050/auth/getdata/user/${uid}`)
+        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/user/${uid}`)
         console.log(`${JSON.stringify(axiosGetResponse.data[0])}`)
         const userType = axiosGetResponse.data[0].us_type
         console.log(`Login.getUserType: success. userType=${userType}`)
@@ -82,7 +82,7 @@ const Login = ({ navigation }) => {
     console.log(`Login.getClientDetails: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`http://localhost:5050/auth/getdata/client/${uid}`)
+        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/client/${uid}`)
         const clientDetails = axiosGetResponse.data[0]
         console.log(JSON.stringify(clientDetails))
         console.log(`Login.getClientDetails: success`)
@@ -97,7 +97,7 @@ const Login = ({ navigation }) => {
     console.log(`Login.getEmployeeDetails: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`http://localhost:5050/auth/getdata/employee/${uid}`)
+        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/employee/${uid}`)
         const employeeDetails = axiosGetResponse.data[0]
         console.log(JSON.stringify(employeeDetails))
         console.log(`Login.getEmployeeDetails: success`)
