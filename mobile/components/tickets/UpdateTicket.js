@@ -45,7 +45,7 @@ const Ticket = ({ route, navigation }) => {
     try {
       const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/updateticketdetails`, {
         tc_id: tc_id,
-        tc_title: title.trim(),
+        tc_title: title.trim().toUpperCase(),
         tc_detail: detail.trim(),
       })
       console.log(`UpdateTicket.updateTicketDetail: axiosPostResponse=${axiosPostResponse.data[0]}`)

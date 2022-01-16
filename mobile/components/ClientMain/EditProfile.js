@@ -153,14 +153,15 @@ const EditProfile = ({ navigation }) => {
         </View>
         <View style={{ marginVertical: 5 }}>
           <TextInput
-            label='USERNAME'
-            placeholder="USERNAME"
+            label='EMAIL'
+            placeholder="EMAIL"
             mode='outlined'
-            value={client.cl_username}
-            onChangeText={(username) => setClient({
+            value={client.cl_email}
+            onChangeText={(email) => setClient({
               ...client,
-              cl_username: username,
+              cl_email: email,
             })}
+            disabled='true'
           />
         </View>
         <View style={{ marginVertical: 5 }}>
@@ -176,50 +177,7 @@ const EditProfile = ({ navigation }) => {
           />
           <Text style={{ fontSize: 10 }}>Your phone number will be public. Leave empty for privacy.</Text>
         </View>
-        <View style={{ marginVertical: 5 }}>
-          <TextInput
-            label='EMAIL'
-            placeholder="EMAIL"
-            mode='outlined'
-            value={client.cl_email}
-            onChangeText={(email) => setClient({
-              ...client,
-              cl_email: email,
-            })}
-            disabled='true'
-          />
-        </View>
-        <View style={{ marginVertical: 10 }}><Text style={{
-          alignSelf: 'center'
-        }}>PROJECTS</Text>
 
-          {/* <View style={{ ...styles.row, marginVertical: 5 }}> */}
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-            {
-              client.cl_pjcode.map((pj, index) => {
-                return (
-                  <Chip
-                    style={{ ...styles.chip }}
-                    key={index}
-                    mode='flat'
-                    selected={pj == client.cl_curpj}
-                    disabled={pj == client.cl_curpj}
-                    onPress={() => changeCurrentPjcode(pj)}
-                    onClose={() => { pj == client.cl_curpj ? console.log(`close pressed`) : deleteProject(pj) }}
-                  >
-                    {/* <Text style={styles.chipText}>{pj}</Text> */}
-                    {pj}
-                  </Chip>
-
-                )
-              })
-            }
-            <FAB
-              style={{ ...styles.chip, ...styles.fab }}
-              small icon='plus' onPress={showModal} />
-            {/* </View> */}
-          </View>
-        </View>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 10 }}><Button
         mode="contained"
@@ -283,3 +241,36 @@ const styles = StyleSheet.create({
 });
 
 export default EditProfile
+
+//<View style={{ marginVertical: 10 }}>
+//<Text style={{
+//  alignSelf: 'center'
+//}}>PROJECTS</Text>
+
+{/* <View style={{ ...styles.row, marginVertical: 5 }}> */ }
+  // <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+  //   {
+  //     client.cl_pjcode.map((pj, index) => {
+  //       return (
+  //         <Chip
+  //           style={{ ...styles.chip }}
+  //           key={index}
+  //           mode='flat'
+  //           selected={pj == client.cl_curpj}
+  //           disabled={pj == client.cl_curpj}
+  //           onPress={() => changeCurrentPjcode(pj)}
+  //           onClose={() => { pj == client.cl_curpj ? console.log(`close pressed`) : deleteProject(pj) }}
+  //         >
+  //           {/* <Text style={styles.chipText}>{pj}</Text> */}
+  //           {pj}
+  //         </Chip>
+
+  //       )
+  //     })
+  //   }
+  //   <FAB
+  //     style={{ ...styles.chip, ...styles.fab }}
+  //     small icon='plus' onPress={showModal} />
+  //   {/* </View> */}
+  // </View>
+//</View> */}

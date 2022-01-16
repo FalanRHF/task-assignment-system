@@ -3,14 +3,6 @@ import React, { Component, useState, useEffect, useCallback } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native';
 import { useFocusEffect, useIsFocused } from '@react-navigation/native';
 
-import { connect } from "react-redux";
-import { bindActionCreators } from "redux";
-import { fetchClient } from '../../oldredux/actions';
-
-import firebase from 'firebase';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
-
 import { Button, Divider, Text } from 'react-native-paper';
 
 //redux
@@ -36,15 +28,15 @@ const Completed = ({ navigation }) => {
   useEffect(() => {
     if (isFocused) {
       // console.log(`Client.Completed.useEffect: called`)
-      getCompleted(currentUser.cl_curpj)
+      getCompleted(currentUser.cl_cmcode)
     }
   }, [isFocused])
 
-  const getCompleted = async (pjcode) => {
+  const getCompleted = async (cmcode) => {
     console.log(`Completed.getCompleted: called`)
     try {
-      console.log(`Project Code: ${currentUser.cl_curpj}`)
-      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/completedticket/${pjcode}`)
+      console.log(`Company Code: ${cmcode}`)
+      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/completedticket/${cmcode}`)
       console.log(`Resolved Tickets Data: ${JSON.stringify(res.data)}`)
       setCompletedTicket(res.data)
       setIsLoaded(true)
@@ -59,7 +51,7 @@ const Completed = ({ navigation }) => {
         <Text>Completed is loading...</Text>
       </View>
     )
-  } else if (currentUser.cl_curpj == null) {
+  } else if (currentUser.cl_cmcode == null) {
     return (
       <View>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -71,7 +63,7 @@ const Completed = ({ navigation }) => {
     return (
       <View style={{ flex: 1 }}>
         <View style={{ backgroundColor: '#f4b210', alignItems: 'center', paddingVertical: 2 }}>
-          <Text style={{ fontSize: 12, fontWeight: 'bold' }}>Project Code: {currentUser.cl_curpj}</Text>
+          <Text style={{ fontSize: 12, fontWeight: 'bold' }}>Company Code: {currentUser.cl_cmcode}</Text>
         </View>
         <View style={{ marginHorizontal: 16 }}>
           <View style={{ paddingVertical: 20 }}>

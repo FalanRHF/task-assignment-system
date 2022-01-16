@@ -3,12 +3,16 @@ import { View } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import axios from 'axios';
 
+import DropDown from "react-native-paper-dropdown";
+
 import auth from '@react-native-firebase/auth';
 
 
 const Register = ({ navigation }) => {
   const [password, setPassword] = useState('')
   const [employee, setEmployee] = useState({})
+  const [showDropDown, setShowDropDown] = useState(false)
+  const [state, setState] = useState('')
   // const [uid, setUid] = useState('')
   const setEmployeeData = (key, value) => {
     var data = {};
@@ -25,9 +29,28 @@ const Register = ({ navigation }) => {
     }
   }, [])
 
+  const stateList = [
+    { label: 'JOHOR', value: 'JOHOR' },
+    { label: 'KEDAH', value: 'KEDAH' },
+    { label: 'KELANTAN', value: 'KELANTAN' },
+    { label: 'MELAKA', value: 'MELAKA' },
+    { label: 'NEGERI SEMBILAN', value: 'N9' },
+    { label: 'PAHANG', value: 'PAHANG' },
+    { label: 'PERAK', value: 'PERAK' },
+    { label: 'PERLIS', value: 'PERLIS' },
+    { label: 'PULAU PINANG', value: 'PENANG' },
+    { label: 'SABAH', value: 'SABAH' },
+    { label: 'SARAWAK', value: 'SARAWAK' },
+    { label: 'SELANGOR', value: 'SELANGOR' },
+    { label: 'TERENGGANU', value: 'TERENGGANU' },
+    { label: 'WP KUALA LUMPUR', value: 'WPKL' },
+    { label: 'WP LABUAN', value: 'WPL' },
+    { label: 'WP PUTRAJAYA', value: 'WPP' },
+  ]
+
   const onSignUpButton = async (e) => {
     console.log(`EmployeeRegister.onSignUpButton: called`)
-    //e.preventDefault() //avoids auto go to App.js
+    console.log(JSON.stringify(employee))
     try {
       const fbUID = await firebaseSignUp()
       await employeeSignUp(fbUID)
@@ -59,7 +82,6 @@ const Register = ({ navigation }) => {
         const fbresult = await auth()
           .createUserWithEmailAndPassword(employee.email, password)
         console.log(`firebaseSignUp() success`)
-        // setUid(auth().currentUser.uid)
         resolve(auth().currentUser.uid)
       } catch (error) {
         if (error.code === 'auth/email-already-in-use') {
@@ -70,7 +92,7 @@ const Register = ({ navigation }) => {
         }
         reject(error)
       }
-    });
+    })
   }
 
   const employeeSignUp = (fbUID) => {
@@ -81,10 +103,10 @@ const Register = ({ navigation }) => {
         const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/employee`, {
           em_uid: fbUID,
           em_fullname: employee.fullname.toUpperCase(),
-          em_username: employee.username,
-          em_email: employee.email
+          em_email: employee.email,
+          em_phonenum: employee.phonenum,
+          em_state: state
         })
-
         console.log(`App.Login.PreRegister.employeeRegister.employeeSignUp: ${JSON.stringify(getPostResponse.data)}`)
         resolve(getPostResponse)
       } catch (error) {
@@ -116,20 +138,36 @@ const Register = ({ navigation }) => {
     <View style={{ flex: 1, paddingHorizontal: 15, backgroundColor: '#232323' }}>
       <View style={{ marginVertical: 15 }}>
         <TextInput
-          placeholder="Full Name"
-          label='Full Name'
+          placeholder="FULL NAME"
+          label='FULL NAME'
           mode='outlined' onChangeText={(fullname) => setEmployeeData('fullname', fullname)}
         />
         <TextInput
-          placeholder="Username"
-          mode='outlined' onChangeText={(username) => setEmployeeData('username', username)}
-        />
-        <TextInput
-          placeholder="Email Address"
+          placeholder="EMAIL ADDRESS"
+          label='EMAIL ADDRESS'
           mode='outlined' onChangeText={(email) => setEmployeeData('email', email)}
         />
         <TextInput
-          placeholder="Password"
+          placeholder="PHONE NUMBER"
+          label='PHONE NUMBER'
+          mode='outlined' onChangeText={(phonenum) => setEmployeeData('phonenum', phonenum)}
+        />
+        <View>
+          <DropDown
+            label={"STATE"}
+            mode={"outlined"}
+            visible={showDropDown}
+            showDropDown={() => setShowDropDown(true)}
+            onDismiss={() => setShowDropDown(false)}
+            value={state}
+            setValue={setState}
+            list={stateList}
+            dropDownItemStyle={{ backgroundColor: 'white' }}
+          />
+        </View>
+        <TextInput
+          placeholder="PASSWORD"
+          label='PASSWORD'
           secureTextEntry={true}
           mode='outlined' onChangeText={(password) => setPassword(password)}
         />
