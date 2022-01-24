@@ -7,8 +7,8 @@ const theme = createTheme({
       paper: '#ffffff'
     },
     primary: {
-      contrastText: '#ffffff',
-      main: '#5664d2'
+      contrastText: '#000000', //ffffff
+      main: '#f4b210' //5664d2
     },
     text: {
       primary: '#172b4d',

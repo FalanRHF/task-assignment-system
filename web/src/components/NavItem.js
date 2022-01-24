@@ -6,12 +6,7 @@ import {
 import PropTypes from 'prop-types';
 import { Button, ListItem } from '@material-ui/core';
 
-const NavItem = ({
-  href,
-  icon: Icon,
-  title,
-  ...rest
-}) => {
+const NavItem = ({ href, icon: Icon, title, ...rest }) => {
   const location = useLocation();
 
   const active = href ? !!matchPath({
