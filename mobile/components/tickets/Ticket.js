@@ -1,12 +1,17 @@
 import firestore from '@react-native-firebase/firestore';
+import { current } from '@reduxjs/toolkit';
 
 import axios from 'axios';
 import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, Text, TouchableOpacity, FlatList, Image } from 'react-native';
-import { Button } from 'react-native-paper';
+import { Button } from 'react-native-paper'
+
+//redux
+import { useSelector } from 'react-redux'
 
 const Ticket = ({ route, navigation }) => {
   const { tc_id } = route.params
+  const currentUser = useSelector(state => state.currentUser.value)
   const [ticket, setTicket] = useState({})
   const [imagePath, setImagePath] = useState('')
   const [isLoaded, setIsLoaded] = useState(false)
@@ -56,24 +61,6 @@ const Ticket = ({ route, navigation }) => {
     })
   }
 
-  const getImage = (filePath) => {
-    console.info(`Ticket.getImage(): called`)
-    console.log(`filePath=${filePath}`)
-    return new Promise(async (resolve, reject) => {
-      try {
-        const res = await axios.post(`http://localhost:5050/api/mobile/helpdesk/getfile`, {
-          filePath: filePath
-        })
-        console.log(`res: ${JSON.stringify(res)}`)
-        setImage(res.data)
-        resolve('')
-      } catch (error) {
-        console.error(`Ticket.getImage(): ERROR`)
-        reject(error)
-      }
-    })
-  }
-
 
   const changeTicketStatus = async (update) => {
     console.log(`Ticket.changeTicketStatus: called`)
@@ -95,44 +82,56 @@ const Ticket = ({ route, navigation }) => {
   }
 
   const renderButton = () => {
-    if (ticket.tc_status == 'PENDING') {
+    if (currentUser.type == 'client') {
+      if (ticket.tc_status == 'PENDING') {
+        return (
+          <View>
+            <Button
+              mode="contained"
+              onPress={() => {
+                console.log('Ticket.renderButton: navigating to UpdateTicket.js...')
+                navigation.navigate('UpdateTicket', {
+                  tc_id: ticket.tc_id,
+                })
+              }}
+            >Edit Ticket</Button>
+          </View>
+        )
+      }
       return (
-        <View>
-          <Button
-            mode="contained"
-            onPress={() => {
-              console.log('Ticket.renderButton: navigating to UpdateTicket.js...');
-              navigation.navigate('UpdateTicket', {
-                tc_id: ticket.tc_id,
-              });
-            }}
-          >Edit Ticket</Button>
-          <Button
-            mode="outlined"
-            onPress={() => { console.log('Change pressed'); changeTicketStatus('IN PROGRESS'); }}
-          >Change Status to "In Progress"</Button>
-        </View>
+        <View></View>
       )
     }
-    else if (ticket.tc_status == 'IN PROGRESS') {
-      return (
+    if (ticket.tc_assignedto == currentUser.em_fullname) {
+      if (ticket.tc_status == 'PENDING') {
+        return (
+          <View>
+            <Button
+              mode="outlined"
+              onPress={() => { console.log('Change pressed'); changeTicketStatus('IN PROGRESS'); }}
+            >Change Status to "In Progress"</Button>
+          </View>
+        )
+      }
+      else if (ticket.tc_status == 'IN PROGRESS') {
+        return (
+          <View>
+            <Button
+              mode="outlined"
+              onPress={() => { console.log('Change pressed'); changeTicketStatus('RESOLVED'); }}
+            >Change Status to "RESOLVED"</Button>
+          </View>
+        )
+      } return (
         <View>
-          <Button
-            mode="outlined"
-            onPress={() => { console.log('Change pressed'); changeTicketStatus('PENDING'); }}
-          >Change Status to "Pending"</Button>
-          <Button
-            mode="outlined"
-            onPress={() => { console.log('Change pressed'); changeTicketStatus('RESOLVED'); }}
-          >Change Status to "RESOLVED"</Button>
+          <Button color='green' title='RESOLVED' onPress={() => { console.log('Change pressed') }} />
         </View>
       )
     }
     return (
-      <View>
-        <Button color='green' title='RESOLVED' onPress={() => { console.log('Change pressed'); }} />
-      </View>
+      <View></View>
     )
+
   }
 
   const hasImage = () => {
@@ -145,7 +144,7 @@ const Ticket = ({ route, navigation }) => {
       return (
         <View style={{ height: 200, padding: 0 }}>
           <Image
-            source={{ uri: `http://localhost:5050/api/mobile/uploads/${ticket.tc_filepath}` }}
+            source={{ uri: `http://localhost:5050/${ticket.tc_filepath}` }}
             style={{ aspectRatio: 1, resizeMode: 'contain', maxHeight: 200 }}
           />
         </View>
@@ -153,24 +152,42 @@ const Ticket = ({ route, navigation }) => {
     }
   }
 
+  const extraDetails = () => {
+    if (currentUser.type == 'client') {
+      return (
+        <View></View>
+      )
+    }
+    return (
+      <View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...styles.tableItem, flex: 1 }}>ASSIGNED TO</Text>
+          <Text style={{ ...styles.tableItem, flex: 2 }}>{ticket.tc_assignedto}</Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...styles.tableItem, flex: 1 }}>DUE DATE</Text>
+          <Text style={{ ...styles.tableItem, flex: 2 }}>{ticket.tc_duedate == null ? '' : ticket.tc_duedate.substr(6, 2) + '/' + ticket.tc_duedate.substr(4, 2) + '/' + ticket.tc_duedate.substr(0, 4)}</Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...styles.tableItem, flex: 1 }}>PRIORITY</Text>
+          <Text style={{ ...styles.tableItem, flex: 2 }}>{ticket.tc_priority}</Text>
+        </View>
+        <View style={{ flexDirection: 'row' }}>
+          <Text style={{ ...styles.tableItem, flex: 1 }}>COMPLETED DATE</Text>
+          <Text style={{ ...styles.tableItem, flex: 2 }}>{ticket.tc_completeddate == null ? '' : ticket.tc_completeddate.substr(6, 2) + '/' + ticket.tc_completeddate.substr(4, 2) + '/' + ticket.tc_completeddate.substr(0, 4)}</Text>
+        </View>
+      </View>
+    )
+
+  }
+
+
   if (!isLoaded) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <Text>Ticket data is loading...</Text>
       </View>
     )
-    // }
-    // if (image != null) {
-    //   console.log(`image type: ${image}`)
-    //   return (
-    //     <View>
-    //       <Text>LMAO</Text>
-    //       <Image
-    //         source={{ uri: `http://localhost:5050/api/mobile/uploads/${ticket.tc_filepath}` }}
-    //       />
-    //     </View>
-    //   )
-    // }
   }
 
   return (
@@ -179,10 +196,6 @@ const Ticket = ({ route, navigation }) => {
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ ...styles.tableItem, flex: 1, borderTopLeftRadius: 5 }}>TICKET ID</Text>
           <Text style={{ ...styles.tableItem, flex: 2, borderTopRightRadius: 5 }}>{ticket.tc_id}</Text>
-        </View>
-        <View style={{ flexDirection: 'row', justifyContent: 'center' }}>
-          <Text style={{ ...styles.tableItem, flex: 1 }}>PROJECT CODE</Text>
-          <Text style={{ ...styles.tableItem, flex: 2 }}>{ticket.tc_pjcode}</Text>
         </View>
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ ...styles.tableItem, flex: 1 }}>TITLE</Text>
@@ -199,8 +212,8 @@ const Ticket = ({ route, navigation }) => {
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ ...styles.tableItem, flex: 1 }}>FILE</Text>
           <View style={{ ...styles.tableItem, flex: 2 }}>{hasImage()}</View>
-
         </View>
+        {extraDetails()}
         <View style={{ flexDirection: 'row' }}>
           <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>STATUS</Text>
           <Text style={{ ...styles.tableItem, flex: 2, borderBottomRightRadius: 5 }}>{ticket.tc_status}</Text>

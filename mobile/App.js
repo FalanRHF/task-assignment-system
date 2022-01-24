@@ -17,11 +17,11 @@ import currentUserReducer, { resetUser } from "./redux/currentUser"
 import LoadingScreen from './components/Loading';
 
 //Auth Screens
-import PreRegisterScreen from './components/auth/PreRegister';
-import ClientRegisterScreen from './components/auth/ClientRegister';
-import EmployeeRegisterScreen from './components/auth/EmployeeRegister';
-import PostRegisterScreen from './components/auth/PostRegister';
-import LoginScreen from './components/auth/Login';
+import PreRegisterScreen from './components/Auth/PreRegister';
+import ClientRegisterScreen from './components/Auth/ClientRegister';
+import EmployeeRegisterScreen from './components/Auth/EmployeeRegister';
+import PostRegisterScreen from './components/Auth/PostRegister';
+import LoginScreen from './components/Auth/Login';
 
 //Client Screens
 import ClientMainScreen from './components/ClientMain';
@@ -62,8 +62,6 @@ const NetsinityApp = () => {
   const currentUser = useSelector(state => state.currentUser.value)
   const dispatch = useDispatch()
 
-  // console.log(`App.js render...`)
-  // console.log(`currentUser.loggedin= ${currentUser.loggedin}`)
 
   useEffect(() => {
     console.log(`App.useEffect: rendering...`)
@@ -119,6 +117,7 @@ const NetsinityApp = () => {
     <Stack.Navigator>
       <Stack.Screen name="EmployeeMain" component={EmployeeMainScreen} options={{ headerShown: false, headerTitleAlign: 'center' }} />
       <Stack.Screen name="Task" component={TaskScreen} options={{ title: 'Task', headerTitleAlign: 'center' }} />
+      <Stack.Screen name="Ticket" component={TicketScreen} options={{ title: 'Ticket', headerTitleAlign: 'center' }} />
     </Stack.Navigator>
   )
 }

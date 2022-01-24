@@ -10,12 +10,12 @@ import ImagePicker, { launchCamera, launchImageLibrary } from 'react-native-imag
 const NewTicket = ({ route, navigation }) => {
   const [title, settitle] = useState('')
   const [detail, setdetail] = useState('')
-  const pjcode = route.params.code
+  const { cmcode } = route.params
   // const [ticket, setTicket] = useState([])
   // const [imageExist, setImageExist] = useState(false)
   const [imageAsset, setImageAsset] = useState({ imageExist: false })
-  const [uri, setUri] = useState('')
-  const [uploadedFile, setUploadedFile] = useState(null)
+  // const [uri, setUri] = useState('')
+  // const [uploadedFile, setUploadedFile] = useState(null)
 
   // useEffect(() => {
   //   return () => {}
@@ -61,10 +61,11 @@ const NewTicket = ({ route, navigation }) => {
     fd.append('ticketImage', { uri: imageURI, type: 'image/jpg', name: fileName })
     return new Promise(async (resolve, reject) => {
       try {
-        const res = axios.post(`http://localhost:5050/api/mobile/helpdesk/uploadfile`, fd)
+        const { data } = await axios.post(`http://localhost:5050/api/mobile/helpdesk/uploadfile`, fd)
         console.log(`NewTicket.uploadImage: success`)
-        console.log(JSON.stringify(res))
-        resolve('helpdesk/' + fileName)
+        // console.log(JSON.stringify(res))
+        resolve(data.data.path)
+        resolve(null)
       } catch (error) {
         console.log(`NewTicket.uploadImage: error= ${error}`)
         reject(error)
@@ -156,13 +157,13 @@ const NewTicket = ({ route, navigation }) => {
     })
   }
 
-  const getLatestTicketID = (projectID) => {
-    console.log(`NewTicket.onSubmitTicket.getLatestTicketID(${projectID}): called`)
+  const getLatestTicketID = (ticketID) => {
+    console.log(`NewTicket.onSubmitTicket.getLatestTicketID(${ticketID}): called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/helpdesk/lastid/${projectID}`)
+        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/helpdesk/lastid/${ticketID}`)
 
-        console.log(`NewTicket.onSubmitTicket.getLatestTicketID(${projectID}).axiosGetResponse: ${JSON.stringify(axiosGetResponse.data)}`)
+        console.log(`NewTicket.onSubmitTicket.getLatestTicketID(${ticketID}).axiosGetResponse: ${JSON.stringify(axiosGetResponse.data)}`)
         if (axiosGetResponse.data == "") {
           //console.log("00")
           resolve("00")
@@ -182,8 +183,8 @@ const NewTicket = ({ route, navigation }) => {
       try {
         const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/postnewticket`, {
           tc_id: ticketID,
-          tc_pjcode: pjcode,
-          tc_title: title.trim(),
+          tc_cmcode: cmcode,
+          tc_title: title.trim().toUpperCase(),
           tc_detail: detail.trim(),
           tc_createdat: date,
           tc_status: 'PENDING'
@@ -202,8 +203,8 @@ const NewTicket = ({ route, navigation }) => {
       try {
         const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/postnewticketwithimage`, {
           tc_id: ticketID,
-          tc_pjcode: pjcode,
-          tc_title: title.trim(),
+          tc_cmcode: cmcode,
+          tc_title: title.trim().toUpperCase(),
           tc_detail: detail.trim(),
           tc_createdat: date,
           tc_status: 'PENDING',
@@ -222,11 +223,11 @@ const NewTicket = ({ route, navigation }) => {
     try {
       const date = await getCurrentDate()
       console.log(`NewTicket.onSubmitTicket: date=${date}`)
-      var ticketID = pjcode + date.substr(0, 8)
+      var ticketID = cmcode + date.substr(0, 8)
       var latestID = await getLatestTicketID(ticketID)
       console.log(`NewTicket.onSubmitTicket: latestID=${latestID}`)
       ticketID = ticketID + (++latestID < 10 ? '0' : '') + latestID
-      console.log(`NewTicket.onSubmitTicket: next projectID=${ticketID}`)
+      console.log(`NewTicket.onSubmitTicket: next ticketID=${ticketID}`)
       if (imageAsset.imageExist) {
         const filePath = await uploadImage(imageAsset.uri, ticketID)
         const nice = await createNewTicketWithImage(ticketID, date, filePath)

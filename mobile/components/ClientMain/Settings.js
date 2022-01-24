@@ -49,8 +49,6 @@ const Settings = ({ navigation }) => {
     }
   }, [isFocused])
 
-
-
   const getUserDetails = async () => {
     console.log(`Settings.getUserDetails: called`)
     const uid = auth().currentUser.uid
@@ -67,6 +65,8 @@ const Settings = ({ navigation }) => {
       console.log(`Settings.getUserDetails: [ERROR] ${error}`)
     }
   }
+  //create table comcom (name VARCHAR, code VARCHAR);
+  //create table meow(name VARCHAR, cname VARCHAR, constraint fk_cname FOREIGN KEY(cname) references comcom(name) on delete set null);
 
   const onLogOutButton = () => {
     auth()
@@ -86,7 +86,6 @@ const Settings = ({ navigation }) => {
       </View>
     )
   } else {
-    console.log(typeof currentUser.cl_pjcode)
     return (
       <View style={{ flex: 1, margin: 10 }}>
         <View style={{ borderWidth: 0.5, borderRadius: 5, borderColor: 'grey', marginVertical: 5 }}>
@@ -95,27 +94,21 @@ const Settings = ({ navigation }) => {
             <Text style={{ ...styles.tableItem, flex: 2, borderTopRightRadius: 5 }}>{currentUser.cl_fullname}</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={{ ...styles.tableItem, flex: 1 }}>USERNAME</Text>
-            <Text style={{ ...styles.tableItem, flex: 2 }}>@{currentUser.cl_username}</Text>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
-            <Text style={{ ...styles.tableItem, flex: 1 }}>PHONE NO.</Text>
-            <Text style={{ ...styles.tableItem, flex: 2 }}>{currentUser.cl_phonenum}</Text>
-          </View>
-          <View style={{ flexDirection: 'row' }}>
             <Text style={{ ...styles.tableItem, flex: 1 }}>EMAIL</Text>
             <Text style={{ ...styles.tableItem, flex: 2 }}>{currentUser.cl_email}</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>PROJECT CODES</Text>
-            <Text style={{ ...styles.tableItem, flex: 2, borderBottomRightRadius: 5 }}>
-              {JSON.stringify(currentUser.cl_pjcode).slice(1, -1).replace(/\,/g, ", ").replace(/\"/g, "")}
-            </Text>
+            <Text style={{ ...styles.tableItem, flex: 1 }}>COMPANY NAME</Text>
+            <Text style={{ ...styles.tableItem, flex: 2 }}>{currentUser.cm_name}</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>CURRENT PROJECT CODE</Text>
+            <Text style={{ ...styles.tableItem, flex: 1 }}>COMPANY CODE</Text>
+            <Text style={{ ...styles.tableItem, flex: 2 }}>{currentUser.cl_cmcode}</Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>PHONE NO.</Text>
             <Text style={{ ...styles.tableItem, flex: 2, borderBottomRightRadius: 5 }}>
-              {currentUser.cl_curpj}
+              {currentUser.cl_phonenum}
             </Text>
           </View>
         </View>

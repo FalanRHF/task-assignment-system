@@ -20,7 +20,7 @@ const Separator = () => (
 
 const Home = ({ navigation }) => {
   const isFocused = useIsFocused()
-  const [curpjcode, setcurpjcode] = useState('')
+  // const [curpjcode, setcurpjcode] = useState('')
   const [isLoaded, setIsLoaded] = useState(false)
   const [pendingTicket, setpendingTicket] = useState([])
   const currentUser = useSelector(state => state.currentUser.value)
@@ -28,14 +28,14 @@ const Home = ({ navigation }) => {
   useEffect(() => {
     if (isFocused) {
       // console.log(`Client.Home.useEffect: called`)
-      getPending(currentUser.cl_curpj)
+      getPending(currentUser.cl_cmcode)
     }
   }, [isFocused])
 
-  const getPending = async (pjcode) => {
+  const getPending = async (cmcode) => {
     try {
-      console.log(`Project Code: ${currentUser.cl_curpj}`)
-      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/pendingticket/${pjcode}`)
+      console.log(`Company Code: ${cmcode}`)
+      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/pendingticket/${cmcode}`)
       console.log(`Pending Tickets Data: ${JSON.stringify(res.data)}`)
       setpendingTicket(res.data)
       setIsLoaded(true)
@@ -48,7 +48,7 @@ const Home = ({ navigation }) => {
     return (
       <Loading />
     )
-  } else if (curpjcode == null) {
+  } else if (currentUser.cl_cmcode == null) {
     return (
       <View>
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -60,14 +60,14 @@ const Home = ({ navigation }) => {
     return (
       <View style={{ flex: 1 }}>
         <View style={{ backgroundColor: '#f4b210', alignItems: 'center', paddingVertical: 2 }}>
-          <Text style={{ fontSize: 12, fontWeight: 'bold' }}>Project Code: {currentUser.cl_curpj}</Text>
+          <Text style={{ fontSize: 12, fontWeight: 'bold' }}>Company Code: {currentUser.cl_cmcode}</Text>
         </View>
         <View style={{ marginHorizontal: 16, flex: 1 }}>
           <View style={{ alignItems: 'center', paddingVertical: 30 }}>
             <Button
               mode="contained"
               onPress={() => navigation.navigate('NewTicket', {
-                code: currentUser.cl_curpj,
+                cmcode: currentUser.cl_cmcode
               })}>Add New Ticket</Button>
           </View>
           <Divider style={{ borderWidth: 0.5, borderColor: 'grey' }} />
