@@ -32,26 +32,26 @@ const user = {
 };
 
 const items = [
-  // {
-  //   href: '/app/dashboard',
-  //   icon: BarChartIcon,
-  //   title: 'Dashboard'
-  // },
-  // {
-  //   href: '/app/tasks',
-  //   icon: UsersIcon,
-  //   title: 'Tasks'
-  // },
-  // {
-  //   href: '/app/projects',
-  //   icon: ShoppingBagIcon,
-  //   title: 'Projects'
-  // },
-  // {
-  //   href: '/app/account',
-  //   icon: UserIcon,
-  //   title: 'Account'
-  // },
+  {
+    href: '/app/dashboard',
+    icon: BarChartIcon,
+    title: 'Dashboard'
+  },
+  {
+    href: '/app/tasks',
+    icon: UsersIcon,
+    title: 'Tasks'
+  },
+  {
+    href: '/app/company',
+    icon: ShoppingBagIcon,
+    title: 'Company'
+  },
+  {
+    href: '/app/account',
+    icon: UserIcon,
+    title: 'Account'
+  },
   {
     href: '/app/assessment',
     icon: AssessmentIcon,
@@ -62,11 +62,11 @@ const items = [
     icon: AnalysisIcon,
     title: 'Analysis'
   },
-  // {
-  //   href: '/app/settings',
-  //   icon: SettingsIcon,
-  //   title: 'Settings'
-  // }
+  {
+    href: '/app/settings',
+    icon: SettingsIcon,
+    title: 'Settings'
+  },
 ];
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
