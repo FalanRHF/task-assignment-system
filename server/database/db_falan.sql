@@ -9,9 +9,8 @@ create table client (
 --create table client ( cl_uid VARCHAR(100) NOT NULL, cl_email VARCHAR(25) NOT NULL, cl_fullname VARCHAR(100) NOT NULL, cl_phonenum VARCHAR(20), cl_cmcode VARCHAR(10) NOT NULL);
 
 create table company (
-  cm_id SERIAL,
   cm_name VARCHAR(50) NOT NULL,
-  cm_code VARCHAR(10),
+  cm_code VARCHAR(10) NOT NULL,
   cm_detail VARCHAR
 );
 
@@ -21,8 +20,7 @@ create table employee (
   em_uid VARCHAR(100) NOT NULL,
   em_fullname VARCHAR(25) NOT NULL,
   em_email VARCHAR(25) NOT NULL,
-  em_phonenum VARCHAR(20),
-  em_state VARCHAR(15) NOT NULL
+  em_phonenum VARCHAR(20)
 );
 
 --create table employee ( em_uid VARCHAR(100) NOT NULL, em_fullname VARCHAR(25) NOT NULL, em_email VARCHAR(25) NOT NULL, em_phonenum VARCHAR(20), em_state VARCHAR(15) NOT NULL);
