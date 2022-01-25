@@ -1,9 +1,9 @@
 import { Helmet } from 'react-helmet';
 import { Box, Container } from '@material-ui/core';
-import ProjectListResults from '../components/project/ProjectListResults';
+import CompanyListResults from '../components/company/CompanyListResults';
 import projects from '../__mocks__/projects';
 
-const ProjectList = () => (
+const CompanyList = () => (
   <>
     <Helmet>
       <title>Project</title>
@@ -17,11 +17,11 @@ const ProjectList = () => (
     >
       <Container maxWidth={false}>
         <Box sx={{ pt: 3 }}>
-          <ProjectListResults projects={projects} />
+          <CompanyListResults projects={projects} />
         </Box>
       </Container>
     </Box>
   </>
 );
 
-export default ProjectList;
+export default CompanyList;

@@ -21,7 +21,7 @@ import {
 } from '@material-ui/core';
 import { spacing } from '@material-ui/system';
 import { makeStyles } from '@material-ui/styles';
-// import getInitials from '../../utils/getInitials';
+import axios from 'axios';
 
 function getModalStyle() {
   const top = 50;
@@ -54,10 +54,12 @@ const TaskListResults = ({ tasks, ...rest }) => {
   const [page, setPage] = useState(0);
   const [openTask, setOpenTask] = useState(false);
   const [title, setTitle] = useState('');
-  const [description, setDescription] = useState('');
+  const [detail, setDetail] = useState('');
+  const [pjcode, setpjCode] = useState('');
   const [assignTo, setAssignTo] = useState('');
-  const [filePath, setFilepath] = useState(null);
+  const [file, setFile] = useState(null);
   const [duedate, setDuedate] = useState('');
+  const [recommend, setRecommend] = useState('');
 
   // const handleSelectAll = (event) => {
   //   let newSelectedtaskIds;
@@ -91,9 +93,9 @@ const TaskListResults = ({ tasks, ...rest }) => {
   //   setSelectedtaskIds(newSelectedtaskIds);
   // };
 
-  const handleChange = (e) => {
+  const handleFileChange = (e) => {
     if (e.target.files[0]) {
-      setFilepath(e.target.files[0]);
+      setFile(e.target.files[0]);
     }
   };
 
@@ -104,6 +106,26 @@ const TaskListResults = ({ tasks, ...rest }) => {
   const handlePageChange = (event, newPage) => {
     setPage(newPage);
   };
+
+//TODO
+  const uploadFile = (fileURI, taskID) => {
+    console.log(`NewTask.uploadFile: called`)
+    console.log(`imageURI: ${fileURI}`)
+    let fd = new FormData()
+    const fileName = taskID + '.jpg'
+    fd.append('taskfile', { uri: fileURI, type: 'file/pdf', name: fileName })
+    return new Promise(async (resolve, reject) => {
+      try {
+        const res = axios.post(`http://localhost:5050/api/web/task/uploadfile`, fd)
+        console.log(`NewTask.uploadFile: success`)
+        console.log(JSON.stringify(res))
+        resolve('task/' + fileName)
+      } catch (error) {
+        console.log(`NewTask.uploadTask: error= ${error}`)
+        reject(error)
+      }
+    })
+  }
 
   const getCurrentDate = () => {
     console.log(`NewTicket.onSubmitTicket.getCurrentDate: called`)
@@ -126,21 +148,104 @@ const TaskListResults = ({ tasks, ...rest }) => {
     })
   }
 
-  const submitForm = async e => {
-    e.preventDefault();
-    try {
-      const body = { title, description, assignTo, duedate, filePath };
-      const response = await fetch("http://localhost:5000/postnewtask", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(body)
-      });
+  const getLatestTaskID = (projectID) => {
+    console.log(`NewTask.onSubmitTask.getLatestTaskID(${projectID}): called`)
+    return new Promise(async (resolve, reject) => {
+      try {
+        const axiosGetResponse = await axios.get(`http://localhost:5050/api/web/task/lastid/${projectID}`)
 
-      window.location = "/";
-    } catch (err) {
-      console.error(err.message);
+        console.log(`NewTask.onSubmitTask.getLatestTaskID(${projectID}).axiosGetResponse: ${JSON.stringify(axiosGetResponse.data)}`)
+        if (axiosGetResponse.data == "") {
+          //console.log("00")
+          resolve("00")
+        } else {
+          //console.log(axiosGetResponse.data[0].tc_id.substr(-2, 2))
+          resolve(axiosGetResponse.data[0].ta_id.substr(-2, 2))
+        }
+      } catch (error) {
+        reject(error)
+      }
+    })
+  }
+
+  const createNewTask = (taskID, date) => {
+    console.log(`NewTask.onSubmitTask.createNewTask: called`)
+    const newduedate = duedate.replace(/-/g, "") + "000000"
+    console.log(newduedate)
+
+    return new Promise(async (resolve, reject) => {
+      try {
+        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/task/postnewtask", {
+          ta_id: taskID,
+          ta_pjcode: pjcode,
+          ta_title: title.trim(),
+          ta_detail: detail.trim(),
+          ta_assignTo: assignTo,
+          ta_createdat: date,
+          ta_status: 'PENDING',
+          ta_duedate: newduedate
+        })
+
+        resolve(axiosPostResponse)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  }
+
+  const createNewTaskWithFile = (taskID, date, filePath) => {
+    console.log(`NewTask.onSubmitTask.createNewTask: called`)
+    return new Promise(async (resolve, reject) => {
+      try {
+        const axiosPostResponse = await axios.post(`http://localhost:5050/api/web/task/postnewtaskwithfile`, {
+          ta_id: taskID,
+          ta_title: title.trim(),
+          ta_detail: detail.trim(),
+          ta_assignTo: assignTo,
+          ta_createdat: date,
+          ta_status: 'PENDING',
+          ta_duedate: duedate,
+          ta_filepath: filePath
+        })
+
+        resolve(axiosPostResponse)
+      } catch (error) {
+        reject(error)
+      }
+    })
+  }
+
+  //TODO:
+  const onSubmitTask = async () => {
+    console.log(`NewTask.onSubmitTask: called`)
+    try {
+      const date = await getCurrentDate()
+      console.log(`NewTask.onSubmitTask: date=${date}`)
+      var taskID = "NETSYS" + date.substr(0, 8)
+      var latestID = await getLatestTaskID(taskID)
+      console.log(`NewTask.onSubmitTask: latestID=${latestID}`)
+      taskID = taskID + (++latestID < 10 ? '0' : '') + latestID
+      console.log(`NewTask.onSubmitTask: next projectID=${taskID}`)
+      const nice = await createNewTask(taskID, date)
+      //what to do
+      // if (fileAsset.fileExist) {
+      //   const filePath = await uploadFile(fileAsset.uri, taskID)
+      //   const nice = await createNewTaskWithFile(taskID, date, filePath)
+      // } else {
+      //   const nice = await createNewTask(taskID, date)
+      // }
+      setOpenTask(false)
+      setTitle('')
+      setAssignTo('')
+      setDetail('')
+      setDuedate('')
+    } catch (error) {
+      console.log(error)
     }
-    setOpenTask(false);
+  }
+
+  const getRecommend = () => {
+    setRecommend();
   };
 
   return (
@@ -162,19 +267,22 @@ const TaskListResults = ({ tasks, ...rest }) => {
               <option value={'Ah Chong'}>Ah Chong</option>
             </select>
           </label>
-          <label>Task Description:</label>
-          <input type="text" placeholder="Enter task description" value={description} onChange={e => setDescription(e.target.value)}/>
+          <label>Task Details:</label>
+          <input type="text" placeholder="Enter task detail" value={detail} onChange={e => setDetail(e.target.value)}/>
           <label>Attachment:</label>
-          <input type="file" value={filePath} onChange={handleChange}/>
+          <input type="file" value={file} onChange={handleFileChange}/>
           <label>Due Date:</label>
           <input type="date" value={duedate} onChange={e => setDuedate(e.target.value)}/>
-          <Button variant="contained" color="primary" onClick={submitForm}>Upload</Button>
+          <Button variant="contained" color="primary" onClick={onSubmitTask}>Upload</Button>
         </form>
       </div>
     </Modal>
 
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
-    <Button variant="contained" onClick={() => setOpenTask(true)} color="primary">Add Task</Button>
+    <Button variant="contained" onClick={() => {
+      setOpenTask(true); 
+      getRecommend();
+    }} color="primary">Add Task</Button>
     </Box>
 
       <Card {...rest}>

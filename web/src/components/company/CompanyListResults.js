@@ -1,4 +1,4 @@
-import "./ProjectListResults.css"
+import "./CompanyListResults.css"
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
@@ -45,7 +45,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const ProjectListResults = ({ projects, ...rest }) => {
+const CompanyListResults = ({ projects, ...rest }) => {
   // const [selectedprojectIds, setSelectedprojectIds] = useState([]);
   const classes = useStyles();
   const [modalStyle] = React.useState(getModalStyle);
@@ -103,16 +103,15 @@ const ProjectListResults = ({ projects, ...rest }) => {
       >
       <div style={modalStyle} className={classes.paper}>
         <FormControl className="add_project">
-          <input type="text" placeholder="Enter project name"/>
-          <input type="text" placeholder="Enter client name"/>
-          <input type="text" placeholder="Enter client contact number"/>
+          <input type="text" placeholder="Enter company name"/>
+          <input type="text" placeholder="Enter company code"/>
           <Button variant="contained" color="primary">Add</Button>
         </FormControl>
       </div>
     </Modal>
 
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
-    <Button variant="contained" onClick={() => setOpenproject(true)} color="primary">Add Project</Button>
+    <Button variant="contained" onClick={() => setOpenproject(true)} color="primary">Add Company</Button>
     </Box>
 
       <Card {...rest}>
@@ -133,16 +132,16 @@ const ProjectListResults = ({ projects, ...rest }) => {
                     /> */}
                   </TableCell>
                   <TableCell>
-                    Project Name
+                    Company Name
                   </TableCell>
                   <TableCell>
-                    Client Name
+                    PIC Name
                   </TableCell>
                   <TableCell>
-                    Contact Number
+                    PIC Number
                   </TableCell>
                   <TableCell>
-                    Date Created
+                    Company Code
                   </TableCell>
                 </TableRow>
               </TableHead>
@@ -210,8 +209,8 @@ const ProjectListResults = ({ projects, ...rest }) => {
   );
 };
 
-ProjectListResults.propTypes = {
+CompanyListResults.propTypes = {
   projects: PropTypes.array.isRequired
 };
 
-export default ProjectListResults;
+export default CompanyListResults;
