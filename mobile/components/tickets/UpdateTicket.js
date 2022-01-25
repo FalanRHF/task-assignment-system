@@ -45,7 +45,7 @@ const Ticket = ({ route, navigation }) => {
     try {
       const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/updateticketdetails`, {
         tc_id: tc_id,
-        tc_title: title.trim(),
+        tc_title: title.trim().toUpperCase(),
         tc_detail: detail.trim(),
       })
       console.log(`UpdateTicket.updateTicketDetail: axiosPostResponse=${axiosPostResponse.data[0]}`)
@@ -59,8 +59,9 @@ const Ticket = ({ route, navigation }) => {
   const deleteTicket = async () => {
     console.log(`UpdateTicket.deleteTicket: called`)
     try {
-      const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/deleteticket`, {
+      const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/updateticketstatus`, {
         tc_id: tc_id,
+        newStatus: 'DELETED',
       })
       console.log(`UpdateTicket.deleteTicket: axiosPostResponse=${axiosPostResponse.data[0]}`)
       console.log(`UpdateTicket.deleteTicket: Ticket ${tc_id} deleted`)

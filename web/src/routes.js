@@ -9,6 +9,8 @@ import NotFound from './pages/NotFound';
 import CompanyList from './pages/CompanyList';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
+import Assessment from './pages/Assessment';
+import Analysis from './pages/Analysis';
 
 const routes = [
   {
@@ -19,6 +21,8 @@ const routes = [
       { path: 'tasks', element: <TaskList /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'company', element: <CompanyList /> },
+      { path: 'assessment', element: <Assessment /> },
+      { path: 'analysis', element: <Analysis /> },
       { path: 'settings', element: <Settings /> },
       { path: '*', element: <Navigate to="/404" /> }
     ]
@@ -36,4 +40,4 @@ const routes = [
   }
 ];
 
-export default routes;
+export default routes

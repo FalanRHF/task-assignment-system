@@ -28,11 +28,25 @@ router.get("/tickets", async (req, res) => {
   }
 });
 
-router.get("/pendingticket/:pjcode", async (req, res) => {
+router.get("/pendingticket/all", async (req, res) => {
   try {
     console.log(`GET url: ${req.originalUrl}`)
-    const { pjcode } = req.params;
-    const queryString = `SELECT tc_id,tc_title,tc_status,tc_createdat FROM ticket WHERE tc_pjcode = '${pjcode}' AND (tc_status = 'PENDING' OR tc_status = 'IN PROGRESS') ORDER BY tc_createdat DESC`
+    const queryString = `SELECT * FROM ticket where (tc_status = 'PENDING' OR tc_status = 'IN PROGRESS') ORDER BY tc_createdat DESC`
+    console.log(queryString)
+    const query = await db.query(queryString)
+    res.json(query.rows);
+    console.log(query.rows);
+
+  } catch (error) {
+    console.error(error.message);
+  }
+})
+
+router.get("/pendingticket/:cmcode", async (req, res) => {
+  try {
+    console.log(`GET url: ${req.originalUrl}`)
+    const { cmcode } = req.params
+    const queryString = `SELECT tc_id,tc_title,tc_status,tc_createdat FROM ticket where tc_cmcode='${cmcode}' AND (tc_status = 'PENDING' OR tc_status = 'IN PROGRESS') ORDER BY tc_createdat DESC`
     console.log(queryString)
     const query = await db.query(queryString);
 
@@ -42,39 +56,37 @@ router.get("/pendingticket/:pjcode", async (req, res) => {
   } catch (error) {
     console.error(error.message);
   }
-});
-
-// router.get("/", async (req, res) => {
-//   try {
-//     console.log(`GET url: ${req.originalUrl}`)
-//     const { pjcode } = req.params;
-//     const queryString = `SELECT tc_id,tc_title,tc_createdat,tc_status FROM ticket WHERE tc_id LIKE '${pjcode}%' AND tc_status = 'RESOLVED' ORDER BY tc_createdat DESC`
-//     console.log(queryString)
-//     const query = await db.query(queryString);
-
-//     res.json(query.rows);
-//     console.log(query.rows);
-
-//   } catch (error) {
-//     console.error(error.message);
-//   }
-// });
+})
 
 router.get("/completedticket/:pjcode", async (req, res) => {
   try {
     console.log(`GET url: ${req.originalUrl}`)
     const { pjcode } = req.params;
-    const queryString = `SELECT tc_id,tc_title,tc_createdat,tc_status FROM ticket WHERE tc_id LIKE '${pjcode}%' AND tc_status = 'RESOLVED' ORDER BY tc_createdat DESC`
+    const queryString = `SELECT tc_id,tc_title,tc_createdat,tc_status FROM ticket WHERE tc_id LIKE '${pjcode}%' AND tc_status = 'RESOLVED' ORDER BY tc_completeddate DESC`
     console.log(queryString)
-    const query = await db.query(queryString);
+    const query = await db.query(queryString)
 
-    res.json(query.rows);
-    console.log(query.rows);
+    res.json(query.rows)
+    console.log(query.rows)
 
   } catch (error) {
-    console.error(error.message);
+    console.error(error.message)
   }
-});
+})
+
+router.get("/resolvedticket/all", async (req, res) => {
+  try {
+    console.log(`GET url: ${req.originalUrl}`)
+    const queryString = `SELECT * FROM ticket where tc_status = 'RESOLVED' ORDER BY tc_completeddate DESC`
+    console.log(queryString)
+    const query = await db.query(queryString)
+    res.json(query.rows)
+    console.log(query.rows)
+
+  } catch (error) {
+    console.error(error.message)
+  }
+})
 
 router.get("/lastid/:tcid", async (req, res) => {
   try {
@@ -88,7 +100,7 @@ router.get("/lastid/:tcid", async (req, res) => {
   } catch (error) {
     console.error(error.message);
   }
-});
+})
 
 router.get("/getticketdata/:tcid", async (req, res) => {
   try {
@@ -97,33 +109,33 @@ router.get("/getticketdata/:tcid", async (req, res) => {
     const queryString = `SELECT * FROM ticket WHERE tc_id = '${tcid}'`
     console.log(queryString)
     const query = await db.query(queryString)
-    res.json(query.rows);
-    console.log(query.rows);
+    res.json(query.rows)
+    console.log(query.rows)
   } catch (error) {
-    console.error(error.message);
+    console.error(error.message)
   }
 });
 
 router.post("/postnewticket", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
-    const { tc_id, tc_pjcode, tc_title, tc_detail, tc_createdat, tc_status } = req.body;
-    const queryString = `INSERT INTO ticket(tc_id,tc_pjcode,tc_title,tc_detail,tc_createdat,tc_status) VALUES('${tc_id}','${tc_pjcode}','${tc_title}','${tc_detail}','${tc_createdat}','${tc_status}') RETURNING *`
+    const { tc_id, tc_cmcode, tc_title, tc_detail, tc_createdat, tc_status } = req.body;
+    const queryString = `INSERT INTO ticket(tc_id,tc_cmcode,tc_title,tc_detail,tc_createdat,tc_status) VALUES('${tc_id}','${tc_cmcode}','${tc_title}','${tc_detail}','${tc_createdat}','${tc_status}') RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)
-    res.json(query.rows);
-    console.log(query.rows);
+    res.json(query.rows)
+    console.log(query.rows)
   } catch (error) {
-    console.error(error.message);
+    console.error(error.message)
   }
-});
+})
 
 
 router.post("/postnewticketwithimage", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
-    const { tc_id, tc_pjcode, tc_title, tc_detail, tc_createdat, tc_status, tc_filepath } = req.body;
-    const queryString = `INSERT INTO ticket(tc_id,tc_pjcode,tc_title,tc_detail,tc_createdat,tc_status,tc_filepath) VALUES('${tc_id}','${tc_pjcode}','${tc_title}','${tc_detail}','${tc_createdat}','${tc_status}','${tc_filepath}') RETURNING *`
+    const { tc_id, tc_cmcode, tc_title, tc_detail, tc_createdat, tc_status, tc_filepath } = req.body;
+    const queryString = `INSERT INTO ticket(tc_id,tc_cmcode,tc_title,tc_detail,tc_createdat,tc_status,tc_filepath) VALUES('${tc_id}','${tc_cmcode}','${tc_title}','${tc_detail}','${tc_createdat}','${tc_status}','${tc_filepath}') RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);
@@ -131,7 +143,7 @@ router.post("/postnewticketwithimage", async (req, res) => {
   } catch (error) {
     console.error(error.message);
   }
-});
+})
 
 router.post("/uploadfile", async (req, res) => {
   try {
@@ -143,11 +155,12 @@ router.post("/uploadfile", async (req, res) => {
     } else {
       let img = req.files.ticketImage;
       console.log(`image.name= ${img.name}`)
-      const filePath = 'attachments/' + img.name
-      // literally upload image to filePath
-      img.mv(`./public/${filePath}`)
+      const filePath = 'api/files/attachments/' + img.name
 
-      res.send({
+      // literally upload image to filePath
+      img.mv(`./public/attachments/${img.name}`)
+
+      res.json({
         status: true,
         message: 'File is uploaded',
         data: {
@@ -160,48 +173,9 @@ router.post("/uploadfile", async (req, res) => {
     }
   } catch (err) {
     console.error(err)
-    res.status(500).send(err);
+    res.status(500).send(err)
   }
-});
-
-// router.post("/getfile", async (req, res) => {
-//   try {
-//     console.info(`POST url: ${req.originalUrl}`)
-//     const { filePath } = req.body
-//     console.log(`filePath=${filePath}`)
-//     // var data = getIcon(req.params.w);
-//     // var img = Buffer.from(data, 'base64');
-
-
-//     // const img = await fs.readFile(`./${filePath}`, { encoding: 'base64' });
-//     // console.log(img)
-
-//     // res.writeHead(200, {
-//     //   'Content-Type': 'image/jpg',
-//     //   'Content-Length': img.length
-//     // });
-//     // res.end(img);
-//     //   res.contentType('jpg')
-//     res.sendFile(path.join(__dirname, `../${filePath}`))
-
-//     // var options = {
-//     //   root: path.join(__dirname)
-//     // }
-
-//     // var fileName = `../${filePath}`;
-//     // res.contentType('jpg')
-//     // res.sendFile(fileName, options, (err) => {
-//     //   if (err) {
-//     //     console.log(err)
-//     //   } else {
-//     //     console.log('Sent:', fileName)
-//     //   }
-//     // })
-//   } catch (err) {
-//     console.log(err)
-//     res.status(500).send(err);
-//   }
-// })
+})
 
 router.post("/updateticketstatus", async (req, res) => {
   try {
@@ -229,7 +203,7 @@ router.post("/deleteticket", async (req, res) => {
   } catch (error) {
     console.error(error.message);
   }
-});
+})
 
 router.post("/updateticketdetails", async (req, res) => {
   try {
@@ -243,6 +217,6 @@ router.post("/updateticketdetails", async (req, res) => {
   } catch (error) {
     console.error(error.message);
   }
-});
+})
 
 module.exports = router

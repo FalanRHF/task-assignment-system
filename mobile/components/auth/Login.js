@@ -15,7 +15,6 @@ const logo1 = require('../../../mobile/files/logo/netsinity1.png')
 
 
 const Login = ({ navigation }) => {
-  console.log(logo1)
   const isFocused = useIsFocused()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -179,18 +178,5 @@ const Login = ({ navigation }) => {
     </View>
   )
 }
-
-//   async getEmail(username) {
-//     let email = ''
-//     try {
-//       email = (await firestore().collection('Client').where('cl_username', '==', username).get()).docs[0].data().cl_email
-//       console.log(`email: ${email}`)
-//     } catch (error) {
-//       console.log(`getEmail() error: ${error}`)
-//     }
-//     console.log(`email: ${email}`)
-//     return (email)
-//   }
-
 
 export default Login

@@ -72,13 +72,19 @@ const Settings = ({ navigation }) => {
             <Text style={{ ...styles.tableItem, flex: 2, borderTopRightRadius: 5 }}>{currentUser.em_fullname}</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={{ ...styles.tableItem, flex: 1 }}>USERNAME</Text>
-            <Text style={{ ...styles.tableItem, flex: 2 }}>@{currentUser.em_username}</Text>
+            <Text style={{ ...styles.tableItem, flex: 1 }}>EMAIL</Text>
+            <Text style={{ ...styles.tableItem, flex: 2 }}>{currentUser.em_email}</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>EMAIL</Text>
+            <Text style={{ ...styles.tableItem, flex: 1 }}>PHONE NO.</Text>
+            <Text style={{ ...styles.tableItem, flex: 2 }}>
+              {currentUser.em_phonenum}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>STATE</Text>
             <Text style={{ ...styles.tableItem, flex: 2, borderBottomRightRadius: 5 }}>
-              {currentUser.em_email}
+              {currentUser.em_state}
             </Text>
           </View>
         </View>

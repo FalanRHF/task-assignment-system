@@ -28,10 +28,10 @@ build/
 .gradle
 local.properties
 *.iml
+node_modules
 
 # node.js
 #
-node_modules/
 npm-debug.log
 yarn-error.log
 

@@ -17,38 +17,38 @@ const Home = ({ navigation }) => {
   const isFocused = useIsFocused()
   const currentUser = useSelector(state => state.currentUser.value)
   const [checked, setChecked] = useState('all')
-  const [allPendingTask, setAllPendingTask] = useState({})
+  const [allPendingTicket, setAllPendingTicket] = useState({})
   const [isLoaded, setIsLoaded] = useState(false)
   console.log(`checked: ${checked}`)
 
   useEffect(() => {
     if (isFocused) {
       // console.log(`Employee.Home.useEffect: called`)
-      getAllPendingTask()
+      getAllPendingTicket()
     }
   }, [isFocused])
 
-  const getAllPendingTask = async () => {
+  const getAllPendingTicket = async () => {
     try {
-      const res = await axios.get(`http://localhost:5050/api/mobile/task/pendingtask`)
-      console.log(`Pending Task Data: ${JSON.stringify(res.data)}`)
-      setAllPendingTask(res.data)
+      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/pendingticket/all`)
+      console.log(`Pending Ticket Data: ${JSON.stringify(res.data)}`)
+      setAllPendingTicket(res.data)
       setIsLoaded(true)
     } catch (error) {
-      console.log(`Home: getPendingTask error: ${error}`)
+      console.log(`Home: getPendingTicket error: ${error}`)
     }
   }
 
   const showTouchableOpacity = (item) => {
-    if (checked == 'all' || item.ta_assignto == currentUser.em_fullname) {
+    if (checked == 'all' || item.tc_assignedto == currentUser.em_fullname) {
       return (
         <TouchableOpacity
-          onPress={() => navigation.navigate('Task', {
-            ta_id: item.ta_id
+          onPress={() => navigation.navigate('Ticket', {
+            tc_id: item.tc_id
           })}
-          style={{ ...styles.item, borderColor: item.ta_status == 'IN PROGRESS' ? '#f2bc46' : '#e0e0e0' }}>
-          <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.ta_title}</Text>
-          <Text style={{ fontSize: 10 }}>{item.ta_createdat.substr(6, 2) + '-' + item.ta_createdat.substr(4, 2) + '-' + item.ta_createdat.substr(0, 4) + ' ' + item.ta_createdat.substr(8, 2) + ':' + item.ta_createdat.substr(10, 2)}</Text>
+          style={{ ...styles.item, borderColor: item.tc_status == 'IN PROGRESS' ? '#f2bc46' : '#e0e0e0' }}>
+          <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.tc_title}</Text>
+          <Text style={{ fontSize: 10 }}>{item.tc_createdat.substr(6, 2) + '-' + item.tc_createdat.substr(4, 2) + '-' + item.tc_createdat.substr(0, 4) + ' ' + item.tc_createdat.substr(8, 2) + ':' + item.tc_createdat.substr(10, 2)}</Text>
         </TouchableOpacity>
       )
     } else {
@@ -83,10 +83,10 @@ const Home = ({ navigation }) => {
       <Divider style={{ marginHorizontal: 10 }} />
       <View style={{ flex: 1, marginVertical: 0 }}>
         <FlatList style={{ flex: 1, marginBottom: 0, borderWidth: 0 }}
-          data={allPendingTask}
+          data={allPendingTicket}
           renderItem={({ item }) => (
             showTouchableOpacity(item))}
-          keyExtractor={(item) => item.ta_id}
+          keyExtractor={(item) => item.tc_id}
           refreshing={true}
         />
       </View>

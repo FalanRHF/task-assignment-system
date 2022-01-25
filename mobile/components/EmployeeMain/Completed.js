@@ -8,84 +8,33 @@ import Loading from '../Loading'
 import { useIsFocused } from '@react-navigation/native';
 
 import { utils } from '@react-native-firebase/app';
-import storage from '@react-native-firebase/storage'
 import ImagePicker, { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 
-import { useSelector } from 'react-redux';
+import { useSelector } from 'react-redux'
 
 const Completed = ({ navigation }) => {
   // create bucket storage reference to not yet existing image
-  const reference = storage().ref('black-t-shirt-sm.png');
-  const [imageExist, setImageExist] = useState(false)
-  const [uri, setUri] = useState('')
 
   const currentUser = useSelector(state => state.currentUser.value)
-
   const isFocused = useIsFocused()
   const [isLoaded, setIsLoaded] = useState(false)
-  const [completedTask, setCompletedTask] = useState({})
-
-  // const pickImageHandler = async () => {
-  // ImagePicker.showImagePicker({ title: 'Pick an Image', maxWidth: 800, maxHeight: 600 },
-  //   response => {
-  //     if (response.error) {
-  //       console.log("image error");
-  //     } else {
-  //       console.log("Image: " + response.uri)
-  //     }
-  //   }
-  // )
-  //   try {
-  //     const { assets } = await launchImageLibrary()
-  //     console.log(`result: ${JSON.stringify(assets[0])}`)
-  //     setUri(assets[0].uri)
-  //     setImageExist(true)
-  //   } catch (error) {
-  //     console.log(error)
-  //   }
-  // }
-
-  // const showImage = () => {
-  //   if (imageExist) {
-  //     return (
-  //       <View>
-  //         <Text>{uri}</Text>
-  //         <Image
-  //           style={{
-  //             width: 50,
-  //             height: 50
-  //           }}
-  //           source={{
-  //             uri: uri
-  //           }}
-  //         />
-  //       </View>
-  //     )
-  //   }
-  //   else {
-  //     return (
-  //       <View>
-  //         <Text>Nothing</Text>
-  //       </View>
-  //     )
-  //   }
-  // }
+  const [completedTicket, setCompletedTicket] = useState({})
 
   useEffect(() => {
     if (isFocused) {
       // console.log(`Employee.Completed.useEffect: called`)
-      getCompletedTask()
+      getCompletedTicket()
     }
   }, [isFocused])
 
-  const getCompletedTask = async () => {
+  const getCompletedTicket = async () => {
     try {
-      const res = await axios.get(`http://localhost:5050/api/mobile/task/completedtask/${currentUser.em_fullname}`)
-      console.log(`Completed Task Data: ${JSON.stringify(res.data)}`)
-      setCompletedTask(res.data)
+      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/resolvedticket/all`)
+      console.log(`Completed Ticket Data: ${JSON.stringify(res.data)}`)
+      setCompletedTicket(res.data)
       setIsLoaded(true)
     } catch (error) {
-      console.log(`Home: getPendingTask error: ${error}`)
+      console.log(`Home: getPendingTicket error: ${error}`)
     }
   }
 
@@ -99,24 +48,24 @@ const Completed = ({ navigation }) => {
         <View style={{ marginHorizontal: 16 }}>
           <View style={{ paddingTop: 20, paddingBottom: 100 }}>
             <FlatList style={{ paddingBottom: 0 }}
-              data={completedTask}
+              data={completedTicket}
               renderItem={({ item }) => (
                 <TouchableOpacity
-                  onPress={() => navigation.navigate('Task', {
-                    ta_id: item.ta_id
+                  onPress={() => navigation.navigate('Ticket', {
+                    tc_id: item.tc_id
                   })}
                   style={{ ...styles.item, borderColor: '#4dc43b' }}>
-                  <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.ta_title}</Text>
-                  <Text style={{ fontSize: 10 }}>{item.ta_createdat.substr(6, 2) + '-' + item.ta_createdat.substr(4, 2) + '-' + item.ta_createdat.substr(0, 4) + ' ' + item.ta_createdat.substr(8, 2) + ':' + item.ta_createdat.substr(10, 2)}</Text>
+                  <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.tc_title}</Text>
+                  <Text style={{ fontSize: 10 }}>{item.tc_createdat.substr(6, 2) + '-' + item.tc_createdat.substr(4, 2) + '-' + item.tc_createdat.substr(0, 4) + ' ' + item.tc_createdat.substr(8, 2) + ':' + item.tc_createdat.substr(10, 2)}</Text>
                 </TouchableOpacity>
               )}
-              keyExtractor={(item) => item.ta_id}
+              keyExtractor={(item) => item.tc_id}
               refreshing={true}
             />
           </View>
         </View>
       </View>
-    );
+    )
   }
 }
 

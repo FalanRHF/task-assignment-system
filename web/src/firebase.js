@@ -1,4 +1,4 @@
-// mport firebase from "firebase";
+// import firebase from "firebase";
 
 // const firebaseApp = firebase.initializeApp({
 //     apiKey: "AIzaSyDOKn88vEsYjhvNerE-oadm8NmJ48pMTyM",
