@@ -21,7 +21,7 @@ import {
 } from '@material-ui/core';
 import { spacing } from '@material-ui/system';
 import { makeStyles } from '@material-ui/styles';
-// import getInitials from '../../utils/getInitials';
+import axios from 'axios';
 
 function getModalStyle() {
   const top = 50;
@@ -52,7 +52,11 @@ const CompanyListResults = ({ projects, ...rest }) => {
   const [selectedprojectIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  const [openproject, setOpenproject] = useState(false);
+  const [openCompany, setOpencompany] = useState(false);
+  const [name, setName] = useState('');
+  const [details, setDetails] = useState('');
+  const [code, setCode] = useState('');
+  const [company, setCompany] = useState([]);
 
   // const handleSelectAll = (event) => {
   //   let newSelectedprojectIds;
@@ -94,24 +98,65 @@ const CompanyListResults = ({ projects, ...rest }) => {
     setPage(newPage);
   };
 
+  const onSubmitcompany = () => {
+    console.log(`NewTask.onSubmitcompany: called`)
+    return new Promise(async (resolve, reject) => {
+      try {
+        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/company/postnewcompany", {
+          cm_name: name,
+          cm_code: code,
+          cm_detail: details.trim()
+        })
+
+        resolve(axiosPostResponse)
+      } catch (error) {
+        reject(error)
+      }
+      setName('')
+      setDetails('')
+      setCode('')
+      setOpencompany(false)
+    })
+  }
+
+  const getCompany = () => {
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { company } = await axios.get(`http://localhost:5050/api/web/company/getcompany`)
+        resolve(company)
+      } catch (error) {
+        console.error('getCompany(): ERROR')
+        reject(error)
+      }
+    })
+  }
+
+  useEffect(() => {
+    getCompany();
+  }, []);
+
   return (
   <div>
     <Modal
-        open={openproject}
-        onClose={() => setOpenproject(false)}
+        open={openCompany}
+        onClose={() => setOpencompany(false)}
         aria-labelledby="simple-modal-title"
       >
       <div style={modalStyle} className={classes.paper}>
-        <FormControl className="add_project">
-          <input type="text" placeholder="Enter company name"/>
-          <input type="text" placeholder="Enter company code"/>
-          <Button variant="contained" color="primary">Add</Button>
-        </FormControl>
+        <form className="add_company">
+          <label>Company Name:</label>
+          <input type="text" placeholder="Enter company name" value={name} onChange={e => setName(e.target.value)}/>
+          <label>Company Details:</label>
+          <input type="text" placeholder="Enter company details" value={details} onChange={e => setDetails(e.target.value)}/>
+          <label>Company Code:</label>
+          <input type="text" placeholder="Enter company code" value={code} onChange={e => setCode(e.target.value)}/>
+          <Button variant="contained" color="primary" onClick={onSubmitcompany}>Add</Button>
+        </form>
       </div>
     </Modal>
 
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
-    <Button variant="contained" onClick={() => setOpenproject(true)} color="primary">Add Company</Button>
+    <Button variant="contained" onClick={() => setOpencompany(true)} color="primary">Add Company</Button>
     </Box>
 
       <Card {...rest}>
@@ -142,6 +187,9 @@ const CompanyListResults = ({ projects, ...rest }) => {
                   </TableCell>
                   <TableCell>
                     Company Code
+                  </TableCell>
+                  <TableCell>
+                    Company Details
                   </TableCell>
                 </TableRow>
               </TableHead>

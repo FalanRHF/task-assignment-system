@@ -56,9 +56,10 @@ const TaskListResults = ({ tasks, ...rest }) => {
   const [title, setTitle] = useState('');
   const [detail, setDetail] = useState('');
   const [pjcode, setpjCode] = useState('');
-  const [assignTo, setAssignTo] = useState('');
+  const [assign, setAssign] = useState('');
   const [file, setFile] = useState(null);
   const [duedate, setDuedate] = useState('');
+  const [priority, setPriority] = useState('');
   const [recommend, setRecommend] = useState('');
 
   // const handleSelectAll = (event) => {
@@ -160,7 +161,7 @@ const TaskListResults = ({ tasks, ...rest }) => {
           resolve("00")
         } else {
           //console.log(axiosGetResponse.data[0].tc_id.substr(-2, 2))
-          resolve(axiosGetResponse.data[0].ta_id.substr(-2, 2))
+          resolve(axiosGetResponse.data[0].tc_id.substr(-2, 2))
         }
       } catch (error) {
         reject(error)
@@ -175,15 +176,16 @@ const TaskListResults = ({ tasks, ...rest }) => {
 
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/task/postnewtask", {
-          ta_id: taskID,
-          ta_pjcode: pjcode,
-          ta_title: title.trim(),
-          ta_detail: detail.trim(),
-          ta_assignTo: assignTo,
-          ta_createdat: date,
-          ta_status: 'PENDING',
-          ta_duedate: newduedate
+        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/task/postnewticket", {
+          tc_id: taskID,
+          tc_pjcode: pjcode,
+          tc_title: title.trim(),
+          tc_detail: detail.trim(),
+          tc_assignedto: assign,
+          tc_createdat: date,
+          tc_status: 'PENDING',
+          tc_duedate: newduedate,
+          tc_priority: priority,
         })
 
         resolve(axiosPostResponse)
@@ -197,15 +199,16 @@ const TaskListResults = ({ tasks, ...rest }) => {
     console.log(`NewTask.onSubmitTask.createNewTask: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post(`http://localhost:5050/api/web/task/postnewtaskwithfile`, {
-          ta_id: taskID,
-          ta_title: title.trim(),
-          ta_detail: detail.trim(),
-          ta_assignTo: assignTo,
-          ta_createdat: date,
-          ta_status: 'PENDING',
-          ta_duedate: duedate,
-          ta_filepath: filePath
+        const axiosPostResponse = await axios.post(`http://localhost:5050/api/web/task/postnewticketwithfile`, {
+          tc_id: taskID,
+          tc_title: title.trim(),
+          tc_detail: detail.trim(),
+          tc_assignedto: assign,
+          tc_createdat: date,
+          tc_status: 'PENDING',
+          tc_duedate: duedate,
+          tc_priority: priority,
+          tc_filepath: filePath
         })
 
         resolve(axiosPostResponse)
@@ -234,11 +237,12 @@ const TaskListResults = ({ tasks, ...rest }) => {
       // } else {
       //   const nice = await createNewTask(taskID, date)
       // }
-      setOpenTask(false)
       setTitle('')
-      setAssignTo('')
+      setAssign('')
       setDetail('')
       setDuedate('')
+      setPriority('')
+      setOpenTask(false)
     } catch (error) {
       console.log(error)
     }
@@ -261,10 +265,10 @@ const TaskListResults = ({ tasks, ...rest }) => {
           <input type="text" placeholder="Enter task title" value={title} onChange={e => setTitle(e.target.value)}/>
           <label>
             Assign To:
-            <select value={assignTo} onChange={e => setAssignTo(e.target.value)}>
+            <select value={assign} onChange={e => setAssign(e.target.value)}>
               <option value={'Ali'}>Ali</option>
               <option value={'Abu'}>Abu</option>
-              <option value={'Ah Chong'}>Ah Chong</option>
+              <option value={'Acong'}>Acong</option>
             </select>
           </label>
           <label>Task Details:</label>
@@ -273,6 +277,14 @@ const TaskListResults = ({ tasks, ...rest }) => {
           <input type="file" value={file} onChange={handleFileChange}/>
           <label>Due Date:</label>
           <input type="date" value={duedate} onChange={e => setDuedate(e.target.value)}/>
+          <label>
+            Task Priority:
+            <select value={priority} onChange={e => setPriority(e.target.value)}>
+              <option value={'Low'}>Low</option>
+              <option value={'Medium'}>Medium</option>
+              <option value={'High'}>High</option>
+            </select>
+          </label>
           <Button variant="contained" color="primary" onClick={onSubmitTask}>Upload</Button>
         </form>
       </div>
