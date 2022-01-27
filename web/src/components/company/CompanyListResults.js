@@ -1,23 +1,24 @@
-import "./CompanyListResults.css"
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
-  // Avatar,
   Box,
   Button,
   Card,
-  // Checkbox,
   FormControl,
+  FormLabel,
   Table,
   TableBody,
   TableCell,
   TableHead,
   TablePagination,
   TableRow,
+  TextField,
   Typography,
   Modal,
+  MenuItem,
+  Select
 } from '@material-ui/core';
 import { spacing } from '@material-ui/system';
 import { makeStyles } from '@material-ui/styles';
@@ -45,8 +46,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const CompanyListResults = ({ projects, ...rest }) => {
-  // const [selectedprojectIds, setSelectedprojectIds] = useState([]);
+const CompanyListResults = () => {
   const classes = useStyles();
   const [modalStyle] = React.useState(getModalStyle);
   const [selectedprojectIds] = useState([]);
@@ -57,38 +57,6 @@ const CompanyListResults = ({ projects, ...rest }) => {
   const [details, setDetails] = useState('');
   const [code, setCode] = useState('');
   const [company, setCompany] = useState([]);
-
-  // const handleSelectAll = (event) => {
-  //   let newSelectedprojectIds;
-
-  //   if (event.target.checked) {
-  //     newSelectedprojectIds = projects.map((project) => project.id);
-  //   } else {
-  //     newSelectedprojectIds = [];
-  //   }
-
-  //   setSelectedprojectIds(newSelectedprojectIds);
-  // };
-
-  // const handleSelectOne = (event, id) => {
-  //   const selectedIndex = selectedprojectIds.indexOf(id);
-  //   let newSelectedprojectIds = [];
-
-  //   if (selectedIndex === -1) {
-  //     newSelectedprojectIds = newSelectedprojectIds.concat(selectedprojectIds, id);
-  //   } else if (selectedIndex === 0) {
-  //     newSelectedprojectIds = newSelectedprojectIds.concat(selectedprojectIds.slice(1));
-  //   } else if (selectedIndex === selectedprojectIds.length - 1) {
-  //     newSelectedprojectIds = newSelectedprojectIds.concat(selectedprojectIds.slice(0, -1));
-  //   } else if (selectedIndex > 0) {
-  //     newSelectedprojectIds = newSelectedprojectIds.concat(
-  //       selectedprojectIds.slice(0, selectedIndex),
-  //       selectedprojectIds.slice(selectedIndex + 1)
-  //     );
-  //   }
-
-  //   setSelectedprojectIds(newSelectedprojectIds);
-  // };
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -116,19 +84,17 @@ const CompanyListResults = ({ projects, ...rest }) => {
       setDetails('')
       setCode('')
       setOpencompany(false)
+      getCompany()
     })
   }
 
-  const getCompany = () => {
-    return new Promise(async (resolve, reject) => {
+  const getCompany = async () => {
       try {
-        const { company } = await axios.get(`http://localhost:5050/api/web/company/getcompany`)
-        resolve(company)
+        const { data }  = await axios.get(`http://localhost:5050/api/web/company/getcompany`)
+        setCompany(data)
       } catch (error) {
         console.error('getCompany(): ERROR')
-        reject(error)
       }
-    })
   }
 
   useEffect(() => {
@@ -136,46 +102,35 @@ const CompanyListResults = ({ projects, ...rest }) => {
   }, []);
 
   return (
-  <div>
+  <Box>
     <Modal
         open={openCompany}
         onClose={() => setOpencompany(false)}
         aria-labelledby="simple-modal-title"
       >
-      <div style={modalStyle} className={classes.paper}>
-        <form className="add_company">
-          <label>Company Name:</label>
-          <input type="text" placeholder="Enter company name" value={name} onChange={e => setName(e.target.value)}/>
-          <label>Company Details:</label>
-          <input type="text" placeholder="Enter company details" value={details} onChange={e => setDetails(e.target.value)}/>
-          <label>Company Code:</label>
-          <input type="text" placeholder="Enter company code" value={code} onChange={e => setCode(e.target.value)}/>
+      <Box style={modalStyle} className={classes.paper}>
+        <FormControl sx={{ display: 'flex', flexDirection: 'column'}}>
+          <FormLabel>Company Name:</FormLabel>
+          <TextField type="text" placeholder="Enter company name" value={name} onChange={e => setName(e.target.value)}/>
+          <FormLabel>Company Details:</FormLabel>
+          <TextField type="text" placeholder="Enter company details" value={details} onChange={e => setDetails(e.target.value)}/>
+          <FormLabel>Company Code:</FormLabel>
+          <TextField type="text" placeholder="Enter company code" value={code} onChange={e => setCode(e.target.value)}/>
           <Button variant="contained" color="primary" onClick={onSubmitcompany}>Add</Button>
-        </form>
-      </div>
+        </FormControl>
+      </Box>
     </Modal>
 
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
     <Button variant="contained" onClick={() => setOpencompany(true)} color="primary">Add Company</Button>
     </Box>
 
-      <Card {...rest}>
+      <Card>
         <PerfectScrollbar>
           <Box sx={{ minWidth: 1050 }}>
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox">
-                    {/* <Checkbox
-                      checked={selectedprojectIds.length === projects.length}
-                      color="primary"
-                      indeterminate={
-                        selectedprojectIds.length > 0
-                        && selectedprojectIds.length < projects.length
-                      }
-                      onChange={handleSelectAll}
-                    /> */}
-                  </TableCell>
                   <TableCell>
                     Company Name
                   </TableCell>
@@ -194,19 +149,8 @@ const CompanyListResults = ({ projects, ...rest }) => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {projects.slice(0, limit).map((project) => (
-                  <TableRow
-                    hover
-                    key={project.id}
-                    selected={selectedprojectIds.indexOf(project.id) !== -1}
-                  >
-                    <TableCell padding="checkbox">
-                      {/* <Checkbox
-                        checked={selectedprojectIds.indexOf(project.id) !== -1}
-                        onChange={(event) => handleSelectOne(event, project.id)}
-                        value="true"
-                      /> */}
-                    </TableCell>
+                {company.slice(0, limit).map((comp) => (
+                  <TableRow key={comp.cm_code}>
                     <TableCell>
                       <Box
                         sx={{
@@ -224,18 +168,21 @@ const CompanyListResults = ({ projects, ...rest }) => {
                           color="textPrimary"
                           variant="body1"
                         >
-                          {project.name}
+                          {comp.cm_name}
                         </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
-                      {project.email}
+                      {comp.cl_fullname}
                     </TableCell>
                     <TableCell>
-                      {project.phone}
+                      {comp.cl_phonenum}
                     </TableCell>
                     <TableCell>
-                      {moment(project.createdAt).format('DD/MM/YYYY')}
+                      {comp.cm_code}
+                    </TableCell>
+                    <TableCell>
+                      {comp.cm_detail}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -245,7 +192,7 @@ const CompanyListResults = ({ projects, ...rest }) => {
         </PerfectScrollbar>
         <TablePagination
           component="div"
-          count={projects.length}
+          count={company.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -253,12 +200,8 @@ const CompanyListResults = ({ projects, ...rest }) => {
           rowsPerPageOptions={[5, 10, 25]}
         />
       </Card>
-    </div>
+    </Box>
   );
-};
-
-CompanyListResults.propTypes = {
-  projects: PropTypes.array.isRequired
 };
 
 export default CompanyListResults;

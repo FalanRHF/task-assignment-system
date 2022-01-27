@@ -1,14 +1,13 @@
-import "./TaskListResults.css"
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
-  // Avatar,
   Box,
   Button,
   Card,
-  // Checkbox,
+  FormControl,
+  FormLabel,
   Table,
   TableBody,
   TableCell,
@@ -18,6 +17,8 @@ import {
   TextField,
   Typography,
   Modal,
+  MenuItem,
+  Select
 } from '@material-ui/core';
 import { spacing } from '@material-ui/system';
 import { makeStyles } from '@material-ui/styles';
@@ -46,7 +47,6 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const TaskListResults = ({ tasks, ...rest }) => {
-  // const [selectedtaskIds, setSelectedtaskIds] = useState([]);
   const classes = useStyles();
   const [modalStyle] = React.useState(getModalStyle);
   const [selectedtaskIds] = useState([]);
@@ -61,38 +61,6 @@ const TaskListResults = ({ tasks, ...rest }) => {
   const [duedate, setDuedate] = useState('');
   const [priority, setPriority] = useState('');
   const [recommend, setRecommend] = useState('');
-
-  // const handleSelectAll = (event) => {
-  //   let newSelectedtaskIds;
-
-  //   if (event.target.checked) {
-  //     newSelectedtaskIds = tasks.map((task) => task.id);
-  //   } else {
-  //     newSelectedtaskIds = [];
-  //   }
-
-  //   setSelectedtaskIds(newSelectedtaskIds);
-  // };
-
-  // const handleSelectOne = (event, id) => {
-  //   const selectedIndex = selectedtaskIds.indexOf(id);
-  //   let newSelectedtaskIds = [];
-
-  //   if (selectedIndex === -1) {
-  //     newSelectedtaskIds = newSelectedtaskIds.concat(selectedtaskIds, id);
-  //   } else if (selectedIndex === 0) {
-  //     newSelectedtaskIds = newSelectedtaskIds.concat(selectedtaskIds.slice(1));
-  //   } else if (selectedIndex === selectedtaskIds.length - 1) {
-  //     newSelectedtaskIds = newSelectedtaskIds.concat(selectedtaskIds.slice(0, -1));
-  //   } else if (selectedIndex > 0) {
-  //     newSelectedtaskIds = newSelectedtaskIds.concat(
-  //       selectedtaskIds.slice(0, selectedIndex),
-  //       selectedtaskIds.slice(selectedIndex + 1)
-  //     );
-  //   }
-
-  //   setSelectedtaskIds(newSelectedtaskIds);
-  // };
 
   const handleFileChange = (e) => {
     if (e.target.files[0]) {
@@ -253,41 +221,41 @@ const TaskListResults = ({ tasks, ...rest }) => {
   };
 
   return (
-  <div>
+  <Box>
     <Modal
         open={openTask}
         onClose={() => setOpenTask(false)}
         aria-labelledby="simple-modal-title"
       >
-      <div style={modalStyle} className={classes.paper}>
-        <form className="add_task">
-          <label>Task Title:</label>
-          <input type="text" placeholder="Enter task title" value={title} onChange={e => setTitle(e.target.value)}/>
-          <label>
+      <Box style={modalStyle} className={classes.paper}>
+        <FormControl sx={{ display: 'flex', flexDirection: 'column'}}>
+          <FormLabel>Task Title:</FormLabel>
+          <TextField type="text" placeholder="Enter task title" value={title} onChange={e => setTitle(e.target.value)}/>
+          <FormLabel>
             Assign To:
-            <select value={assign} onChange={e => setAssign(e.target.value)}>
-              <option value={'Ali'}>Ali</option>
-              <option value={'Abu'}>Abu</option>
-              <option value={'Acong'}>Acong</option>
-            </select>
-          </label>
-          <label>Task Details:</label>
-          <input type="text" placeholder="Enter task detail" value={detail} onChange={e => setDetail(e.target.value)}/>
-          <label>Attachment:</label>
-          <input type="file" value={file} onChange={handleFileChange}/>
-          <label>Due Date:</label>
-          <input type="date" value={duedate} onChange={e => setDuedate(e.target.value)}/>
-          <label>
+            <Select value={assign} onChange={e => setAssign(e.target.value)}>
+              <MenuItem value={'Ali'}>Ali</MenuItem>
+              <MenuItem value={'Abu'}>Abu</MenuItem>
+              <MenuItem value={'Acong'}>Acong</MenuItem>
+            </Select>
+          </FormLabel>
+          <FormLabel>Task Details:</FormLabel>
+          <TextField type="text" placeholder="Enter task detail" value={detail} onChange={e => setDetail(e.target.value)}/>
+          <FormLabel>Attachment:</FormLabel>
+          <TextField type="file" value={file} onChange={handleFileChange}/>
+          <FormLabel>Due Date:</FormLabel>
+          <TextField type="date" value={duedate} onChange={e => setDuedate(e.target.value)}/>
+          <FormLabel>
             Task Priority:
-            <select value={priority} onChange={e => setPriority(e.target.value)}>
-              <option value={'Low'}>Low</option>
-              <option value={'Medium'}>Medium</option>
-              <option value={'High'}>High</option>
-            </select>
-          </label>
+            <Select value={priority} onChange={e => setPriority(e.target.value)}>
+              <MenuItem value={'Low'}>Low</MenuItem>
+              <MenuItem value={'Medium'}>Medium</MenuItem>
+              <MenuItem value={'High'}>High</MenuItem>
+            </Select>
+          </FormLabel>
           <Button variant="contained" color="primary" onClick={onSubmitTask}>Upload</Button>
-        </form>
-      </div>
+        </FormControl>
+      </Box>
     </Modal>
 
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
@@ -303,17 +271,6 @@ const TaskListResults = ({ tasks, ...rest }) => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell padding="checkbox">
-                    {/* <Checkbox
-                      checked={selectedtaskIds.length === tasks.length}
-                      color="primary"
-                      indeterminate={
-                        selectedtaskIds.length > 0
-                        && selectedtaskIds.length < tasks.length
-                      }
-                      onChange={handleSelectAll}
-                    /> */}
-                  </TableCell>
                   <TableCell>
                     Title
                   </TableCell>
@@ -335,13 +292,6 @@ const TaskListResults = ({ tasks, ...rest }) => {
                     key={task.id}
                     selected={selectedtaskIds.indexOf(task.id) !== -1}
                   >
-                    <TableCell padding="checkbox">
-                      {/* <Checkbox
-                        checked={selectedtaskIds.indexOf(task.id) !== -1}
-                        onChange={(event) => handleSelectOne(event, task.id)}
-                        value="true"
-                      /> */}
-                    </TableCell>
                     <TableCell>
                       <Box
                         sx={{
@@ -349,28 +299,22 @@ const TaskListResults = ({ tasks, ...rest }) => {
                           display: 'flex'
                         }}
                       >
-                        {/* <Avatar
-                          src={task.avatarUrl}
-                          sx={{ mr: 2 }}
-                        >
-                          {getInitials(task.name)}
-                        </Avatar> */}
                         <Typography
                           color="textPrimary"
                           variant="body1"
                         >
-                          {task.name}
+                          {task.tc_title}
                         </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
-                      {task.email}
+                      {task.tc_assignedto}
                     </TableCell>
                     <TableCell>
-                      {task.status}
+                      {task.tc_status}
                     </TableCell>
                     <TableCell>
-                      {moment(task.createdAt).format('DD/MM/YYYY')}
+                      {task.tc_duedate}
                     </TableCell>
                   </TableRow>
                 ))}
@@ -388,7 +332,7 @@ const TaskListResults = ({ tasks, ...rest }) => {
           rowsPerPageOptions={[5, 10, 25]}
         />
       </Card>
-    </div>
+    </Box>
   );
 };
 
