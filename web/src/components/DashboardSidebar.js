@@ -14,12 +14,11 @@ import {
 import {
   AlertCircle as AlertCircleIcon,
   BarChart as BarChartIcon,
+  Briefcase as BriefcaseIcon,
+  CheckSquare as CheckSquareIcon,
   Lock as LockIcon,
   Settings as SettingsIcon,
-  ShoppingBag as ShoppingBagIcon,
   User as UserIcon,
-  UserPlus as UserPlusIcon,
-  Users as UsersIcon,
   Award as AssessmentIcon,
   FileText as AnalysisIcon
 } from 'react-feather';
@@ -39,12 +38,12 @@ const items = [
   },
   {
     href: '/app/tasks',
-    icon: UsersIcon,
+    icon: CheckSquareIcon,
     title: 'Tasks'
   },
   {
     href: '/app/company',
-    icon: ShoppingBagIcon,
+    icon: BriefcaseIcon,
     title: 'Company'
   },
   {

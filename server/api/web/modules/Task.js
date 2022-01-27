@@ -63,11 +63,11 @@ router.get("/completedticket/:pjcode", async (req, res) => {
   }
 });
 
-router.get("/lastid/:taid", async (req, res) => {
+router.get("/lastid/:tcid", async (req, res) => {
   try {
     console.log(`GET url: ${req.originalUrl}`)
-    const { taid } = req.params;
-    const queryString = `SELECT * FROM task WHERE ta_id LIKE '${taid}%' ORDER BY ta_id DESC FETCH FIRST ROW ONLY`
+    const { tcid } = req.params;
+    const queryString = `SELECT * FROM ticket WHERE tc_id LIKE '${tcid}%' ORDER BY tc_id DESC FETCH FIRST ROW ONLY`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);
@@ -91,11 +91,11 @@ router.get("/getticketdata/:tcid", async (req, res) => {
   }
 });
 
-router.post("/postnewtask", async (req, res) => {
+router.post("/postnewticket", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
-    const { ta_id, ta_title, ta_detail, ta_createdat, ta_status, ta_duedate } = req.body;
-    const queryString = `INSERT INTO task(ta_id,ta_pjcode,ta_title,ta_detail,ta_createdat,ta_status,ta_duedate) VALUES('${ta_id}','NETSYS','${ta_title}','${ta_detail}','${ta_createdat}','${ta_status}','${ta_duedate}') RETURNING *`
+    const { tc_id, tc_title, tc_detail, tc_assignedto, tc_createdat, tc_status, tc_duedate, tc_priority } = req.body;
+    const queryString = `INSERT INTO ticket(tc_id,tc_cmcode,tc_title,tc_detail,tc_assignedto,tc_createdat,tc_status,tc_duedate,tc_priority) VALUES('${tc_id}','NETSYS','${tc_title}','${tc_detail}','${tc_assignedto}','${tc_createdat}','${tc_status}','${tc_duedate}','${tc_priority}') RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);
@@ -106,11 +106,11 @@ router.post("/postnewtask", async (req, res) => {
 });
 
 
-router.post("/postnewtaskwithfile", async (req, res) => {
+router.post("/postnewticketwithfile", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
-    const { ta_id, ta_pjcode, ta_title, ta_detail, ta_createdat, ta_status, ta_duedate, ta_filepath } = req.body;
-    const queryString = `INSERT INTO task(ta_id,ta_title,ta_detail,ta_createdat,ta_status,ta_duedate,ta_filepath) VALUES('${ta_id}','${ta_pjcode}','${ta_title}','${ta_detail}','${ta_createdat}','${ta_status}','${ta_duedate}','${ta_filepath}') RETURNING *`
+    const { tc_id, tc_pjcode, tc_title, tc_detail, tc_createdat, tc_status, tc_duedate, tc_priority, tc_filepath } = req.body;
+    const queryString = `INSERT INTO ticket(tc_id,tc_title,tc_detail,tc_createdat,tc_status,tc_duedate,tc_priority,tc_filepath) VALUES('${tc_id}','${tc_pjcode}','${tc_title}','${tc_detail}','${tc_createdat}','${tc_status}','${tc_duedate}','${tc_priority}','${tc_filepath}') RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);
@@ -129,7 +129,7 @@ router.post("/uploadfile", async (req, res) => {
         message: 'No file uploaded'
       });
     } else {
-      let file = req.files.taskFile;
+      let file = req.files.ticketFile;
       console.log(`file.name= ${file.name}`)
       const filePath = 'attachments/' + file.name
       // literally upload image to filePath
