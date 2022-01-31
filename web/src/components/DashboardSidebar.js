@@ -19,6 +19,7 @@ import {
   Lock as LockIcon,
   Settings as SettingsIcon,
   User as UserIcon,
+  Users as UsersIcon,
   Award as AssessmentIcon,
   FileText as AnalysisIcon
 } from 'react-feather';
@@ -35,6 +36,11 @@ const items = [
     href: '/app/dashboard',
     icon: BarChartIcon,
     title: 'Dashboard'
+  },
+  {
+    href: '/app/employee',
+    icon: UsersIcon,
+    title: 'Employee'
   },
   {
     href: '/app/tasks',

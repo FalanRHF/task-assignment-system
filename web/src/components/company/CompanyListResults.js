@@ -1,13 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import PropTypes from 'prop-types';
-import moment from 'moment';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
   Box,
   Button,
   Card,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
   FormControl,
   FormLabel,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -17,10 +21,9 @@ import {
   TextField,
   Typography,
   Modal,
-  MenuItem,
-  Select
 } from '@material-ui/core';
-import { spacing } from '@material-ui/system';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
 
@@ -49,14 +52,21 @@ const useStyles = makeStyles((theme) => ({
 const CompanyListResults = () => {
   const classes = useStyles();
   const [modalStyle] = React.useState(getModalStyle);
-  const [selectedprojectIds] = useState([]);
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(0);
-  const [openCompany, setOpencompany] = useState(false);
+  const [openCompany, setOpenCompany] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [openUpdate, setOpenUpdate] = useState(false);
   const [name, setName] = useState('');
   const [details, setDetails] = useState('');
   const [code, setCode] = useState('');
+  const [updatedName, setUpdatedName] = useState('');
+  const [updatedDetails, setUpdatedDetails] = useState('');
+  const [updatedCode, setUpdatedCode] = useState('');
+  const [newName, setNewName] = useState('');
+  const [newDetails, setNewDetails] = useState('');
   const [company, setCompany] = useState([]);
+  const [deletedCompany, setDeletedCompany] = useState('');
 
   const handleLimitChange = (event) => {
     setLimit(event.target.value);
@@ -66,8 +76,8 @@ const CompanyListResults = () => {
     setPage(newPage);
   };
 
-  const onSubmitcompany = () => {
-    console.log(`NewTask.onSubmitcompany: called`)
+  const onSubmitCompany = () => {
+    console.log(`onSubmitcompany: called`)
     return new Promise(async (resolve, reject) => {
       try {
         const axiosPostResponse = await axios.post("http://localhost:5050/api/web/company/postnewcompany", {
@@ -83,10 +93,46 @@ const CompanyListResults = () => {
       setName('')
       setDetails('')
       setCode('')
-      setOpencompany(false)
+      setOpenCompany(false)
       getCompany()
     })
   }
+
+  const onUpdateCompany = () => {
+    console.log(`onUpdatecompany: called`)
+    return new Promise(async (resolve, reject) => {
+      try {
+        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/company/updatecompany", {
+          cm_name: newName,
+          cm_code: updatedCode,
+          cm_detail: newDetails.trim()
+        })
+
+        resolve(axiosPostResponse)
+      } catch (error) {
+        reject(error)
+      }
+      setUpdatedName('')
+      setUpdatedDetails('')
+      setUpdatedCode('')
+      setNewName('')
+      setNewDetails('')
+      setOpenUpdate(false)
+      getCompany()
+    })
+  }
+
+  const deleteCompany = async id => {
+    try {
+      const deleteCompany = await axios.delete(`http://localhost:5050/api/web/company/deletecompany/${id}`);
+      console.log("Company deleted")
+      setCompany(company.filter(cm => cm.cm_code !== id));
+    } catch (err) {
+      console.error(err.message);
+    }
+    setOpenDelete(false)
+    setDeletedCompany('')
+  };
 
   const getCompany = async () => {
       try {
@@ -105,7 +151,7 @@ const CompanyListResults = () => {
   <Box>
     <Modal
         open={openCompany}
-        onClose={() => setOpencompany(false)}
+        onClose={() => { setOpenCompany(false); setName(''); setDetails(''); setCode('') }}
         aria-labelledby="simple-modal-title"
       >
       <Box style={modalStyle} className={classes.paper}>
@@ -115,14 +161,19 @@ const CompanyListResults = () => {
           <FormLabel>Company Details:</FormLabel>
           <TextField type="text" placeholder="Enter company details" value={details} onChange={e => setDetails(e.target.value)}/>
           <FormLabel>Company Code:</FormLabel>
-          <TextField type="text" placeholder="Enter company code" value={code} onChange={e => setCode(e.target.value)}/>
-          <Button variant="contained" color="primary" onClick={onSubmitcompany}>Add</Button>
+          <TextField inputProps={{ maxLength: 6, style: { textTransform: "uppercase" } }} type="text" placeholder="Enter company code" value={code} onChange={e => setCode(e.target.value)}/>
         </FormControl>
+
+        <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt:2 }}>
+          <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenCompany(false); setName(''); setDetails(''); setCode('') }}>Cancel</Button>
+          <Button variant="contained" color="primary" onClick={onSubmitCompany}>Add</Button>
+        </Box>
+
       </Box>
     </Modal>
 
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
-    <Button variant="contained" onClick={() => setOpencompany(true)} color="primary">Add Company</Button>
+    <Button variant="contained" onClick={() => setOpenCompany(true)} color="primary">Add Company</Button>
     </Box>
 
       <Card>
@@ -135,6 +186,9 @@ const CompanyListResults = () => {
                     Company Name
                   </TableCell>
                   <TableCell>
+                    Company Details
+                  </TableCell>
+                  <TableCell>
                     PIC Name
                   </TableCell>
                   <TableCell>
@@ -144,13 +198,12 @@ const CompanyListResults = () => {
                     Company Code
                   </TableCell>
                   <TableCell>
-                    Company Details
                   </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {company.slice(0, limit).map((comp) => (
-                  <TableRow key={comp.cm_code}>
+                {company.slice(0, limit).map((cm) => (
+                  <TableRow key={cm.cm_code}>
                     <TableCell>
                       <Box
                         sx={{
@@ -158,36 +211,84 @@ const CompanyListResults = () => {
                           display: 'flex'
                         }}
                       >
-                        {/* <Avatar
-                          src={project.avatarUrl}
-                          sx={{ mr: 2 }}
-                        >
-                          {getInitials(project.name)}
-                        </Avatar> */}
                         <Typography
                           color="textPrimary"
                           variant="body1"
                         >
-                          {comp.cm_name}
+                          {cm.cm_name}
                         </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
-                      {comp.cl_fullname}
+                      {cm.cm_detail}
                     </TableCell>
                     <TableCell>
-                      {comp.cl_phonenum}
+                      {cm.cl_fullname}
                     </TableCell>
                     <TableCell>
-                      {comp.cm_code}
+                      {cm.cl_phonenum}
                     </TableCell>
                     <TableCell>
-                      {comp.cm_detail}
+                      {cm.cm_code}
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{display: 'flex'}}>
+                        <IconButton sx={{ color:'lightgreen' }} onClick={() => { setOpenUpdate(true); setUpdatedName(cm.cm_name); setUpdatedDetails(cm.cm_detail); setUpdatedCode(cm.cm_code) }} aria-label="edit">
+                          <EditIcon/>
+                        </IconButton>
+                        <IconButton sx={{ color:'red' }} onClick={() => { setOpenDelete(true); setDeletedCompany(cm.cm_code) } } aria-label="delete">
+                          <DeleteIcon/>
+                        </IconButton>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
+
+            <Dialog
+              open={openDelete}
+              onClose={() => { setOpenDelete(false); setDeletedCompany('') }}
+              aria-labelledby="alert-dialog-title"
+              aria-describedby="alert-dialog-description"
+            >
+              <DialogTitle id="alert-dialog-title">{"Are you sure you want to delete this company?"}</DialogTitle>
+              <DialogContent>
+                <DialogContentText id="alert-dialog-description">
+                  This action will delete all the details about the company from the system.
+                </DialogContentText>
+              </DialogContent>
+              <DialogActions>
+                <Button sx={{ bgcolor:'lightgreen' }} variant="contained" onClick={() => { setOpenDelete(false); setDeletedCompany('') }}>
+                  Cancel
+                </Button>
+                <Button sx={{ bgcolor:'red' }} variant="contained" onClick={() => deleteCompany(deletedCompany)} autoFocus>
+                  Delete
+                </Button>
+              </DialogActions>
+            </Dialog>
+
+            <Modal
+                open={openUpdate}
+                onClose={() => { setOpenUpdate(false); setUpdatedName(''); setUpdatedDetails(''); setUpdatedCode(''); setNewName(''); setNewDetails('') }}
+                aria-labelledby="simple-modal-title"
+              >
+              <Box style={modalStyle} className={classes.paper}>
+                <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
+                  <FormLabel>Company Name:</FormLabel>
+                  <TextField type="text" placeholder={updatedName} value={newName} onChange={e => setNewName(e.target.value)}/>
+                  <FormLabel>Company Details:</FormLabel>
+                  <TextField type="text" placeholder={updatedDetails} value={newDetails} onChange={e => setNewDetails(e.target.value)}/>
+                  <FormLabel>Company Code:</FormLabel>
+                  <TextField disabled type="text" value={updatedCode}/>
+                </FormControl>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt:2 }}>
+                  <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenUpdate(false); setUpdatedName(''); setUpdatedDetails(''); setUpdatedCode(''); setNewName(''); setNewDetails('') }}>Cancel</Button>
+                  <Button sx={{ bgcolor:'lightblue' }} variant="contained" onClick={onUpdateCompany}>Update</Button>
+                </Box>
+              </Box>
+            </Modal>
+
           </Box>
         </PerfectScrollbar>
         <TablePagination
