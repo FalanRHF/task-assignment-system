@@ -6,6 +6,7 @@ import TaskList from './pages/TaskList';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
+import EmployeeList from './pages/EmployeeList';
 import CompanyList from './pages/CompanyList';
 import Register from './pages/Register';
 import Settings from './pages/Settings';
@@ -18,6 +19,7 @@ const routes = [
     element: <DashboardLayout />,
     children: [
       { path: 'account', element: <Account /> },
+      { path: 'employee', element: <EmployeeList /> },
       { path: 'tasks', element: <TaskList /> },
       { path: 'dashboard', element: <Dashboard /> },
       { path: 'company', element: <CompanyList /> },

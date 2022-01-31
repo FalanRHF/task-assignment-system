@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import moment from 'moment';
+import React, { useState, useEffect } from 'react';
 import PerfectScrollbar from 'react-perfect-scrollbar';
 import {
   Box,
@@ -8,6 +6,7 @@ import {
   Card,
   FormControl,
   FormLabel,
+  IconButton,
   Table,
   TableBody,
   TableCell,
@@ -20,7 +19,8 @@ import {
   MenuItem,
   Select
 } from '@material-ui/core';
-import { spacing } from '@material-ui/system';
+import DeleteIcon from '@material-ui/icons/Delete';
+import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
 
@@ -46,7 +46,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TaskListResults = ({ tasks, ...rest }) => {
+const TaskListResults = () => {
   const classes = useStyles();
   const [modalStyle] = React.useState(getModalStyle);
   const [selectedtaskIds] = useState([]);
@@ -61,6 +61,7 @@ const TaskListResults = ({ tasks, ...rest }) => {
   const [duedate, setDuedate] = useState('');
   const [priority, setPriority] = useState('');
   const [recommend, setRecommend] = useState('');
+  const [task, setTask] = useState([]);
 
   const handleFileChange = (e) => {
     if (e.target.files[0]) {
@@ -211,10 +212,24 @@ const TaskListResults = ({ tasks, ...rest }) => {
       setDuedate('')
       setPriority('')
       setOpenTask(false)
+      getTask()
     } catch (error) {
       console.log(error)
     }
   }
+
+  const getTask = async () => {
+    try {
+      const { data }  = await axios.get(`http://localhost:5050/api/web/task/getticket`)
+      setTask(data)
+    } catch (error) {
+      console.error('getTask(): ERROR')
+    }
+}
+
+useEffect(() => {
+  getTask();
+}, []);
 
   const getRecommend = () => {
     setRecommend();
@@ -265,7 +280,7 @@ const TaskListResults = ({ tasks, ...rest }) => {
     }} color="primary">Add Task</Button>
     </Box>
 
-      <Card {...rest}>
+      <Card>
         <PerfectScrollbar>
           <Box sx={{ minWidth: 1050 }}>
             <Table>
@@ -273,6 +288,9 @@ const TaskListResults = ({ tasks, ...rest }) => {
                 <TableRow>
                   <TableCell>
                     Title
+                  </TableCell>
+                  <TableCell>
+                    Title details
                   </TableCell>
                   <TableCell>
                     Assigned to
@@ -283,15 +301,13 @@ const TaskListResults = ({ tasks, ...rest }) => {
                   <TableCell>
                     Due Date
                   </TableCell>
+                  <TableCell>
+                  </TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
-                {tasks.slice(0, limit).map((task) => (
-                  <TableRow
-                    hover
-                    key={task.id}
-                    selected={selectedtaskIds.indexOf(task.id) !== -1}
-                  >
+                {task.slice(0, limit).map((ta) => (
+                  <TableRow key={ta.tc_id}>
                     <TableCell>
                       <Box
                         sx={{
@@ -303,18 +319,31 @@ const TaskListResults = ({ tasks, ...rest }) => {
                           color="textPrimary"
                           variant="body1"
                         >
-                          {task.tc_title}
+                          {ta.tc_title}
                         </Typography>
                       </Box>
                     </TableCell>
                     <TableCell>
-                      {task.tc_assignedto}
+                      {ta.tc_detail}
                     </TableCell>
                     <TableCell>
-                      {task.tc_status}
+                      {ta.tc_assignedto}
                     </TableCell>
                     <TableCell>
-                      {task.tc_duedate}
+                      {ta.tc_status}
+                    </TableCell>
+                    <TableCell>
+                      {ta.tc_duedate}
+                    </TableCell>
+                    <TableCell>
+                      <Box sx={{display: 'flex'}}>
+                        <IconButton sx={{color:'blue'}}  aria-label="edit">
+                          <EditIcon/>
+                        </IconButton>
+                        <IconButton sx={{color:'red'}} aria-label="delete">
+                          <DeleteIcon/>
+                        </IconButton>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}
@@ -324,7 +353,7 @@ const TaskListResults = ({ tasks, ...rest }) => {
         </PerfectScrollbar>
         <TablePagination
           component="div"
-          count={tasks.length}
+          count={task.length}
           onPageChange={handlePageChange}
           onRowsPerPageChange={handleLimitChange}
           page={page}
@@ -334,10 +363,6 @@ const TaskListResults = ({ tasks, ...rest }) => {
       </Card>
     </Box>
   );
-};
-
-TaskListResults.propTypes = {
-  tasks: PropTypes.array.isRequired
 };
 
 export default TaskListResults;
