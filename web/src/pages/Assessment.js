@@ -29,13 +29,6 @@ const Assessment = () => {
 
   var csvReportHeader = `NETSINITY SDN BHD\n\nMONTHLY ASSESSMENT REPORT\n\n`
 
-  useEffect(() => {
-    getKpiData()
-    setDate(FormatDate(new Date().getTime()).substring(0, 6))
-    return () => {
-      console.log('Assessment Page unmounted')
-    }
-  }, [])
 
   useEffect(() => {
     init()
