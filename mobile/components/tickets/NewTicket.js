@@ -2,8 +2,10 @@ import React, { Component, useState, useEffect } from 'react';
 import { View, Image } from 'react-native';
 import { TextInput, Button, Text, Chip } from 'react-native-paper';
 
-import auth from '@react-native-firebase/auth';
 import axios from 'axios';
+
+import env from 'mobile/env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 import ImagePicker, { launchCamera, launchImageLibrary } from 'react-native-image-picker'
 
@@ -52,7 +54,6 @@ const NewTicket = ({ route, navigation }) => {
     }
   }
 
-
   const uploadImage = (imageURI, ticketID) => {
     console.log(`NewTicket.uploadImage: called`)
     console.log(`imageURI: ${imageURI}`)
@@ -61,7 +62,7 @@ const NewTicket = ({ route, navigation }) => {
     fd.append('ticketImage', { uri: imageURI, type: 'image/jpg', name: fileName })
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await axios.post(`http://localhost:5050/api/mobile/helpdesk/uploadfile`, fd)
+        const { data } = await axios.post(`${SERVER_DOMAIN}/api/mobile/helpdesk/uploadfile`, fd)
         console.log(`NewTicket.uploadImage: success`)
         // console.log(JSON.stringify(res))
         resolve(data.data.path)
@@ -161,7 +162,7 @@ const NewTicket = ({ route, navigation }) => {
     console.log(`NewTicket.onSubmitTicket.getLatestTicketID(${ticketID}): called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/helpdesk/lastid/${ticketID}`)
+        const axiosGetResponse = await axios.get(`${SERVER_DOMAIN}/api/mobile/helpdesk/lastid/${ticketID}`)
 
         console.log(`NewTicket.onSubmitTicket.getLatestTicketID(${ticketID}).axiosGetResponse: ${JSON.stringify(axiosGetResponse.data)}`)
         if (axiosGetResponse.data == "") {
@@ -181,7 +182,7 @@ const NewTicket = ({ route, navigation }) => {
     console.log(`NewTicket.onSubmitTicket.createNewTicket: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/postnewticket`, {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/mobile/helpdesk/postnewticket`, {
           tc_id: ticketID,
           tc_cmcode: cmcode,
           tc_title: title.trim().toUpperCase(),
@@ -201,7 +202,7 @@ const NewTicket = ({ route, navigation }) => {
     console.log(`NewTicket.onSubmitTicket.createNewTicket: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/postnewticketwithimage`, {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/mobile/helpdesk/postnewticketwithimage`, {
           tc_id: ticketID,
           tc_cmcode: cmcode,
           tc_title: title.trim().toUpperCase(),

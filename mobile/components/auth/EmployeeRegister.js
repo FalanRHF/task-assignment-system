@@ -2,74 +2,62 @@ import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import axios from 'axios';
-
-import DropDown from "react-native-paper-dropdown";
-
 import auth from '@react-native-firebase/auth';
 
+import env from 'mobile/env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
-const Register = ({ navigation }) => {
+
+const EmployeeRegister = ({ navigation }) => {
+  const [email, setEmail] = useState('')
+  const [full_name, setFullName] = useState('')
   const [password, setPassword] = useState('')
-  const [employee, setEmployee] = useState({})
-  const [showDropDown, setShowDropDown] = useState(false)
-  const [state, setState] = useState('')
-  // const [uid, setUid] = useState('')
-  const setEmployeeData = (key, value) => {
-    var data = {};
-    data[key] = value;
-    setEmployee({
-      ...employee,
-      ...data,
+  const [phone_no, setPhoneNum] = useState('')
+  const [isPasswordSafe, setIsPasswordSafe] = useState(false)
+  const [isEmailExist, setIsEmailExist] = useState(true)
+
+  useEffect(() => {
+    console.log('EmployeeRegister.js rendering...')
+  }, [])
+
+  const onSignUpButton = async () => {
+    console.log(`onSignUpButton()`)
+    //e.preventDefault() //avoids auto go to App.js
+    try {
+      if (await checkEmailExist(email)) {
+        setIsEmailExist(true)
+        registerEmployee()
+      } else {
+        setIsEmailExist(false)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const checkEmailExist = (email) => {
+    console.log('checkEmailExist()');
+    return new Promise(async (resolve, reject) => {
+      try {
+        const { data } = await axios.get(`${SERVER_DOMAIN}/api/mobile/auth/employee/email/${email}`)
+        if (data.length > 0) {
+          resolve(true)
+        } else {
+          resolve(false)
+        }
+      } catch (error) {
+        reject(error)
+      }
     })
   }
 
-  useEffect(() => {
-    return () => {
-      console.log(`Unmounting PreRegister.employeeRegister...`)
-    }
-  }, [])
-
-  const stateList = [
-    { label: 'JOHOR', value: 'JOHOR' },
-    { label: 'KEDAH', value: 'KEDAH' },
-    { label: 'KELANTAN', value: 'KELANTAN' },
-    { label: 'MELAKA', value: 'MELAKA' },
-    { label: 'NEGERI SEMBILAN', value: 'N9' },
-    { label: 'PAHANG', value: 'PAHANG' },
-    { label: 'PERAK', value: 'PERAK' },
-    { label: 'PERLIS', value: 'PERLIS' },
-    { label: 'PULAU PINANG', value: 'PENANG' },
-    { label: 'SABAH', value: 'SABAH' },
-    { label: 'SARAWAK', value: 'SARAWAK' },
-    { label: 'SELANGOR', value: 'SELANGOR' },
-    { label: 'TERENGGANU', value: 'TERENGGANU' },
-    { label: 'WP KUALA LUMPUR', value: 'WPKL' },
-    { label: 'WP LABUAN', value: 'WPL' },
-    { label: 'WP PUTRAJAYA', value: 'WPP' },
-  ]
-
-  const onSignUpButton = async (e) => {
-    console.log(`EmployeeRegister.onSignUpButton: called`)
-    console.log(JSON.stringify(employee))
+  const registerEmployee = async () => {
+    console.log(`registerClient()`)
     try {
       const fbUID = await firebaseSignUp()
       await employeeSignUp(fbUID)
       await usersSignUp(fbUID)
       navigation.navigate('PostRegister')
-    } catch (error) {
-      console.log(`EmployeeRegister.onSignUpButton: error`)
-      console.log(error)
-      // failedRegistration()
-
-    }
-  }
-
-  const failedRegistration = async () => {
-    console.log(`failedRegistration`)
-    try {
-      await deleteFirebaseAccount()
-      await deleteEmployee()
-      await deleteUsers()
     } catch (error) {
       console.log(error)
     }
@@ -80,7 +68,7 @@ const Register = ({ navigation }) => {
     return new Promise(async (resolve, reject) => {
       try {
         const fbresult = await auth()
-          .createUserWithEmailAndPassword(employee.email, password)
+          .createUserWithEmailAndPassword(email, password)
         console.log(`firebaseSignUp() success`)
         resolve(auth().currentUser.uid)
       } catch (error) {
@@ -96,19 +84,18 @@ const Register = ({ navigation }) => {
   }
 
   const employeeSignUp = (fbUID) => {
-    console.log(`EmployeeRegister.employeeSignUp: called`)
+    console.log(`employeeSignUp()`)
     return new Promise(async (resolve, reject) => {
       try {
         console.log(`uid: ${fbUID}`)
-        const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/employee`, {
+        const { data } = await axios.post(`${SERVER_DOMAIN}/api/mobile/auth/register/employee`, {
           em_uid: fbUID,
-          em_fullname: employee.fullname.toUpperCase(),
-          em_email: employee.email,
-          em_phonenum: employee.phonenum,
-          em_state: state
+          em_fullname: full_name,
+          em_email: email,
+          em_phonenum: phone_no
         })
-        console.log(`App.Login.PreRegister.employeeRegister.employeeSignUp: ${JSON.stringify(getPostResponse.data)}`)
-        resolve(getPostResponse)
+        console.log(`App.Login.PreRegister.employeeRegister.employeeSignUp: ${JSON.stringify(data)}`)
+        resolve(data)
       } catch (error) {
         console.log(`employeeRegister.onemployeeSignUp.axios.post.employee(): ${error}`)
         reject(error)
@@ -120,18 +107,59 @@ const Register = ({ navigation }) => {
     console.log(`usersSignUp`)
     return new Promise(async (resolve, reject) => {
       try {
-        const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/users`, {
+        const { data } = await axios.post(`${SERVER_DOMAIN}/api/mobile/auth/register/users`, {
           us_uid: fbUID,
           us_type: 'employee',
         })
         console.log(`usersSignUp = success`)
-        console.log(`App.Login.PreRegister.employeeRegister.usersSignUp: ${JSON.stringify(getPostResponse.data)}`)
-        resolve(getPostResponse)
+        console.log(`App.Login.PreRegister.employeeRegister.usersSignUp: ${JSON.stringify(data)}`)
+        resolve(data)
       } catch (error) {
         console.log(`employeeRegister.onEmployeeSignUp.axios.post(): ${error}`)
         reject(error)
       }
     })
+  }
+
+  const checkPasswordSafe = (password) => {
+    if (password.length > 5) {
+      setIsPasswordSafe(true)
+    } else {
+      setIsPasswordSafe(false)
+    }
+  }
+
+  const PasswordWarning = () => {
+    if (!isPasswordSafe) {
+      return (
+        <Text style={{ fontSize: 10, color: 'white' }}>Password must be at least 6 characters.</Text>
+      )
+    }
+  }
+
+  const EmailWarning = () => {
+    if (!isEmailExist) {
+      return (
+        <Text style={{ fontSize: 10, color: 'white' }}>Email does not exist.</Text>
+      )
+    }
+  }
+
+  const SignUpButton = () => {
+    if (email == '' || full_name == '' || password == '' || phone_no == '' || !isPasswordSafe) {
+      return (
+        <Button
+          mode="contained"
+          style={{ backgroundColor: 'gray' }}
+        >Sign Up</Button>
+      )
+    }
+    return (
+      <Button
+        mode="contained"
+        onPress={(e) => { setIsEmailExist(true); onSignUpButton() }}
+      >Sign Up</Button>
+    )
   }
 
   return (
@@ -140,46 +168,32 @@ const Register = ({ navigation }) => {
         <TextInput
           placeholder="FULL NAME"
           label='FULL NAME'
-          mode='outlined' onChangeText={(fullname) => setEmployeeData('fullname', fullname)}
+          mode='outlined' onChangeText={(fullname) => setFullName(fullname.trim().toUpperCase())}
         />
         <TextInput
           placeholder="EMAIL ADDRESS"
           label='EMAIL ADDRESS'
-          mode='outlined' onChangeText={(email) => setEmployeeData('email', email)}
+          mode='outlined' onChangeText={(email) => setEmail(email.trim())}
         />
+        {EmailWarning()}
         <TextInput
           placeholder="PHONE NUMBER"
           label='PHONE NUMBER'
-          mode='outlined' onChangeText={(phonenum) => setEmployeeData('phonenum', phonenum)}
+          mode='outlined' onChangeText={(phonenum) => setPhoneNum(phonenum.trim())}
         />
-        <View>
-          <DropDown
-            label={"STATE"}
-            mode={"outlined"}
-            visible={showDropDown}
-            showDropDown={() => setShowDropDown(true)}
-            onDismiss={() => setShowDropDown(false)}
-            value={state}
-            setValue={setState}
-            list={stateList}
-            dropDownItemStyle={{ backgroundColor: 'white' }}
-          />
-        </View>
         <TextInput
           placeholder="PASSWORD"
           label='PASSWORD'
           secureTextEntry={true}
-          mode='outlined' onChangeText={(password) => setPassword(password)}
+          mode='outlined' onChangeText={(password) => { setPassword(password); checkPasswordSafe(password) }}
         />
+        {PasswordWarning()}
       </View>
       <View style={{ marginVertical: 5 }}>
-        <Button
-          mode="contained"
-          onPress={(e) => onSignUpButton(e)}
-        >Sign Up</Button>
+        {SignUpButton()}
       </View>
     </View>
   )
 }
 
-export default Register
+export default EmployeeRegister
