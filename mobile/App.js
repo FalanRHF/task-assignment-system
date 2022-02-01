@@ -28,11 +28,12 @@ import ClientMainScreen from './components/ClientMain';
 import NewTicketScreen from './components/tickets/NewTicket';
 import TicketScreen from './components/tickets/Ticket';
 import UpdateTicketScreen from './components/tickets/UpdateTicket';
-import EditProfileScreen from './components/ClientMain/EditProfile';
+import ClientEditProfileScreen from './components/ClientMain/EditProfile';
 
 //Employee Screens
 import EmployeeMainScreen from './components/EmployeeMain';
 import TaskScreen from './components/tasks/Task';
+import EmployeeEditProfileScreen from './components/EmployeeMain/EditProfile';
 
 
 const Stack = createStackNavigator();
@@ -109,15 +110,15 @@ const NetsinityApp = () => {
         <Stack.Screen name="NewTicket" component={NewTicketScreen} options={{ title: 'Add New Ticket', headerTitleAlign: 'center' }} />
         <Stack.Screen name="Ticket" component={TicketScreen} options={{ title: 'Ticket', headerTitleAlign: 'center' }} />
         <Stack.Screen name="UpdateTicket" component={UpdateTicketScreen} options={{ title: 'Update Ticket', headerTitleAlign: 'center' }} />
-        <Stack.Screen name="EditProfile" component={EditProfileScreen} options={{ title: 'Edit Profile', headerTitleAlign: 'center' }} />
+        <Stack.Screen name="EditProfile" component={ClientEditProfileScreen} options={{ title: 'Edit Profile', headerTitleAlign: 'center' }} />
       </Stack.Navigator>
     )
   }
   return (
     <Stack.Navigator>
       <Stack.Screen name="EmployeeMain" component={EmployeeMainScreen} options={{ headerShown: false, headerTitleAlign: 'center' }} />
-      <Stack.Screen name="Task" component={TaskScreen} options={{ title: 'Task', headerTitleAlign: 'center' }} />
       <Stack.Screen name="Ticket" component={TicketScreen} options={{ title: 'Ticket', headerTitleAlign: 'center' }} />
+      <Stack.Screen name="EditProfile" component={EmployeeEditProfileScreen} options={{ title: 'Edit Profile', headerTitleAlign: 'center' }} />
     </Stack.Navigator>
   )
 }

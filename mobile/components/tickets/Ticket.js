@@ -9,6 +9,9 @@ import { Button } from 'react-native-paper'
 //redux
 import { useSelector } from 'react-redux'
 
+import env from 'mobile/env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
+
 const Ticket = ({ route, navigation }) => {
   const { tc_id } = route.params
   const currentUser = useSelector(state => state.currentUser.value)
@@ -44,7 +47,7 @@ const Ticket = ({ route, navigation }) => {
     console.log(`ticketID=${ticketID}`)
     return new Promise(async (resolve, reject) => {
       try {
-        const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/getticketdata/${ticketID}`)
+        const res = await axios.get(`${SERVER_DOMAIN}/api/mobile/helpdesk/getticketdata/${ticketID}`)
         console.log(`Ticket Data: \n${JSON.stringify(res.data[0])}`)
         setTicket({
           ...ticket,
@@ -69,7 +72,7 @@ const Ticket = ({ route, navigation }) => {
       // const res = (await firestore().collection('Ticket').where('tc_id', '==', tc_id).get()).docs[0].ref.update({
       //   'tc_status': update,
       // })
-      const res = await axios.post(`http://localhost:5050/api/mobile/helpdesk/updateticketstatus`, {
+      const res = await axios.post(`${SERVER_DOMAIN}/api/mobile/helpdesk/updateticketstatus`, {
         tc_id: tc_id,
         newStatus: update,
       })
