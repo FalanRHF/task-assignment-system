@@ -13,9 +13,6 @@ import Loading from '../Loading'
 //redux
 import { useSelector } from 'react-redux'
 
-import env from 'mobile/env.json'
-const SERVER_DOMAIN = env.SERVER_DOMAIN
-
 const Separator = () => (
   <View style={styles.separator} />
 )
@@ -38,7 +35,7 @@ const Home = ({ navigation }) => {
   const getPending = async (cmcode) => {
     try {
       console.log(`Company Code: ${cmcode}`)
-      const res = await axios.get(`${SERVER_DOMAIN}/api/mobile/helpdesk/pendingticket/${cmcode}`)
+      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/pendingticket/${cmcode}`)
       console.log(`Pending Tickets Data: ${JSON.stringify(res.data)}`)
       setpendingTicket(res.data)
       setIsLoaded(true)

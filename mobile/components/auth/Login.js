@@ -1,6 +1,7 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { View, Image } from 'react-native';
-import axios from 'axios'
+import axios from 'axios';
+
 import { TextInput, Button, Text } from 'react-native-paper';
 
 import auth from '@react-native-firebase/auth';
@@ -10,11 +11,8 @@ import { NavigationContainer, useFocusEffect, useIsFocused } from '@react-naviga
 import { useDispatch } from 'react-redux'
 import { setUser } from '../../redux/currentUser';
 
-import env from 'mobile/env.json'
-// import { SERVER_DOMAIN } from '@env'
-const SERVER_DOMAIN = env.SERVER_DOMAIN
-
 const logo1 = require('../../../mobile/files/logo/netsinity1.png')
+
 
 const Login = ({ navigation }) => {
   const isFocused = useIsFocused()
@@ -25,7 +23,6 @@ const Login = ({ navigation }) => {
   useEffect(() => {
     if (isFocused) {
       console.log(`Login: rendering...`)
-      console.log('SERVER_DOMAIN', SERVER_DOMAIN)
     }
   }, [isFocused])
 
@@ -69,7 +66,7 @@ const Login = ({ navigation }) => {
     console.log(`Login.getUserType: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`${SERVER_DOMAIN}/api/mobile/auth/getdata/user/${uid}`)
+        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/user/${uid}`)
         console.log(`${JSON.stringify(axiosGetResponse.data[0])}`)
         const userType = axiosGetResponse.data[0].us_type
         console.log(`Login.getUserType: success. userType=${userType}`)
@@ -84,7 +81,7 @@ const Login = ({ navigation }) => {
     console.log(`Login.getClientDetails: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`${SERVER_DOMAIN}/api/mobile/auth/getdata/client/${uid}`)
+        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/client/${uid}`)
         const clientDetails = axiosGetResponse.data[0]
         console.log(JSON.stringify(clientDetails))
         console.log(`Login.getClientDetails: success`)
@@ -99,7 +96,7 @@ const Login = ({ navigation }) => {
     console.log(`Login.getEmployeeDetails: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`${SERVER_DOMAIN}/api/mobile/auth/getdata/employee/${uid}`)
+        const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/employee/${uid}`)
         const employeeDetails = axiosGetResponse.data[0]
         console.log(JSON.stringify(employeeDetails))
         console.log(`Login.getEmployeeDetails: success`)
@@ -113,6 +110,15 @@ const Login = ({ navigation }) => {
   const toRegister = () => {
     navigation.navigate("PreRegister")
   }
+
+  // const toRegister2 = async () => {
+  //   try {
+  //     const getPendingResponse = await axios.get(`http://192.168.68.109:5050/ticket/getpending/${this.state.pjcode}`)
+  //     pendingTicket = getPendingResponse.data
+  //   } catch (error) {
+  //     console.log(`getPending(): ${error}`)
+  //   }
+  // }
 
   return (
     <View style={{ flex: 1, justifyContent: 'center', paddingHorizontal: 16, backgroundColor: '#232323' }}>

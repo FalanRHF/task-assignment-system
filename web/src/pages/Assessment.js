@@ -1,6 +1,6 @@
 import { Helmet } from 'react-helmet';
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Card, CardActions, CardContent, CardHeader, CircularProgress, Container, Grid, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Typography } from '@mui/material'
+import { Box, Button, Card, CardActions, CardContent, CardHeader, CircularProgress, Container, Grid, Paper, Stack, Typography } from '@mui/material'
 import axios from 'axios'
 import FormatDate from '../components/DateFormatter'
 import { CSVDownload, CSVLink } from "react-csv"
@@ -37,67 +37,17 @@ const Assessment = () => {
     }
   }, [])
 
-  useEffect(() => {
-    init()
-    setDate(FormatDate(new Date().getTime()).substring(0, 6))
-    return () => {
-      console.log('Assessment Page unmounted')
-    }
-  }, [])
-
-
-  const init = async () => {
-    console.log('init()');
-    try {
-      const unsortedData = await getKpiData()
-      if (unsortedData.length > 0) {
-        const sortedData = await sortKpiData(unsortedData)
-        setKpiData(sortedData)
-      }
-    } catch (error) {
-      console.log(error)
-    }
-    setIsLoaded(true)
-  }
-
-
   const getKpiData = async () => {
-    console.log('getKpiData()');
-    return new Promise(async (resolve, reject) => {
-      try {
-        const { data } = await axios.get(`http://localhost:5050/api/web/kpi/data/all`)
-        // console.log(data)
-        resolve(data)
-      } catch (error) {
-        console.error(error)
-        reject(error)
-      }
-    })
-  }
-
-  const sortKpiData = (data) => {
-    return new Promise(async (resolve, reject) => {
-      var arr3d = []
-      var arr2d = []
-      var curr_id = '' + data[0].kp_id
-
-      data.map((row) => {
-        if (row.kp_id != curr_id) {
-          var temp_json = { "id": curr_id, "data": arr2d }
-          arr3d.push(temp_json)
-          arr2d = []
-          curr_id = row.kp_id
-        }
-        arr2d.push(row)
-      })
-      var temp_json = { "id": curr_id, "data": arr2d }
-      arr3d.push(temp_json)
-      resolve(arr3d)
-    })
+    try {
+      const { data } = await axios.get(`http://localhost:5050/api/web/kpi/data/all`)
+      setKpiData(data)
+      setIsLoaded(true)
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   const calculateScore = (id) => {
-    console.log('Calculating Score...');
     return new Promise(async (resolve, reject) => {
       try {
         const { data } = await axios.get(`http://localhost:5050/api/web/kpi/newdata/${id}`)
@@ -112,13 +62,13 @@ const Assessment = () => {
   }
 
   const postScore = (id, data) => {
-    console.log('id', id);
     return new Promise(async (resolve, reject) => {
       try {
         const res = await axios.post('http://localhost:5050/api/web/kpi/postdata', {
-          id: id,
+          kp_id: id,
           data: data
         })
+        getKpiData()
         resolve(res)
       } catch (error) {
         console.log(error)
@@ -135,14 +85,13 @@ const Assessment = () => {
       if (data.length > 0) {
         await postScore(id, data)
       }
+      getKpiData()
     } catch (error) {
       console.log(error)
     }
-    init()
   }
 
   const renderGenerateKPIButton = (currentMonth) => {
-    console.log('renderGenerateKPIButton()');
     let prevMonth = currentMonth - 1
     prevMonth = prevMonth % 10 > 0 ? prevMonth : (prevMonth - 88)
     if (isLoaded && (kpiData.length == 0 || kpiData[0].kp_id < prevMonth)) {
@@ -168,36 +117,12 @@ const Assessment = () => {
   const KPIRow = (item) => {
     return (
       <>
-        <Grid item xs={5}>
-          <Typography>{item.kp_emname}
+        <Grid item xs={10}>
+          <Typography fontFamily={'Roboto'}>{item.employee}
           </Typography>
         </Grid>
-        <Grid item xs={1}>
-          <Typography>{item.kp_low}
-          </Typography>
-        </Grid>
-        <Grid item xs={1}>
-          <Typography>{item.kp_medium}
-          </Typography>
-        </Grid>
-        <Grid item xs={1}>
-          <Typography>{item.kp_high}
-          </Typography>
-        </Grid>
-        <Grid item xs={1}>
-          <Typography>{item.kp_early}
-          </Typography>
-        </Grid>
-        <Grid item xs={1}>
-          <Typography>{item.kp_notearly}
-          </Typography>
-        </Grid>
-        <Grid item xs={1}>
-          <Typography>{item.kp_overdue}
-          </Typography>
-        </Grid>
-        <Grid item xs={1}>
-          <Typography>{item.kp_score}
+        <Grid item xs={2}>
+          <Typography fontFamily={'Roboto'}>{item.score}
           </Typography>
         </Grid>
       </>
@@ -208,64 +133,26 @@ const Assessment = () => {
     return csvString
   }
 
-  const KPITable = (data) => {
+  const KPIGridItem = (item) => {
+    const id = '' + item.kp_id
+    const data = item.kp_data
     return (
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-          <TableHead>
-            <TableRow>
-              <TableCell>NAME</TableCell>
-              <TableCell align="center">LOW</TableCell>
-              <TableCell align="center">MEDIUM</TableCell>
-              <TableCell align="center">HIGH</TableCell>
-              <TableCell align="center">EARLY</TableCell>
-              <TableCell align="center">ON TIME</TableCell>
-              <TableCell align="center">OVERDUE</TableCell>
-              <TableCell align="center"><b>SCORE</b></TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {data.map((row) => (
-              <TableRow
-                key={row.kp_emname}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.kp_emname}
-                </TableCell>
-                <TableCell align="center">{row.kp_low}</TableCell>
-                <TableCell align="center">{row.kp_medium}</TableCell>
-                <TableCell align="center">{row.kp_high}</TableCell>
-                <TableCell align="center">{row.kp_early}</TableCell>
-                <TableCell align="center">{row.kp_notearly}</TableCell>
-                <TableCell align="center">{row.kp_overdue}</TableCell>
-                <TableCell align="center"><b>{row.kp_score}</b></TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-    );
-  }
-
-  const KPICard = (item) => {
-    const id = '' + item.id
-    const data = item.data
-    return (
-      <Grid item key={item.kp_id} xs={12}>
+      <Grid item key={item.kp_id} xs={12} sm={6} lg={4}>
         <Card sx={{ height: '100%' }}>
-          <Stack alignItems={'center'} paddingTop={2}>
+          <Stack alignItems={'center'} padding={1}>
             <Typography variant='h3'>{numToMonth[id.substring(4, 6)]} {id.substring(0, 4)}
             </Typography>
           </Stack>
           <CardContent>
-            {KPITable(data)}
+            <Grid container>
+              {data.map((item) => KPIRow(item))}
+            </Grid>
           </CardContent>
-          <Grid container justifyContent='right' padding={0}>
+          <Grid container justifyContent='right' padding={1}>
             <Grid item>
               <Button>
                 <CSVLink filename={`kpiReport_${id}.csv`} data={getCsvString()} asyncOnClick={true}
-                  onClick={() => prepareCSV(done, id, data)}>Download CSV</CSVLink>
+                  onClick={() => prepareCSV(done, id, item)}>Download CSV</CSVLink>
               </Button></Grid>
           </Grid>
         </Card>
@@ -273,21 +160,17 @@ const Assessment = () => {
     )
   }
 
-  const prepareCSV = (done, id, data) => {
+  const prepareCSV = (done, id, item) => {
     id = '' + id
     let csv = '' + csvReportHeader
+    // today.setTime(today.getTime())
     const currentDate = '' + FormatDate(new Date().getTime())
     console.log(currentDate)
     const genDate = '' + currentDate.substring(6, 8) + '/' + currentDate.substring(4, 6) + '/' + currentDate.substring(0, 4)
     const genTime = '' + currentDate.substring(8, 10) + ':' + currentDate.substring(10, 12) + ':' + currentDate.substring(12, 14)
-
-    csv += `DATE|${genDate}|TIME|${genTime}\n\n${numToMonth[id.substring(4, 6)]}|${id.substring(0, 4)}\n\n`
-
-    csv += `NAME|LOW|MEDIUM|HIGH|EARLY|ON TIME|OVERDUE|SCORE\n`
-
-    data.map((row) => {
-      csv += `${row.kp_emname}|${row.kp_low}|${row.kp_medium}|${row.kp_high}|${row.kp_early}|${row.kp_notearly}|${row.kp_overdue}|${row.kp_score}\n`
-
+    csv += `DATE|${genDate}|TIME|${genTime}\n\n${numToMonth[id.substring(4, 6)]}|${id.substring(0, 4)}\n\nEMPLOYEE|SCORE\n`
+    item.kp_data.map((row) => {
+      csv += `${row.employee}|${row.score}\n`
     })
     setCsvString(csv)
     done(true)
@@ -310,7 +193,7 @@ const Assessment = () => {
         {renderGenerateKPIButton(date.substring(0, 6))}
         <Container>
           <Grid container spacing={2} justifyContent={'center'}>
-            {kpiData.map((item) => KPICard(item))}
+            {kpiData.map((item) => KPIGridItem(item))}
           </Grid>
         </Container>
       </Container>
