@@ -1,60 +1,60 @@
-import React, { useEffect, useState, useIsF } from 'react';
+import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import axios from 'axios';
-import { useIsFocused } from '@react-navigation/native';
-
-
-import firebase from '@react-native-firebase/app';
 
 import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
 import { TextInput, Button, Text } from 'react-native-paper';
 
-
+import env from 'mobile/env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 const Register = ({ navigation }) => {
+  // const [client, setClient] = useState({})
+  const [email, setEmail] = useState('')
+  const [full_name, setFullName] = useState('')
   const [password, setPassword] = useState('')
-  const [client, setClient] = useState({})
-  // const [uid, setUid] = useState('')
+  const [company_code, setCompanyCode] = useState('')
+  const [isPasswordSafe, setIsPasswordSafe] = useState(false)
+  const [isCompanyExist, setIsCompanyExist] = useState(true)
 
-  const setClientData = (key, value) => {
-    var data = {}
-    data[key] = value
-    setClient({
-      ...client,
-      ...data,
-    })
-  }
-  // useEffect(() => {
-  //   return () => {
-  //     console.log(`Unmounting PreRegister.ClientRegister...`)
-  //   }
-  // }, [isFocused])
+  useEffect(() => {
+    console.log('ClientRegister.js rendering...')
+  }, [])
 
-
-
-  const onSignUpButton = async (e) => {
-    console.log(`onClientSignUp`)
+  const onSignUpButton = async () => {
+    console.log(`onSignUpButton()`)
     //e.preventDefault() //avoids auto go to App.js
+    try {
+      if (await checkCompanyExist(company_code)) {
+        setIsCompanyExist(true)
+        registerClient()
+      } else {
+        setIsCompanyExist(false)
+      }
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  const registerClient = async () => {
+    console.log(`registerClient()`)
     try {
       const fbUID = await firebaseSignUp()
       await clientSignUp(fbUID)
       await usersSignUp(fbUID)
       navigation.navigate('PostRegister')
     } catch (error) {
-      console.log(`onClientSignUp() error`)
       console.log(error)
-      // failedRegistration()
-
     }
-  }
+  };
+
 
   const firebaseSignUp = () => {
-    console.log(`firebaseSignUp`)
+    console.log(`firebaseSignUp()`)
     return new Promise(async (resolve, reject) => {
       try {
         const fbresult = await auth()
-          .createUserWithEmailAndPassword(client.email, password)
+          .createUserWithEmailAndPassword(email, password)
         console.log(`firebaseSignUp() success`)
         resolve(auth().currentUser.uid)
       } catch (error) {
@@ -70,17 +70,16 @@ const Register = ({ navigation }) => {
   }
 
   const clientSignUp = (fbUID) => {
-    console.log(`clientSignUp`)
+    console.log(`clientSignUp()`)
     return new Promise(async (resolve, reject) => {
       try {
         console.log(`uid: ${fbUID}`)
-        const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/client`, {
+        const getPostResponse = await axios.post(`${SERVER_DOMAIN}/api/mobile/auth/register/client`, {
           cl_uid: fbUID,
-          cl_email: client.email,
-          cl_fullname: client.fullname.toUpperCase(),
-          cl_cmcode: client.cmcode,
+          cl_email: email,
+          cl_fullname: full_name,
+          cl_cmcode: company_code,
         })
-
         console.log(`clientSignUp success`)
         console.log(`App.Login.PreRegister.ClientRegister.clientSignUp: ${JSON.stringify(getPostResponse.data)}`)
         resolve(getPostResponse)
@@ -88,14 +87,14 @@ const Register = ({ navigation }) => {
         console.log(`ClientRegister.onClientSignUp.axios.post.client(): ${error}`)
         reject(error)
       }
-    });
+    })
   }
 
   const usersSignUp = (fbUID) => {
     console.log(`usersSignUp`)
     return new Promise(async (resolve, reject) => {
       try {
-        const getPostResponse = await axios.post(`http://localhost:5050/api/mobile/auth/register/users`, {
+        const getPostResponse = await axios.post(`${SERVER_DOMAIN}/api/mobile/auth/register/users`, {
           us_uid: fbUID,
           us_type: 'client',
         })
@@ -106,39 +105,65 @@ const Register = ({ navigation }) => {
         console.log(`ClientRegister.onClientSignUp.axios.post(): ${error}`)
         reject(error)
       }
-    });
+    })
   }
 
-  const failedRegistration = async () => {
-    console.log(`failedRegistration`)
-    try {
-      await deleteFirebaseAccount()
-      await deleteClient()
-      await deleteUsers()
-    } catch (error) {
-      console.log(error)
-
+  const checkPasswordSafe = (password) => {
+    if (password.length > 5) {
+      setIsPasswordSafe(true)
+    } else {
+      setIsPasswordSafe(false)
     }
-  }
-  const deleteFirebaseAccount = () => {
-    console.log(`deleteFirebaseAccount`)
+  };
+
+  const checkCompanyExist = (code) => {
+    console.log('checkCompanyExist()');
     return new Promise(async (resolve, reject) => {
       try {
-        const fbresult = await auth().
-          console.log(`firebaseSignUp() success`)
-        resolve(fbresult)
+        const { data } = await axios.get(`${SERVER_DOMAIN}/api/mobile/auth/company/${code}`)
+        if (data.length > 0) {
+          resolve(true)
+        } else {
+          resolve(false)
+        }
       } catch (error) {
-        if (error.code === 'auth/email-already-in-use') {
-          console.log('That email address is already in use!');
-        }
-        if (error.code === 'auth/invalid-email') {
-          console.log('That email address is invalid!');
-        }
         reject(error)
       }
-    });
+    })
   }
 
+  const PasswordWarning = () => {
+    if (!isPasswordSafe) {
+      return (
+        <Text style={{ fontSize: 10, color: 'white' }}>Password must be at least 6 characters.</Text>
+      )
+    }
+  };
+
+  const CompanyWarning = () => {
+    if (!isCompanyExist) {
+      return (
+        <Text style={{ fontSize: 10, color: 'white' }}>Company does not exist.</Text>
+      )
+    }
+  }
+
+  const SignUpButton = () => {
+    if (email == '' || full_name == '' || password == '' || company_code == '' || !isPasswordSafe) {
+      return (
+        <Button
+          mode="contained"
+          style={{ backgroundColor: 'gray' }}
+        >Sign Up</Button>
+      )
+    }
+    return (
+      <Button
+        mode="contained"
+        onPress={() => { setIsCompanyExist(true); onSignUpButton() }}
+      >Sign Up</Button>
+    )
+  }
 
   return (
     <View style={{ flex: 1, paddingHorizontal: 15, backgroundColor: '#232323' }}>
@@ -146,31 +171,30 @@ const Register = ({ navigation }) => {
         <TextInput
           label='EMAIL ADDRESS'
           placeholder='EMAIL ADDRESS'
-          mode='outlined' onChangeText={(email) => setClientData('email', email)}
+          mode='outlined' onChangeText={(email) => setEmail(email.trim())}
         />
         <TextInput
           label='FULL NAME'
           placeholder='FULL NAME'
           mode='outlined'
-          onChangeText={(fullname) => setClientData('fullname', fullname)}
+          onChangeText={(fullname) => setFullName(fullname.trim().toUpperCase())}
         />
         <TextInput
           label='PASSWORD'
           placeholder='PASSWORD'
           secureTextEntry={true}
-          mode='outlined' onChangeText={(password) => setPassword(password)}
+          mode='outlined' onChangeText={(password) => { setPassword(password); checkPasswordSafe(password) }}
         />
+        {PasswordWarning()}
         <TextInput
           label='COMPANY CODE'
           placeholder='COMPANY CODE'
-          mode='outlined' onChangeText={(cmcode) => setClientData('cmcode', cmcode)}
+          mode='outlined' onChangeText={(cmcode) => setCompanyCode(cmcode.trim().toUpperCase())}
         />
+        {CompanyWarning()}
       </View>
       <View style={{ marginVertical: 5 }}>
-        <Button
-          mode="contained"
-          onPress={(e) => onSignUpButton(e)}
-        >Sign Up</Button>
+        {SignUpButton()}
       </View>
     </View>
   )
