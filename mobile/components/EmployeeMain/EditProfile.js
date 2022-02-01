@@ -19,14 +19,12 @@ const SERVER_DOMAIN = env.SERVER_DOMAIN
 const EditProfile = ({ navigation }) => {
   const isFocused = useIsFocused()
   const currentUser = useSelector(state => state.currentUser.value)
-  const [full_name_raw, setFullNameRaw] = useState(currentUser?.cl_fullname)
-  const [phone_no_raw, setPhoneNumRaw] = useState(currentUser?.cl_phonenum)
   const dispatch = useDispatch()
   const [loaded, setIsLoaded] = useState(false)
-  const [client, setClient] = useState(currentUser)
-
-
-  const containerStyle = { backgroundColor: 'white', padding: 10 };
+  const [employee, setEmployee] = useState(currentUser)
+  const [full_name_raw, setFullNameRaw] = useState(currentUser?.em_fullname)
+  const [phone_no_raw, setPhoneNumRaw] = useState(currentUser?.em_phonenum)
+  const [isPhoneNumCorrect, setIsPhoneNumCorrect] = useState(true)
 
   useEffect(() => {
     const unsubscribe = navigation.addListener('focus', () => {
@@ -34,26 +32,50 @@ const EditProfile = ({ navigation }) => {
       setIsLoaded(true)
     })
     return unsubscribe
-  }, [navigation]);
+  }, [navigation])
 
   const updateUserProfile = async () => {
     console.log(`updateUserProfile()`)
     try {
-      const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/mobile/profile/client/update`, {
-        cl_uid: client.cl_uid,
-        cl_fullname: client.cl_fullname,
-        cl_phonenum: client.cl_phonenum
+      const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/mobile/profile/employee/update`, {
+        em_uid: employee.em_uid,
+        em_fullname: employee.em_fullname,
+        em_phonenum: employee.em_phonenum
       })
       console.log(`EditProfile.updateUserProfile`)
-      dispatch(setUser(client))
+      dispatch(setUser(employee))
     } catch (error) {
       console.log(`EditProfile.updateUserProfile: [ERROR] ${error}`)
     }
     navigation.goBack()
   }
 
+  const checkPhoneNumValid = (phone_no) => {
+    if (phone_no.length >= 10 && phone_no.length <= 11 && phone_no.substring(0, 2) == '01' && !(/[a-z]/i.test(phone_no))) {
+      setIsPhoneNumCorrect(true)
+    } else {
+      setIsPhoneNumCorrect(false)
+    }
+  };
+
+
+  const PhoneNumWarning = (phone_no) => {
+    phone_no = '' + phone_no
+    if (!isPhoneNumCorrect) {
+      if (phone_no.length <= 0) {
+        return (
+          <Text style={{ fontSize: 10 }}>Phone Number cannot be empty!</Text>
+        )
+      }
+      return (
+        <Text style={{ fontSize: 10 }}>Invalid phone number!</Text>
+      )
+    }
+  };
+
+
   const SubmitButton = () => {
-    if (client.cl_fullname == '') {
+    if (employee.em_fullname == '' || !isPhoneNumCorrect) {
       return (
         <Button
           mode="contained"
@@ -80,9 +102,9 @@ const EditProfile = ({ navigation }) => {
             value={full_name_raw}
             onChangeText={(fullname) => {
               setFullNameRaw(fullname)
-              setClient({
-                ...client,
-                cl_fullname: fullname.trim().toUpperCase(),
+              setEmployee({
+                ...employee,
+                em_fullname: fullname.trim().toUpperCase(),
               })
             }}
           />
@@ -92,7 +114,7 @@ const EditProfile = ({ navigation }) => {
             label='EMAIL'
             placeholder="EMAIL"
             mode='outlined'
-            value={client.cl_email}
+            value={employee.em_email}
             disabled='true'
           />
         </View>
@@ -103,49 +125,21 @@ const EditProfile = ({ navigation }) => {
             mode='outlined'
             value={phone_no_raw}
             onChangeText={(phonenum) => {
-              setPhoneNumRaw(phonenum.trim())
-              setClient({
-                ...client,
-                cl_phonenum: phonenum.trim(),
+              setPhoneNumRaw(phonenum)
+              checkPhoneNumValid(phonenum.trim())
+              setEmployee({
+                ...employee,
+                em_phonenum: phonenum.trim(),
               })
             }} />
-          <Text style={{ fontSize: 10 }}>Your phone number will be public. Leave empty for privacy.</Text>
+          {PhoneNumWarning(employee?.em_phonenum)}
         </View>
       </View>
       <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 10 }}>
         {SubmitButton()}
       </View>
-    </View >
+    </View>
   )
 }
-
-// const styles = StyleSheet.create({
-//   container: {
-//     flex: 1,
-//     marginTop: 100,
-//     alignItems: "center"
-//   },
-//   row: {
-//     flexDirection: 'row',
-//     flexWrap: 'wrap',
-//     paddingHorizontal: 12
-//   },
-//   chip: {
-//     borderColor: "#000000",
-//     borderWidth: 1,
-//     marginVertical: 1,
-//     marginHorizontal: 1
-//   },
-//   chipText: {
-//     color: "#000000"
-//   },
-//   fab: {
-//     backgroundColor: '#56b700',
-//     height: 30,
-//     width: 30,
-//     alignItems: 'center',
-//     justifyContent: 'center'
-//   }
-// });
 
 export default EditProfile
