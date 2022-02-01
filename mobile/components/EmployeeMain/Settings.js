@@ -12,9 +12,6 @@ import { setUser, resetUser } from '../../redux/currentUser';
 
 import Loading from '../Loading'
 
-import env from 'mobile/env.json'
-const SERVER_DOMAIN = env.SERVER_DOMAIN
-
 
 const Settings = ({ navigation }) => {
   const isFocused = useIsFocused()
@@ -27,8 +24,6 @@ const Settings = ({ navigation }) => {
       // console.log('Employee.Settings.useEffect: called')
       navigation.setOptions({ title: 'Settings' })
       setIsLoaded(true)
-    } else {
-      setIsLoaded(false)
     }
   }, [isFocused])
 
@@ -36,7 +31,7 @@ const Settings = ({ navigation }) => {
     console.log(`Settings.getUserDetails: called`)
     const uid = auth().currentUser.uid
     try {
-      const axiosGetResponse = await axios.get(`${SERVER_DOMAIN}/api/mobile/auth/getdata/client/${uid}`)
+      const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/client/${uid}`)
       console.log(`${JSON.stringify(axiosGetResponse.data[0])}`)
       setclient({
         ...client,
@@ -59,13 +54,13 @@ const Settings = ({ navigation }) => {
   if (!isLoaded) {
     return (
       <View style={{ flex: 1 }}>
+        <Loading />
         <View style={{ flexDirection: 'row', justifyContent: 'space-around', paddingVertical: 10, backgroundColor: 'white' }}>
           <Button
             mode="contained"
             onPress={() => onLogOutButton()}
           >Log Out</Button>
         </View>
-        <Loading />
       </View>
     )
   } else {
@@ -81,17 +76,19 @@ const Settings = ({ navigation }) => {
             <Text style={{ ...styles.tableItem, flex: 2 }}>{currentUser.em_email}</Text>
           </View>
           <View style={{ flexDirection: 'row' }}>
-            <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>PHONE NO.</Text>
-            <Text style={{ ...styles.tableItem, flex: 2, borderBottomRightRadius: 5 }}>
+            <Text style={{ ...styles.tableItem, flex: 1 }}>PHONE NO.</Text>
+            <Text style={{ ...styles.tableItem, flex: 2 }}>
               {currentUser.em_phonenum}
+            </Text>
+          </View>
+          <View style={{ flexDirection: 'row' }}>
+            <Text style={{ ...styles.tableItem, flex: 1, borderBottomLeftRadius: 5 }}>STATE</Text>
+            <Text style={{ ...styles.tableItem, flex: 2, borderBottomRightRadius: 5 }}>
+              {currentUser.em_state}
             </Text>
           </View>
         </View>
         <View style={{ flexDirection: 'row', justifyContent: 'space-around', marginVertical: 10 }}>
-          <Button
-            mode="contained"
-            onPress={() => navigation.navigate('EditProfile')}
-          >Edit Profile</Button>
           <Button
             mode="contained"
             onPress={() => onLogOutButton()}
