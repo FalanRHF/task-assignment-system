@@ -7,9 +7,7 @@ import { Button, Divider, Text } from 'react-native-paper';
 
 //redux
 import { useSelector } from 'react-redux';
-
-import env from 'mobile/env.json'
-const SERVER_DOMAIN = env.SERVER_DOMAIN
+import { current } from '@reduxjs/toolkit';
 
 
 const Completed = ({ navigation }) => {
@@ -19,6 +17,13 @@ const Completed = ({ navigation }) => {
   const [completedTicket, setCompletedTicket] = useState([])
   const currentUser = useSelector(state => state.currentUser.value)
   navigation.setOptions({ title: 'Resolved Tickets' })
+
+  // useEffect(() => {
+  //   const unsubscribe = navigation.addListener('focus', () => {
+
+  //   })
+  //   return unsubscribe
+  // }, [navigation])
 
   useEffect(() => {
     if (isFocused) {
@@ -31,7 +36,7 @@ const Completed = ({ navigation }) => {
     console.log(`Completed.getCompleted: called`)
     try {
       console.log(`Company Code: ${cmcode}`)
-      const res = await axios.get(`${SERVER_DOMAIN}/api/mobile/helpdesk/completedticket/${cmcode}`)
+      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/completedticket/${cmcode}`)
       console.log(`Resolved Tickets Data: ${JSON.stringify(res.data)}`)
       setCompletedTicket(res.data)
       setIsLoaded(true)

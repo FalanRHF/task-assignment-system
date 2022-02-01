@@ -39,18 +39,8 @@ router.post("/register/client", async (req, res) => {
   generalPost(req, res, 'client')
 })
 
-router.post("/register/employee", async (req, res) => {
-  try {
-    console.log(`POST url: ${req.originalUrl}`)
-    const { em_uid, em_fullname, em_email, em_phonenum } = req.body
-    const queryString = `UPDATE employee set em_uid='${em_uid}', em_fullname='${em_fullname}', em_phonenum='${em_phonenum}' where em_email='${em_email}' returning *`
-    console.log(queryString)
-    const query = await db.query(queryString)
-    res.json(query.rows)
-    console.log(query.rows)
-  } catch (error) {
-    console.error(error.message)
-  }
+router.post("/register/employee", (req, res) => {
+  generalPost(req, res, 'employee')
 })
 
 router.post("/register/users", (req, res) => {
@@ -82,26 +72,16 @@ router.get("/getdata/client/:uid", async (req, res) => {
   } catch (error) {
     console.error(error.message)
   }
-})
+});
 
 router.get("/getdata/employee/:uid", (req, res) => {
   const { uid } = req.params;
   generalGet(req, res, 'employee', 'em_uid', uid)
-})
+});
 
 router.get("/getdata/user/:uid", (req, res) => {
   const { uid } = req.params;
   generalGet(req, res, 'users', 'us_uid', uid)
-})
-
-router.get("/company/:code", (req, res) => {
-  const { code } = req.params;
-  generalGet(req, res, 'company', 'cm_code', code)
-})
-
-router.get("/employee/email/:email", (req, res) => {
-  const { email } = req.params;
-  generalGet(req, res, 'employee', 'em_email', email)
-})
+});
 
 module.exports = router

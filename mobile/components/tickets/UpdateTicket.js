@@ -6,9 +6,6 @@ import { StyleSheet, View, Text, TouchableOpacity, FlatList } from 'react-native
 
 import { TextInput, Button } from 'react-native-paper';
 
-import env from 'mobile/env.json'
-const SERVER_DOMAIN = env.SERVER_DOMAIN
-
 const Ticket = ({ route, navigation }) => {
   const { tc_id } = route.params
   const [isLoading, setisLoading] = useState(true)
@@ -32,7 +29,7 @@ const Ticket = ({ route, navigation }) => {
     console.log(`UpdateTicket.loadTicket: called`)
     console.log(`UpdateTicket.loadTicket: ticketID=${tc_id}`)
     try {
-      const axiosGetResponse = await axios.get(`${SERVER_DOMAIN}/api/mobile/helpdesk/getticketdata/${tc_id}`)
+      const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/helpdesk/getticketdata/${tc_id}`)
       console.log(`Ticket Data: \n${JSON.stringify(axiosGetResponse.data[0])}`)
       settitle(axiosGetResponse.data[0].tc_title)
       setdetail(axiosGetResponse.data[0].tc_detail)
@@ -46,7 +43,7 @@ const Ticket = ({ route, navigation }) => {
   const updateTicketDetail = async () => {
     console.log(`UpdateTicket.updateTicketDetail: called`)
     try {
-      const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/mobile/helpdesk/updateticketdetails`, {
+      const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/updateticketdetails`, {
         tc_id: tc_id,
         tc_title: title.trim().toUpperCase(),
         tc_detail: detail.trim(),
@@ -62,7 +59,7 @@ const Ticket = ({ route, navigation }) => {
   const deleteTicket = async () => {
     console.log(`UpdateTicket.deleteTicket: called`)
     try {
-      const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/mobile/helpdesk/updateticketstatus`, {
+      const axiosPostResponse = await axios.post(`http://localhost:5050/api/mobile/helpdesk/updateticketstatus`, {
         tc_id: tc_id,
         newStatus: 'DELETED',
       })
