@@ -50,6 +50,8 @@ function SettingsScreen() {
 }
 
 const Main = ({ navigation }) => {
+  useEffect(() => {
+  }, [])
 
   return (
     <Tab.Navigator
@@ -65,7 +67,7 @@ const Main = ({ navigation }) => {
           ),
         }} />
       <Tab.Screen name="Completed" component={CompletedScreen} options={{
-        tabBarLabel: 'COMPLETED',
+        tabBarLabel: 'RESOLVED',
         tabBarIcon: ({ color }) => (
           <MaterialCommunityIcons name="check-circle" color={color} size={26} />
         ),

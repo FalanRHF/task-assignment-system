@@ -3,8 +3,6 @@ import { StyleSheet, View, Text } from 'react-native';
 import { Button } from 'react-native-paper';
 import axios from 'axios'
 import auth from '@react-native-firebase/auth'
-import firestore from '@react-native-firebase/firestore'
-//import { Dropdown } from 'react-native-material-dropdown';
 import DropDownPicker from 'react-native-dropdown-picker';
 import DropdownMenu from 'react-native-dropdown-menu';
 
@@ -12,6 +10,9 @@ import { useDispatch, useSelector } from 'react-redux'
 import { setUser, resetUser } from '../../redux/currentUser';
 
 import { useIsFocused } from '@react-navigation/native';
+
+import env from 'mobile/env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 
 const Settings = ({ navigation }) => {
@@ -53,7 +54,7 @@ const Settings = ({ navigation }) => {
     console.log(`Settings.getUserDetails: called`)
     const uid = auth().currentUser.uid
     try {
-      const axiosGetResponse = await axios.get(`http://localhost:5050/api/mobile/auth/getdata/client/${uid}`)
+      const axiosGetResponse = await axios.get(`${SERVER_DOMAIN}/api/mobile/auth/getdata/client/${uid}`)
       console.log(`${JSON.stringify(axiosGetResponse.data[0])}`)
       setclient({
         ...client,
@@ -65,8 +66,6 @@ const Settings = ({ navigation }) => {
       console.log(`Settings.getUserDetails: [ERROR] ${error}`)
     }
   }
-  //create table comcom (name VARCHAR, code VARCHAR);
-  //create table meow(name VARCHAR, cname VARCHAR, constraint fk_cname FOREIGN KEY(cname) references comcom(name) on delete set null);
 
   const onLogOutButton = () => {
     auth()

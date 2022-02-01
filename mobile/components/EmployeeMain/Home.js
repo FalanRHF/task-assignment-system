@@ -2,15 +2,14 @@ import axios from 'axios';
 import React, { useState, useEffect } from 'react'
 import { StyleSheet, View, TouchableOpacity, FlatList } from 'react-native';
 import { useIsFocused } from '@react-navigation/native';
+import Loading from '../Loading'
+import { RadioButton, Divider, Button, Text } from 'react-native-paper';
 
 //redux
 import { useSelector } from 'react-redux';
 
-import { RadioButton, Divider, Button, Text } from 'react-native-paper';
-
-import firebase from 'firebase';
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
+import env from 'mobile/env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 
 const Home = ({ navigation }) => {
@@ -25,12 +24,15 @@ const Home = ({ navigation }) => {
     if (isFocused) {
       // console.log(`Employee.Home.useEffect: called`)
       getAllPendingTicket()
+    } else {
+      setChecked('all')
+      setIsLoaded(false)
     }
   }, [isFocused])
 
   const getAllPendingTicket = async () => {
     try {
-      const res = await axios.get(`http://localhost:5050/api/mobile/helpdesk/pendingticket/all`)
+      const res = await axios.get(`${SERVER_DOMAIN}/api/mobile/helpdesk/pendingticket/all`)
       console.log(`Pending Ticket Data: ${JSON.stringify(res.data)}`)
       setAllPendingTicket(res.data)
       setIsLoaded(true)
@@ -56,6 +58,12 @@ const Home = ({ navigation }) => {
         <View></View>
       )
     }
+  }
+
+  if (!isLoaded) {
+    return (
+      <Loading />
+    )
   }
 
   return (

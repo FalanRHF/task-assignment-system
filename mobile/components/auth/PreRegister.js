@@ -1,14 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
-import axios from 'axios';
-
-
-import firebase from '@react-native-firebase/app';
-
-import auth from '@react-native-firebase/auth';
-import firestore from '@react-native-firebase/firestore';
-
 
 
 const PreRegister = ({ navigation, route }) => {
