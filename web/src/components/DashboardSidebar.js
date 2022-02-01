@@ -14,11 +14,11 @@ import {
 import {
   AlertCircle as AlertCircleIcon,
   BarChart as BarChartIcon,
+  Briefcase as BriefcaseIcon,
+  CheckSquare as CheckSquareIcon,
   Lock as LockIcon,
   Settings as SettingsIcon,
-  ShoppingBag as ShoppingBagIcon,
   User as UserIcon,
-  UserPlus as UserPlusIcon,
   Users as UsersIcon,
   Award as AssessmentIcon,
   FileText as AnalysisIcon
@@ -33,24 +33,19 @@ const user = {
 
 const items = [
   {
-    href: '/app/dashboard',
-    icon: BarChartIcon,
-    title: 'Dashboard'
-  },
-  {
     href: '/app/tasks',
-    icon: UsersIcon,
+    icon: CheckSquareIcon,
     title: 'Tasks'
   },
   {
-    href: '/app/company',
-    icon: ShoppingBagIcon,
-    title: 'Company'
+    href: '/app/employee',
+    icon: UsersIcon,
+    title: 'Employee'
   },
   {
-    href: '/app/account',
-    icon: UserIcon,
-    title: 'Account'
+    href: '/app/company',
+    icon: BriefcaseIcon,
+    title: 'Company'
   },
   {
     href: '/app/assessment',
@@ -62,11 +57,11 @@ const items = [
     icon: AnalysisIcon,
     title: 'Analysis'
   },
-  {
-    href: '/app/settings',
-    icon: SettingsIcon,
-    title: 'Settings'
-  },
+  // {
+  //   href: '/login',
+  //   icon: LockIcon,
+  //   title: 'Login'
+  // },
 ];
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
