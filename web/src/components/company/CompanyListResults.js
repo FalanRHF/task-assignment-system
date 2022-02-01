@@ -58,13 +58,11 @@ const CompanyListResults = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openUpdate, setOpenUpdate] = useState(false);
   const [name, setName] = useState('');
-  const [details, setDetails] = useState('');
+  const [detail, setDetail] = useState('');
   const [code, setCode] = useState('');
   const [updatedName, setUpdatedName] = useState('');
-  const [updatedDetails, setUpdatedDetails] = useState('');
+  const [updatedDetail, setUpdatedDetail] = useState('');
   const [updatedCode, setUpdatedCode] = useState('');
-  const [newName, setNewName] = useState('');
-  const [newDetails, setNewDetails] = useState('');
   const [company, setCompany] = useState([]);
   const [deletedCompany, setDeletedCompany] = useState('');
 
@@ -82,8 +80,8 @@ const CompanyListResults = () => {
       try {
         const axiosPostResponse = await axios.post("http://localhost:5050/api/web/company/postnewcompany", {
           cm_name: name,
-          cm_code: code,
-          cm_detail: details.trim()
+          cm_code: code.toUpperCase(),
+          cm_detail: detail.trim()
         })
 
         resolve(axiosPostResponse)
@@ -91,7 +89,7 @@ const CompanyListResults = () => {
         reject(error)
       }
       setName('')
-      setDetails('')
+      setDetail('')
       setCode('')
       setOpenCompany(false)
       getCompany()
@@ -103,9 +101,9 @@ const CompanyListResults = () => {
     return new Promise(async (resolve, reject) => {
       try {
         const axiosPostResponse = await axios.post("http://localhost:5050/api/web/company/updatecompany", {
-          cm_name: newName,
+          cm_name: updatedName,
           cm_code: updatedCode,
-          cm_detail: newDetails.trim()
+          cm_detail: updatedDetail.trim()
         })
 
         resolve(axiosPostResponse)
@@ -113,10 +111,8 @@ const CompanyListResults = () => {
         reject(error)
       }
       setUpdatedName('')
-      setUpdatedDetails('')
+      setUpdatedDetail('')
       setUpdatedCode('')
-      setNewName('')
-      setNewDetails('')
       setOpenUpdate(false)
       getCompany()
     })
@@ -151,7 +147,7 @@ const CompanyListResults = () => {
   <Box>
     <Modal
         open={openCompany}
-        onClose={() => { setOpenCompany(false); setName(''); setDetails(''); setCode('') }}
+        onClose={() => { setOpenCompany(false); setName(''); setDetail(''); setCode('') }}
         aria-labelledby="simple-modal-title"
       >
       <Box style={modalStyle} className={classes.paper}>
@@ -159,13 +155,13 @@ const CompanyListResults = () => {
           <FormLabel>Company Name:</FormLabel>
           <TextField type="text" placeholder="Enter company name" value={name} onChange={e => setName(e.target.value)}/>
           <FormLabel>Company Details:</FormLabel>
-          <TextField type="text" placeholder="Enter company details" value={details} onChange={e => setDetails(e.target.value)}/>
+          <TextField type="text" placeholder="Enter company details" value={detail} onChange={e => setDetail(e.target.value)}/>
           <FormLabel>Company Code:</FormLabel>
-          <TextField inputProps={{ maxLength: 6, style: { textTransform: "uppercase" } }} type="text" placeholder="Enter company code" value={code} onChange={e => setCode(e.target.value)}/>
+          <TextField inputProps={{ maxLength: 6 }} type="text" placeholder="Enter company code" value={code} onChange={e => setCode(e.target.value)}/>
         </FormControl>
 
         <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt:2 }}>
-          <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenCompany(false); setName(''); setDetails(''); setCode('') }}>Cancel</Button>
+          <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenCompany(false); setName(''); setDetail(''); setCode('') }}>Cancel</Button>
           <Button variant="contained" color="primary" onClick={onSubmitCompany}>Add</Button>
         </Box>
 
@@ -233,7 +229,7 @@ const CompanyListResults = () => {
                     </TableCell>
                     <TableCell>
                       <Box sx={{display: 'flex'}}>
-                        <IconButton sx={{ color:'lightgreen' }} onClick={() => { setOpenUpdate(true); setUpdatedName(cm.cm_name); setUpdatedDetails(cm.cm_detail); setUpdatedCode(cm.cm_code) }} aria-label="edit">
+                        <IconButton sx={{ color:'lightgreen' }} onClick={() => { setOpenUpdate(true); setUpdatedName(cm.cm_name); setUpdatedDetail(cm.cm_detail); setUpdatedCode(cm.cm_code) }} aria-label="edit">
                           <EditIcon/>
                         </IconButton>
                         <IconButton sx={{ color:'red' }} onClick={() => { setOpenDelete(true); setDeletedCompany(cm.cm_code) } } aria-label="delete">
@@ -270,20 +266,20 @@ const CompanyListResults = () => {
 
             <Modal
                 open={openUpdate}
-                onClose={() => { setOpenUpdate(false); setUpdatedName(''); setUpdatedDetails(''); setUpdatedCode(''); setNewName(''); setNewDetails('') }}
+                onClose={() => { setOpenUpdate(false); setUpdatedName(''); setUpdatedDetail(''); setUpdatedCode('') }}
                 aria-labelledby="simple-modal-title"
               >
               <Box style={modalStyle} className={classes.paper}>
                 <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
                   <FormLabel>Company Name:</FormLabel>
-                  <TextField type="text" placeholder={updatedName} value={newName} onChange={e => setNewName(e.target.value)}/>
+                  <TextField type="text" value={updatedName} onChange={e => setUpdatedName(e.target.value)}/>
                   <FormLabel>Company Details:</FormLabel>
-                  <TextField type="text" placeholder={updatedDetails} value={newDetails} onChange={e => setNewDetails(e.target.value)}/>
+                  <TextField type="text" value={updatedDetail} onChange={e => setUpdatedDetail(e.target.value)}/>
                   <FormLabel>Company Code:</FormLabel>
                   <TextField disabled type="text" value={updatedCode}/>
                 </FormControl>
                 <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt:2 }}>
-                  <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenUpdate(false); setUpdatedName(''); setUpdatedDetails(''); setUpdatedCode(''); setNewName(''); setNewDetails('') }}>Cancel</Button>
+                  <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenUpdate(false); setUpdatedName(''); setUpdatedDetail(''); setUpdatedCode('') }}>Cancel</Button>
                   <Button sx={{ bgcolor:'lightblue' }} variant="contained" onClick={onUpdateCompany}>Update</Button>
                 </Box>
               </Box>

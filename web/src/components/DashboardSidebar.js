@@ -33,9 +33,9 @@ const user = {
 
 const items = [
   {
-    href: '/app/dashboard',
-    icon: BarChartIcon,
-    title: 'Dashboard'
+    href: '/app/tasks',
+    icon: CheckSquareIcon,
+    title: 'Tasks'
   },
   {
     href: '/app/employee',
@@ -43,19 +43,9 @@ const items = [
     title: 'Employee'
   },
   {
-    href: '/app/tasks',
-    icon: CheckSquareIcon,
-    title: 'Tasks'
-  },
-  {
     href: '/app/company',
     icon: BriefcaseIcon,
     title: 'Company'
-  },
-  {
-    href: '/app/account',
-    icon: UserIcon,
-    title: 'Account'
   },
   {
     href: '/app/assessment',
@@ -67,11 +57,11 @@ const items = [
     icon: AnalysisIcon,
     title: 'Analysis'
   },
-  {
-    href: '/app/settings',
-    icon: SettingsIcon,
-    title: 'Settings'
-  },
+  // {
+  //   href: '/login',
+  //   icon: LockIcon,
+  //   title: 'Login'
+  // },
 ];
 
 const DashboardSidebar = ({ onMobileClose, openMobile }) => {
