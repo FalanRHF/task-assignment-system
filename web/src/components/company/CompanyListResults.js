@@ -191,6 +191,9 @@ const CompanyListResults = () => {
                     PIC Number
                   </TableCell>
                   <TableCell>
+                    PIC Email
+                  </TableCell>
+                  <TableCell>
                     Company Code
                   </TableCell>
                   <TableCell>
@@ -223,6 +226,9 @@ const CompanyListResults = () => {
                     </TableCell>
                     <TableCell>
                       {cm.cl_phonenum}
+                    </TableCell>
+                    <TableCell>
+                      {cm.cl_email}
                     </TableCell>
                     <TableCell>
                       {cm.cm_code}

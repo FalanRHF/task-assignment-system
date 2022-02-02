@@ -4,7 +4,7 @@ const router = require('express').Router()
 router.get("/getcompany", async (req, res) => {
   try {
     console.log(`GET url: ${req.originalUrl}`)
-    const queryString = `SELECT client.cl_fullname, client.cl_phonenum, company.cm_name, company.cm_code, company.cm_detail FROM client RIGHT JOIN company ON client.cl_cmcode = company.cm_code`
+    const queryString = `SELECT client.cl_fullname, client.cl_phonenum, client.cl_email, company.cm_name, company.cm_code, company.cm_detail FROM client RIGHT JOIN company ON client.cl_cmcode = company.cm_code`
     console.log(queryString)
     const query = await db.query(queryString);
     res.json(query.rows);

@@ -122,6 +122,7 @@ const Assessment = () => {
 
   const generateKPIScore = async (prevMonth) => {
     const id = '' + prevMonth
+    console.log('id', id)
     console.log('generateKPIScore clicked')
     try {
       const data = await calculateScore(id)
@@ -137,8 +138,8 @@ const Assessment = () => {
   const renderGenerateKPIButton = (currentMonth) => {
     console.log('renderGenerateKPIButton()');
     let prevMonth = currentMonth - 1
-    prevMonth = prevMonth % 10 > 0 ? prevMonth : (prevMonth - 88)
-    if (isLoaded && (kpiData.length == 0 || kpiData[0].kp_id < prevMonth)) {
+    prevMonth = prevMonth % 10 > 0 ? prevMonth : (prevMonth - 88)  
+    if (isLoaded && (kpiData.length == 0 || kpiData[0].id < prevMonth)) {
       return (
         <Container sx={{ paddingBottom: 2 }}>
           <Stack sx={{ alignItems: "center" }}>
