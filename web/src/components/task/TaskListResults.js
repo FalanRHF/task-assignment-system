@@ -77,14 +77,16 @@ const TaskListResults = () => {
   const [task, setTask] = useState([]);
   const [deletedTask, setDeletedTask] = useState('');
   const [employee, setEmployee] = useState([]);
+  const [kpi, setKpi] = useState(0);
+  const [workload, setWorkload] = useState(0);
   const [recommend, setRecommend] = useState([]);
 
   const imageLink = (filePath) => {
-    if(filePath == null){
-      return null
+    if(filePath == ""){
+      return null;
     }
     const url = 'http://localhost:5050/' + filePath;
-    return (<a href={url} target="_blank">File link</a>)
+    return (<a href={url} target="_blank">Attachment link</a>)
   }
 
   const handleFileChange = (e) => {
@@ -143,7 +145,11 @@ const TaskListResults = () => {
 
   const createNewTask = (taskID, date) => {
     console.log(`NewTask.onSubmitTask.createNewTask: called`)
-    const newduedate = duedate.replace(/-/g, "") + "000000"
+    var newduedate = duedate.replace(/-/g, "")
+    if(newduedate != ""){
+      var newduedate = newduedate + '000000'
+    }
+    
     console.log(newduedate)
 
     return new Promise(async (resolve, reject) => {
@@ -169,7 +175,10 @@ const TaskListResults = () => {
 
   const createNewTaskWithFile = (taskID, date, filePath) => {
     console.log(`NewTask.onSubmitTask.createNewTask: called`)
-    const newduedate = duedate.replace(/-/g, "") + "000000"
+    var newduedate = duedate.replace(/-/g, "")
+    if(newduedate != ""){
+      var newduedate = newduedate + '000000'
+    }
     console.log(newduedate)
     return new Promise(async (resolve, reject) => {
       try {
@@ -191,26 +200,6 @@ const TaskListResults = () => {
       }
     })
   }
-
-  //TODO
-  // const uploadFile = (fileURI, taskID) => {
-  //   console.log(`NewTask.uploadFile: called`)
-  //   console.log(`imageURI: ${fileURI}`)
-  //   let fd = new FormData()
-  //   const fileName = taskID + '.jpg'
-  //   fd.append('ticketFile', { name:fileName })
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       const res = axios.post(`http://localhost:5050/api/web/task/uploadfile`, fd)
-  //       console.log(`NewTask.uploadFile: success`)
-  //       console.log(JSON.stringify(res))
-  //       resolve('task/' + fileName)
-  //     } catch (error) {
-  //       console.log(`NewTask.uploadTask: error= ${error}`)
-  //       reject(error)
-  //     }
-  //   })
-  // }
 
   const uploadFile = (taskID) => {
     const formData = new FormData();
@@ -240,7 +229,6 @@ const TaskListResults = () => {
 
   };
 
-  //TODO:
   const onSubmitTask = async () => {
     console.log(`NewTask.onSubmitTask: called`)
     try {
@@ -251,7 +239,7 @@ const TaskListResults = () => {
       console.log(`NewTask.onSubmitTask: latestID=${latestID}`)
       taskID = taskID + (++latestID < 10 ? '0' : '') + latestID
       console.log(`NewTask.onSubmitTask: next projectID=${taskID}`)
-      if (filename === "") {
+      if (filename == "") {
         const nice = await createNewTask(taskID, date)
       } else {
         const filePath = await uploadFile(taskID)
@@ -266,6 +254,7 @@ const TaskListResults = () => {
       setFilename('')
       setOpenTask(false)
       getTask()
+      getEmployee()
     } catch (error) {
       console.log(error)
     }
@@ -273,6 +262,10 @@ const TaskListResults = () => {
 
   const onUpdateTask = () => {
     console.log(`onUpdatetask: called`)
+    var newduedate = updatedDuedate.replace(/-/g, "")
+    if(newduedate != "" && newduedate.length<10){
+      var newduedate = newduedate + '000000'
+    }
     return new Promise(async (resolve, reject) => {
       try {
         const axiosPostResponse = await axios.post("http://localhost:5050/api/web/task/updatetask", {
@@ -280,7 +273,7 @@ const TaskListResults = () => {
           tc_title: updatedTitle.trim(),
           tc_detail: updatedDetail.trim(),
           tc_assignedto: updatedAssign,
-          tc_duedate: updatedDuedate,
+          tc_duedate: newduedate,
           tc_priority: updatedPriority,
         })
 
@@ -296,6 +289,7 @@ const TaskListResults = () => {
       setUpdatedPriority('')
       setOpenUpdate(false)
       getTask()
+      getEmployee()
     })
   }
 
@@ -309,6 +303,7 @@ const TaskListResults = () => {
     }
     setOpenDelete(false)
     setDeletedTask('')
+    getEmployee()
   };
 
   const getTask = async () => {
@@ -322,7 +317,7 @@ const TaskListResults = () => {
 
   const getEmployee = async () => {
     try {
-      const { data }  = await axios.get(`http://localhost:5050/api/web/task/getemployee`)
+      const { data }  = await axios.get(`http://localhost:5050/api/web/task/getworkload`)
       setEmployee(data)
     } catch (error) {
       console.error('getEmployee(): ERROR')
@@ -333,10 +328,6 @@ useEffect(() => {
   getTask();
   getEmployee();
 }, []);
-
-  const getRecommend = () => {
-    setRecommend();
-  };
 
   return (
   <Box>
@@ -351,10 +342,10 @@ useEffect(() => {
           <TextField type="text" placeholder="Enter task title" value={title} onChange={e => setTitle(e.target.value)}/>
           <FormLabel>
             Assign To:
-            <Select sx={{ pr:5 }} value={assign} onChange={e => setAssign(e.target.value)}>
+            <Select value={assign} onChange={e => setAssign(e.target.value)}>
               {employee.map((em) => {
                 return(
-                  <MenuItem key={em.em_fullname} value={em.em_fullname}>{em.em_fullname}</MenuItem>
+                  <MenuItem key={em.employee} value={em.employee}>{em.employee} ({em.totalworkload})</MenuItem>
                 )
               })}
             </Select>
@@ -370,9 +361,9 @@ useEffect(() => {
           <FormLabel>
               Task Priority:
               <Select value={priority} onChange={e => setPriority(e.target.value)}>
-                <MenuItem value={'Low'}>Low</MenuItem>
-                <MenuItem value={'Medium'}>Medium</MenuItem>
-                <MenuItem value={'High'}>High</MenuItem>
+                <MenuItem value={'LOW'}>Low</MenuItem>
+                <MenuItem value={'MEDIUM'}>Medium</MenuItem>
+                <MenuItem value={'HIGH'}>High</MenuItem>
               </Select>
             </FormLabel>
         </FormControl>
@@ -384,7 +375,7 @@ useEffect(() => {
     </Modal>
 
     <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
-    <Button variant="contained" onClick={() => { setOpenTask(true); getRecommend() }} color="primary">Add Task</Button>
+    <Button variant="contained" onClick={() => { setOpenTask(true) }} color="primary">Add Task</Button>
     </Box>
 
       <Card>
@@ -398,6 +389,9 @@ useEffect(() => {
                   </TableCell>
                   <TableCell>
                     Title details
+                  </TableCell>
+                  <TableCell>
+                    Company code
                   </TableCell>
                   <TableCell>
                     Assigned to
@@ -419,8 +413,19 @@ useEffect(() => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {task.slice(0, limit).map((ta) => (
-                  <TableRow key={ta.tc_id}>
+                {task.slice(0, limit).map((ta) => {
+                  var col = ''
+                  if(ta.tc_status == 'PENDING'){
+                    col = 'red'
+                  }
+                  else if(ta.tc_status == 'IN PROGRESS'){
+                    col = '#f4b210'
+                  }
+                  else {
+                    col = 'green'
+                  }
+                  return(
+                    <TableRow key={ta.tc_id}>
                     <TableCell>
                       <Box
                         sx={{
@@ -440,13 +445,16 @@ useEffect(() => {
                       {ta.tc_detail}
                     </TableCell>
                     <TableCell>
-                      {ta.tc_assignedto}
+                      {ta.tc_cmcode}
                     </TableCell>
                     <TableCell>
+                      {ta.tc_assignedto}
+                    </TableCell>
+                    <TableCell sx={{ color: col }}>
                       {ta.tc_status}
                     </TableCell>
                     <TableCell>
-                      {ta.tc_duedate.slice(0, -6)}
+                      {ta.tc_duedate != null ? ('' + ta.tc_duedate).substring(0, 8): ''}
                     </TableCell>
                     <TableCell>
                       {ta.tc_priority}
@@ -465,7 +473,10 @@ useEffect(() => {
                       </Box>
                     </TableCell>
                   </TableRow>
-                ))}
+                  )
+                }
+                  
+                )}
               </TableBody>
             </Table>
             <Dialog
@@ -504,7 +515,7 @@ useEffect(() => {
                     <Select value={updatedAssign} onChange={e => setUpdatedAssign(e.target.value)}>
                       {employee.map((em) => {
                         return(
-                          <MenuItem key={em.em_fullname} value={em.em_fullname}>{em.em_fullname}</MenuItem>
+                          <MenuItem key={em.employee} value={em.employee}>{em.employee} ({em.totalworkload})</MenuItem>
                         )
                       })}
                     </Select>
@@ -518,9 +529,9 @@ useEffect(() => {
                   <FormLabel>
                       Task Priority:
                       <Select value={updatedPriority} onChange={e => setUpdatedPriority(e.target.value)}>
-                        <MenuItem value={'Low'}>Low</MenuItem>
-                        <MenuItem value={'Medium'}>Medium</MenuItem>
-                        <MenuItem value={'High'}>High</MenuItem>
+                        <MenuItem value={'LOW'}>Low</MenuItem>
+                        <MenuItem value={'MEDIUM'}>Medium</MenuItem>
+                        <MenuItem value={'HIGH'}>High</MenuItem>
                       </Select>
                     </FormLabel>
                 </FormControl>

@@ -3,7 +3,7 @@ const router = require('express').Router()
 router.get("/getticket", async (req, res) => {
   try {
     console.log(`GET url: ${req.originalUrl}`)
-    const queryString = `SELECT * FROM ticket`
+    const queryString = `SELECT * FROM ticket ORDER BY tc_createdat desc`
     console.log(queryString)
     const query = await db.query(queryString);
     res.json(query.rows);
@@ -56,38 +56,6 @@ router.get("/lastid/:tcid", async (req, res) => {
   }
 });
 
-// router.post("/uploadfile", async (req, res) => {
-//   try {
-//     if (!req.files) {
-//       console.log(`GET url: ${req.originalUrl}`)
-//       res.send({
-//         status: false,
-//         message: 'No file uploaded'
-//       });
-//     } else {
-//       let file = req.files.ticketFile;
-//       console.log(`file.name= ${file.name}`)
-//       const filePath = 'attachments/' + file.name
-//       // literally upload file to filePath
-//       file.mv(`./public/${filePath}`)
-
-//       res.send({
-//         status: true,
-//         message: 'File is uploaded',
-//         data: {
-//           name: file.name,
-//           mimetype: file.mimetype,
-//           size: file.size,
-//           path: filePath
-//         }
-//       })
-//     }
-//   } catch (err) {
-//     console.error(err)
-//     res.status(500).send(err);
-//   }
-// });
-
 router.post('/uploadfile/:tcid', (req, res) => {
   if (req.files === null) {
     return res.status(400).json({ msg: 'No file uploaded' });
@@ -106,45 +74,6 @@ router.post('/uploadfile/:tcid', (req, res) => {
     res.json({ fileName: filename, filePath: `/uploads/${filename}` });
   });
 });
-
-router.post("/getfile", async (req, res) => {
-  try {
-    console.info(`POST url: ${req.originalUrl}`)
-    const { filePath } = req.body
-    console.log(`filePath=${filePath}`)
-    // var data = getIcon(req.params.w);
-    // var img = Buffer.from(data, 'base64');
-
-
-    // const img = await fs.readFile(`./${filePath}`, { encoding: 'base64' });
-    // console.log(img)
-
-    // res.writeHead(200, {
-    //   'Content-Type': 'image/jpg',
-    //   'Content-Length': img.length
-    // });
-    // res.end(img);
-    //   res.contentType('jpg')
-    res.sendFile(path.join(__dirname, `../${filePath}`))
-
-    // var options = {
-    //   root: path.join(__dirname)
-    // }
-
-    // var fileName = `../${filePath}`;
-    // res.contentType('jpg')
-    // res.sendFile(fileName, options, (err) => {
-    //   if (err) {
-    //     console.log(err)
-    //   } else {
-    //     console.log('Sent:', fileName)
-    //   }
-    // })
-  } catch (err) {
-    console.log(err)
-    res.status(500).send(err);
-  }
-})
 
 router.delete("/deleteticket/:tc_id", async (req, res) => {
   try {
@@ -178,6 +107,22 @@ router.get("/getemployee", async (req, res) => {
   try {
     console.log(`GET url: ${req.originalUrl}`)
     const queryString = `SELECT em_fullname FROM employee`
+    console.log(queryString)
+    const query = await db.query(queryString);
+    res.json(query.rows);
+    console.log(query.rows);
+
+  } catch (error) {
+    console.error(error.message);
+  }
+});
+
+router.get("/getworkload/", async (req, res) => {
+  try {
+    console.log(`GET url: ${req.originalUrl}`)
+    const queryString = `select employee, workload, case when score is null then 0 else score end as score, workload+(case when score is null then 0 else score end) as totalworkload from (
+      select em_fullname as employee, case when tc_low is null then 0 else tc_low end as low, case when tc_medium is null then 0 else tc_medium end as medium, case when tc_high is null then 0 else tc_high end as high, case when (tc_low*3+tc_medium*4+tc_high*5) is null then 0 else (tc_low*3+tc_medium*4+tc_high*5) end as workload, score from employee left join (select tc_assignedto, sum(case when tc_priority='LOW' then 1 else 0 end) as tc_low, sum(case when tc_priority='MEDIUM' then 1 else 0 end) as tc_medium, sum(case when tc_priority='HIGH' then 1 else 0 end)as tc_high from ticket where  tc_status='PENDING' or tc_status='IN PROGRESS' group by tc_assignedto) workloadtable on em_fullname=tc_assignedto left join (select kp_emname, sum(kp_score) as score from kpi group by kp_emname) kpitable on em_fullname = kp_emname order by workload desc, employee asc
+    ) as finaltable order by totalworkload asc`
     console.log(queryString)
     const query = await db.query(queryString);
     res.json(query.rows);
