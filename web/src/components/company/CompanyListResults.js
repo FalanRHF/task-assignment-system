@@ -26,6 +26,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
+import env from '../../env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 function getModalStyle() {
   const top = 50;
@@ -78,7 +80,7 @@ const CompanyListResults = () => {
     console.log(`onSubmitcompany: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/company/postnewcompany", {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/company/postnewcompany`, {
           cm_name: name,
           cm_code: code.toUpperCase(),
           cm_detail: detail.trim()
@@ -100,7 +102,7 @@ const CompanyListResults = () => {
     console.log(`onUpdatecompany: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/company/updatecompany", {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/company/updatecompany`, {
           cm_name: updatedName,
           cm_code: updatedCode,
           cm_detail: updatedDetail.trim()
@@ -120,7 +122,7 @@ const CompanyListResults = () => {
 
   const deleteCompany = async id => {
     try {
-      const deleteCompany = await axios.delete(`http://localhost:5050/api/web/company/deletecompany/${id}`);
+      const deleteCompany = await axios.delete(`${SERVER_DOMAIN}/api/web/company/deletecompany/${id}`);
       console.log("Company deleted")
       setCompany(company.filter(cm => cm.cm_code !== id));
     } catch (err) {
@@ -131,12 +133,12 @@ const CompanyListResults = () => {
   };
 
   const getCompany = async () => {
-      try {
-        const { data }  = await axios.get(`http://localhost:5050/api/web/company/getcompany`)
-        setCompany(data)
-      } catch (error) {
-        console.error('getCompany(): ERROR')
-      }
+    try {
+      const { data } = await axios.get(`${SERVER_DOMAIN}/api/web/company/getcompany`)
+      setCompany(data)
+    } catch (error) {
+      console.error('getCompany(): ERROR')
+    }
   }
 
   useEffect(() => {
@@ -144,33 +146,33 @@ const CompanyListResults = () => {
   }, []);
 
   return (
-  <Box>
-    <Modal
+    <Box>
+      <Modal
         open={openCompany}
         onClose={() => { setOpenCompany(false); setName(''); setDetail(''); setCode('') }}
         aria-labelledby="simple-modal-title"
       >
-      <Box style={modalStyle} className={classes.paper}>
-        <FormControl sx={{ display: 'flex', flexDirection: 'column'}}>
-          <FormLabel>Company Name:</FormLabel>
-          <TextField type="text" placeholder="Enter company name" value={name} onChange={e => setName(e.target.value)}/>
-          <FormLabel>Company Details:</FormLabel>
-          <TextField type="text" placeholder="Enter company details" value={detail} onChange={e => setDetail(e.target.value)}/>
-          <FormLabel>Company Code:</FormLabel>
-          <TextField inputProps={{ maxLength: 6 }} type="text" placeholder="Enter company code" value={code} onChange={e => setCode(e.target.value)}/>
-        </FormControl>
+        <Box style={modalStyle} className={classes.paper}>
+          <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
+            <FormLabel>Company Name:</FormLabel>
+            <TextField type="text" placeholder="Enter company name" value={name} onChange={e => setName(e.target.value)} />
+            <FormLabel>Company Details:</FormLabel>
+            <TextField type="text" placeholder="Enter company details" value={detail} onChange={e => setDetail(e.target.value)} />
+            <FormLabel>Company Code:</FormLabel>
+            <TextField inputProps={{ maxLength: 6 }} type="text" placeholder="Enter company code" value={code} onChange={e => setCode(e.target.value)} />
+          </FormControl>
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt:2 }}>
-          <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenCompany(false); setName(''); setDetail(''); setCode('') }}>Cancel</Button>
-          <Button variant="contained" color="primary" onClick={onSubmitCompany}>Add</Button>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
+            <Button sx={{ bgcolor: 'lightgreen', mr: 1 }} variant="contained" onClick={() => { setOpenCompany(false); setName(''); setDetail(''); setCode('') }}>Cancel</Button>
+            <Button variant="contained" color="primary" onClick={onSubmitCompany}>Add</Button>
+          </Box>
+
         </Box>
+      </Modal>
 
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1, mr: 5 }}>
+        <Button variant="contained" onClick={() => setOpenCompany(true)} color="primary">Add Company</Button>
       </Box>
-    </Modal>
-
-    <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
-    <Button variant="contained" onClick={() => setOpenCompany(true)} color="primary">Add Company</Button>
-    </Box>
 
       <Card>
         <PerfectScrollbar>
@@ -228,12 +230,12 @@ const CompanyListResults = () => {
                       {cm.cm_code}
                     </TableCell>
                     <TableCell>
-                      <Box sx={{display: 'flex'}}>
-                        <IconButton sx={{ color:'lightgreen' }} onClick={() => { setOpenUpdate(true); setUpdatedName(cm.cm_name); setUpdatedDetail(cm.cm_detail); setUpdatedCode(cm.cm_code) }} aria-label="edit">
-                          <EditIcon/>
+                      <Box sx={{ display: 'flex' }}>
+                        <IconButton sx={{ color: 'lightgreen' }} onClick={() => { setOpenUpdate(true); setUpdatedName(cm.cm_name); setUpdatedDetail(cm.cm_detail); setUpdatedCode(cm.cm_code) }} aria-label="edit">
+                          <EditIcon />
                         </IconButton>
-                        <IconButton sx={{ color:'red' }} onClick={() => { setOpenDelete(true); setDeletedCompany(cm.cm_code) } } aria-label="delete">
-                          <DeleteIcon/>
+                        <IconButton sx={{ color: 'red' }} onClick={() => { setOpenDelete(true); setDeletedCompany(cm.cm_code) }} aria-label="delete">
+                          <DeleteIcon />
                         </IconButton>
                       </Box>
                     </TableCell>
@@ -255,32 +257,32 @@ const CompanyListResults = () => {
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button sx={{ bgcolor:'lightgreen' }} variant="contained" onClick={() => { setOpenDelete(false); setDeletedCompany('') }}>
+                <Button sx={{ bgcolor: 'lightgreen' }} variant="contained" onClick={() => { setOpenDelete(false); setDeletedCompany('') }}>
                   Cancel
                 </Button>
-                <Button sx={{ bgcolor:'red' }} variant="contained" onClick={() => deleteCompany(deletedCompany)} autoFocus>
+                <Button sx={{ bgcolor: 'red' }} variant="contained" onClick={() => deleteCompany(deletedCompany)} autoFocus>
                   Delete
                 </Button>
               </DialogActions>
             </Dialog>
 
             <Modal
-                open={openUpdate}
-                onClose={() => { setOpenUpdate(false); setUpdatedName(''); setUpdatedDetail(''); setUpdatedCode('') }}
-                aria-labelledby="simple-modal-title"
-              >
+              open={openUpdate}
+              onClose={() => { setOpenUpdate(false); setUpdatedName(''); setUpdatedDetail(''); setUpdatedCode('') }}
+              aria-labelledby="simple-modal-title"
+            >
               <Box style={modalStyle} className={classes.paper}>
                 <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
                   <FormLabel>Company Name:</FormLabel>
-                  <TextField type="text" value={updatedName} onChange={e => setUpdatedName(e.target.value)}/>
+                  <TextField type="text" value={updatedName} onChange={e => setUpdatedName(e.target.value)} />
                   <FormLabel>Company Details:</FormLabel>
-                  <TextField type="text" value={updatedDetail} onChange={e => setUpdatedDetail(e.target.value)}/>
+                  <TextField type="text" value={updatedDetail} onChange={e => setUpdatedDetail(e.target.value)} />
                   <FormLabel>Company Code:</FormLabel>
-                  <TextField disabled type="text" value={updatedCode}/>
+                  <TextField disabled type="text" value={updatedCode} />
                 </FormControl>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt:2 }}>
-                  <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenUpdate(false); setUpdatedName(''); setUpdatedDetail(''); setUpdatedCode('') }}>Cancel</Button>
-                  <Button sx={{ bgcolor:'lightblue' }} variant="contained" onClick={onUpdateCompany}>Update</Button>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
+                  <Button sx={{ bgcolor: 'lightgreen', mr: 1 }} variant="contained" onClick={() => { setOpenUpdate(false); setUpdatedName(''); setUpdatedDetail(''); setUpdatedCode('') }}>Cancel</Button>
+                  <Button sx={{ bgcolor: 'lightblue' }} variant="contained" onClick={onUpdateCompany}>Update</Button>
                 </Box>
               </Box>
             </Modal>

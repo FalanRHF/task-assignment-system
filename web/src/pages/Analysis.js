@@ -4,7 +4,9 @@ import { Box, Button, Card, CardActions, CardContent, CardHeader, CircularProgre
 import axios from 'axios'
 import FormatDate from '../components/DateFormatter'
 import { CSVDownload, CSVLink } from "react-csv"
-import { done } from 'nprogress';
+
+import env from '../env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 const bull = (
   <Box
@@ -46,7 +48,7 @@ const Analysis = () => {
   const getSummaryData = () => {
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await axios.get(`http://localhost:5050/api/web/summary/data/all`)
+        const { data } = await axios.get(`${SERVER_DOMAIN}/api/web/summary/data/all`)
         resolve(data)
       } catch (error) {
         console.error('Analysis.getSummaryData(): ERROR')

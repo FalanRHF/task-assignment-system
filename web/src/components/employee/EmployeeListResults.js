@@ -26,6 +26,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
+import env from '../../env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 function getModalStyle() {
   const top = 50;
@@ -72,7 +74,7 @@ const EmployeeListResults = () => {
     console.log(`NewTask.onSubmitemployee: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/employee/postnewemployee", {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/employee/postnewemployee`, {
           em_email: email,
         })
 
@@ -88,7 +90,7 @@ const EmployeeListResults = () => {
 
   const deleteEmployee = async id => {
     try {
-      const deleteEmployee = await axios.delete(`http://localhost:5050/api/web/employee/deleteemployee/${id}`);
+      const deleteEmployee = await axios.delete(`${SERVER_DOMAIN}/api/web/employee/deleteemployee/${id}`);
       console.log("Employee deleted")
       setEmployee(employee.filter(em => em.em_email !== id));
     } catch (err) {
@@ -99,12 +101,12 @@ const EmployeeListResults = () => {
   };
 
   const getEmployee = async () => {
-      try {
-        const { data }  = await axios.get(`http://localhost:5050/api/web/employee/getemployee`)
-        setEmployee(data)
-      } catch (error) {
-        console.error('getEmployee(): ERROR')
-      }
+    try {
+      const { data } = await axios.get(`${SERVER_DOMAIN}/api/web/employee/getemployee`)
+      setEmployee(data)
+    } catch (error) {
+      console.error('getEmployee(): ERROR')
+    }
   }
 
   useEffect(() => {
@@ -112,29 +114,29 @@ const EmployeeListResults = () => {
   }, []);
 
   return (
-  <Box>
-    <Modal
+    <Box>
+      <Modal
         open={openEmployee}
         onClose={() => setOpenEmployee(false)}
         aria-labelledby="simple-modal-title"
       >
-      <Box style={modalStyle} className={classes.paper}>
-        <FormControl sx={{ display: 'flex', flexDirection: 'column'}}>
-          <FormLabel>Employee email:</FormLabel>
-          <TextField type="email" placeholder="Enter employee email" value={email} onChange={e => setEmail(e.target.value)}/>
-        </FormControl>
+        <Box style={modalStyle} className={classes.paper}>
+          <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
+            <FormLabel>Employee email:</FormLabel>
+            <TextField type="email" placeholder="Enter employee email" value={email} onChange={e => setEmail(e.target.value)} />
+          </FormControl>
 
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt:2 }}>
-          <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenEmployee(false); setEmail('') }}>Cancel</Button>
-          <Button variant="contained" color="primary" onClick={onSubmitEmployee}>Add</Button>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
+            <Button sx={{ bgcolor: 'lightgreen', mr: 1 }} variant="contained" onClick={() => { setOpenEmployee(false); setEmail('') }}>Cancel</Button>
+            <Button variant="contained" color="primary" onClick={onSubmitEmployee}>Add</Button>
+          </Box>
+
         </Box>
+      </Modal>
 
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1, mr: 5 }}>
+        <Button variant="contained" onClick={() => setOpenEmployee(true)} color="primary">Add Employee</Button>
       </Box>
-    </Modal>
-
-    <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
-      <Button variant="contained" onClick={() => setOpenEmployee(true)} color="primary">Add Employee</Button>
-    </Box>
 
       <Card>
         <PerfectScrollbar>
@@ -180,17 +182,17 @@ const EmployeeListResults = () => {
                       {em.em_email}
                     </TableCell>
                     <TableCell>
-                    <Box sx={{display: 'flex'}}>
-                      <IconButton sx={{ color:'red' }} onClick={() => { setOpenDelete(true); setDeletedEmail(em.em_email) } } aria-label="delete">
-                        <DeleteIcon/>
-                      </IconButton>
-                    </Box>
+                      <Box sx={{ display: 'flex' }}>
+                        <IconButton sx={{ color: 'red' }} onClick={() => { setOpenDelete(true); setDeletedEmail(em.em_email) }} aria-label="delete">
+                          <DeleteIcon />
+                        </IconButton>
+                      </Box>
                     </TableCell>
                   </TableRow>
                 ))}
               </TableBody>
             </Table>
-            
+
             <Dialog
               open={openDelete}
               onClose={() => { setOpenDelete(false); setDeletedEmail('') }}
@@ -204,10 +206,10 @@ const EmployeeListResults = () => {
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button sx={{ bgcolor:'lightgreen' }} variant="contained" onClick={() => { setOpenDelete(false); setDeletedEmail('') }}>
+                <Button sx={{ bgcolor: 'lightgreen' }} variant="contained" onClick={() => { setOpenDelete(false); setDeletedEmail('') }}>
                   Cancel
                 </Button>
-                <Button sx={{ bgcolor:'red' }} variant="contained" onClick={() => deleteEmployee(deletedEmail)} autoFocus>
+                <Button sx={{ bgcolor: 'red' }} variant="contained" onClick={() => deleteEmployee(deletedEmail)} autoFocus>
                   Delete
                 </Button>
               </DialogActions>

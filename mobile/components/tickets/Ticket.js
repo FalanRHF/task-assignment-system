@@ -181,9 +181,7 @@ const Ticket = ({ route, navigation }) => {
         </View>
       </View>
     )
-
   }
-
 
   if (!isLoaded) {
     return (

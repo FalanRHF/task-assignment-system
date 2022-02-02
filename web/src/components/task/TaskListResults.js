@@ -28,6 +28,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
+import env from '../../env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 function getModalStyle() {
   const top = 50;
@@ -80,10 +82,10 @@ const TaskListResults = () => {
   const [recommend, setRecommend] = useState([]);
 
   const imageLink = (filePath) => {
-    if(filePath == null){
+    if (filePath == null) {
       return null
     }
-    const url = 'http://localhost:5050/' + filePath;
+    const url = SERVER_DOMAIN + '/' + filePath;
     return (<a href={url} target="_blank">File link</a>)
   }
 
@@ -125,7 +127,7 @@ const TaskListResults = () => {
     console.log(`NewTask.onSubmitTask.getLatestTaskID(${projectID}): called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`http://localhost:5050/api/web/task/lastid/${projectID}`)
+        const axiosGetResponse = await axios.get(`${SERVER_DOMAIN}/api/web/task/lastid/${projectID}`)
 
         console.log(`NewTask.onSubmitTask.getLatestTaskID(${projectID}).axiosGetResponse: ${JSON.stringify(axiosGetResponse.data)}`)
         if (axiosGetResponse.data == "") {
@@ -148,7 +150,7 @@ const TaskListResults = () => {
 
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/task/postnewticket", {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/task/postnewticket`, {
           tc_id: taskID,
           tc_pjcode: pjcode,
           tc_title: title.trim(),
@@ -173,7 +175,7 @@ const TaskListResults = () => {
     console.log(newduedate)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post(`http://localhost:5050/api/web/task/postnewticketwithfile`, {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/task/postnewticketwithfile`, {
           tc_id: taskID,
           tc_title: title.trim(),
           tc_detail: detail.trim(),
@@ -201,7 +203,7 @@ const TaskListResults = () => {
   //   fd.append('ticketFile', { name:fileName })
   //   return new Promise(async (resolve, reject) => {
   //     try {
-  //       const res = axios.post(`http://localhost:5050/api/web/task/uploadfile`, fd)
+  //       const res = axios.post(`${SERVER_DOMAIN}/api/web/task/uploadfile`, fd)
   //       console.log(`NewTask.uploadFile: success`)
   //       console.log(JSON.stringify(res))
   //       resolve('task/' + fileName)
@@ -218,11 +220,11 @@ const TaskListResults = () => {
 
     return new Promise(async (resolve, reject) => {
       try {
-        const res = await axios.post(`http://localhost:5050/api/web/task/uploadfile/${taskID}`, formData, {
+        const res = await axios.post(`${SERVER_DOMAIN}/api/web/task/uploadfile/${taskID}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           },
-        }); 
+        });
         const { fileName, filePath } = res.data;
         console.log(fileName)
         console.log(filePath)
@@ -275,7 +277,7 @@ const TaskListResults = () => {
     console.log(`onUpdatetask: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/task/updatetask", {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/task/updatetask`, {
           tc_id: updatedID,
           tc_title: updatedTitle.trim(),
           tc_detail: updatedDetail.trim(),
@@ -301,7 +303,7 @@ const TaskListResults = () => {
 
   const deleteTask = async id => {
     try {
-      const deleteTask = await axios.delete(`http://localhost:5050/api/web/task/deleteticket/${id}`);
+      const deleteTask = await axios.delete(`${SERVER_DOMAIN}/api/web/task/deleteticket/${id}`);
       console.log("Task deleted")
       setTask(task.filter(ta => ta.tc_id !== id));
     } catch (err) {
@@ -313,61 +315,61 @@ const TaskListResults = () => {
 
   const getTask = async () => {
     try {
-      const { data }  = await axios.get(`http://localhost:5050/api/web/task/getticket`)
+      const { data } = await axios.get(`${SERVER_DOMAIN}/api/web/task/getticket`)
       setTask(data)
     } catch (error) {
       console.error('getTask(): ERROR')
     }
-}
+  }
 
   const getEmployee = async () => {
     try {
-      const { data }  = await axios.get(`http://localhost:5050/api/web/task/getemployee`)
+      const { data } = await axios.get(`${SERVER_DOMAIN}/api/web/task/getemployee`)
       setEmployee(data)
     } catch (error) {
       console.error('getEmployee(): ERROR')
     }
   }
 
-useEffect(() => {
-  getTask();
-  getEmployee();
-}, []);
+  useEffect(() => {
+    getTask();
+    getEmployee();
+  }, []);
 
   const getRecommend = () => {
     setRecommend();
   };
 
   return (
-  <Box>
-    <Modal
+    <Box>
+      <Modal
         open={openTask}
-        onClose={() => { setOpenTask(false); setTitle(''); setAssign(''); setDetail(''); setDuedate(''); setPriority(''); setFile(''); setFilename('') } }
+        onClose={() => { setOpenTask(false); setTitle(''); setAssign(''); setDetail(''); setDuedate(''); setPriority(''); setFile(''); setFilename('') }}
         aria-labelledby="simple-modal-title"
       >
-      <Box style={modalStyle} className={classes.paper}>
-        <FormControl sx={{ display: 'flex', flexDirection: 'column'}}>
-          <FormLabel>Task Title:</FormLabel>
-          <TextField type="text" placeholder="Enter task title" value={title} onChange={e => setTitle(e.target.value)}/>
-          <FormLabel>
-            Assign To:
-            <Select sx={{ pr:5 }} value={assign} onChange={e => setAssign(e.target.value)}>
-              {employee.map((em) => {
-                return(
-                  <MenuItem key={em.em_fullname} value={em.em_fullname}>{em.em_fullname}</MenuItem>
-                )
-              })}
-            </Select>
-          </FormLabel>
-          <FormLabel>Task Details:</FormLabel>
-          <TextField type="text" placeholder="Enter task detail" value={detail} onChange={e => setDetail(e.target.value)}/>
-          <FormLabel>Attachment File:</FormLabel>
-          <TextField type="file" onChange={handleFileChange}/>
-          <FormLabel>Due Date:</FormLabel>
-          <TextField type="date" value={duedate} onChange={e => setDuedate(e.target.value)}/>
-        </FormControl>
-        <FormControl>
-          <FormLabel>
+        <Box style={modalStyle} className={classes.paper}>
+          <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
+            <FormLabel>Task Title:</FormLabel>
+            <TextField type="text" placeholder="Enter task title" value={title} onChange={e => setTitle(e.target.value)} />
+            <FormLabel>
+              Assign To:
+              <Select sx={{ pr: 5 }} value={assign} onChange={e => setAssign(e.target.value)}>
+                {employee.map((em) => {
+                  return (
+                    <MenuItem key={em.em_fullname} value={em.em_fullname}>{em.em_fullname}</MenuItem>
+                  )
+                })}
+              </Select>
+            </FormLabel>
+            <FormLabel>Task Details:</FormLabel>
+            <TextField type="text" placeholder="Enter task detail" value={detail} onChange={e => setDetail(e.target.value)} />
+            <FormLabel>Attachment File:</FormLabel>
+            <TextField type="file" onChange={handleFileChange} />
+            <FormLabel>Due Date:</FormLabel>
+            <TextField type="date" value={duedate} onChange={e => setDuedate(e.target.value)} />
+          </FormControl>
+          <FormControl>
+            <FormLabel>
               Task Priority:
               <Select value={priority} onChange={e => setPriority(e.target.value)}>
                 <MenuItem value={'Low'}>Low</MenuItem>
@@ -375,17 +377,17 @@ useEffect(() => {
                 <MenuItem value={'High'}>High</MenuItem>
               </Select>
             </FormLabel>
-        </FormControl>
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt:2 }}>
-          <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenTask(false); setTitle(''); setAssign(''); setDetail(''); setDuedate(''); setPriority(''); setFile(''); setFilename('') }}>Cancel</Button>
-          <Button variant="contained" color="primary" onClick={onSubmitTask}>Add</Button>
+          </FormControl>
+          <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
+            <Button sx={{ bgcolor: 'lightgreen', mr: 1 }} variant="contained" onClick={() => { setOpenTask(false); setTitle(''); setAssign(''); setDetail(''); setDuedate(''); setPriority(''); setFile(''); setFilename('') }}>Cancel</Button>
+            <Button variant="contained" color="primary" onClick={onSubmitTask}>Add</Button>
+          </Box>
         </Box>
-      </Box>
-    </Modal>
+      </Modal>
 
-    <Box sx={{ display: 'flex', justifyContent: 'flex-end', p:1, mr:5}}>
-    <Button variant="contained" onClick={() => { setOpenTask(true); getRecommend() }} color="primary">Add Task</Button>
-    </Box>
+      <Box sx={{ display: 'flex', justifyContent: 'flex-end', p: 1, mr: 5 }}>
+        <Button variant="contained" onClick={() => { setOpenTask(true); getRecommend() }} color="primary">Add Task</Button>
+      </Box>
 
       <Card>
         <PerfectScrollbar>
@@ -452,15 +454,15 @@ useEffect(() => {
                       {ta.tc_priority}
                     </TableCell>
                     <TableCell>
-                      {imageLink(ta.tc_filepath)}                   
+                      {imageLink(ta.tc_filepath)}
                     </TableCell>
                     <TableCell>
-                    <Box sx={{display: 'flex'}}>
-                        <IconButton sx={{ color:'lightgreen' }} onClick={() => { setOpenUpdate(true); setUpdatedID(ta.tc_id); setUpdatedTitle(ta.tc_title); setUpdatedDetail(ta.tc_detail); setUpdatedAssign(ta.tc_assignedto); setUpdatedDuedate(ta.tc_duedate); setUpdatedPriority(ta.tc_priority) }} aria-label="edit">
-                          <EditIcon/>
+                      <Box sx={{ display: 'flex' }}>
+                        <IconButton sx={{ color: 'lightgreen' }} onClick={() => { setOpenUpdate(true); setUpdatedID(ta.tc_id); setUpdatedTitle(ta.tc_title); setUpdatedDetail(ta.tc_detail); setUpdatedAssign(ta.tc_assignedto); setUpdatedDuedate(ta.tc_duedate); setUpdatedPriority(ta.tc_priority) }} aria-label="edit">
+                          <EditIcon />
                         </IconButton>
-                        <IconButton sx={{ color:'red' }} onClick={() => { setOpenDelete(true); setDeletedTask(ta.tc_id) } } aria-label="delete">
-                          <DeleteIcon/>
+                        <IconButton sx={{ color: 'red' }} onClick={() => { setOpenDelete(true); setDeletedTask(ta.tc_id) }} aria-label="delete">
+                          <DeleteIcon />
                         </IconButton>
                       </Box>
                     </TableCell>
@@ -481,52 +483,52 @@ useEffect(() => {
                 </DialogContentText>
               </DialogContent>
               <DialogActions>
-                <Button sx={{ bgcolor:'lightgreen' }} variant="contained" onClick={() => { setOpenDelete(false); setDeletedTask('') }}>
+                <Button sx={{ bgcolor: 'lightgreen' }} variant="contained" onClick={() => { setOpenDelete(false); setDeletedTask('') }}>
                   Cancel
                 </Button>
-                <Button sx={{ bgcolor:'red' }} variant="contained" onClick={() => deleteTask(deletedTask)} autoFocus>
+                <Button sx={{ bgcolor: 'red' }} variant="contained" onClick={() => deleteTask(deletedTask)} autoFocus>
                   Delete
                 </Button>
               </DialogActions>
             </Dialog>
 
             <Modal
-                open={openUpdate}
-                onClose={() => { setOpenUpdate(false); setUpdatedTitle(''); setUpdatedDetail(''); setUpdatedAssign(''); setUpdatedDuedate(''); setUpdatedPriority('') }}
-                aria-labelledby="simple-modal-title"
-              >
+              open={openUpdate}
+              onClose={() => { setOpenUpdate(false); setUpdatedTitle(''); setUpdatedDetail(''); setUpdatedAssign(''); setUpdatedDuedate(''); setUpdatedPriority('') }}
+              aria-labelledby="simple-modal-title"
+            >
               <Box style={modalStyle} className={classes.paper}>
-                <FormControl sx={{ display: 'flex', flexDirection: 'column'}}>
+                <FormControl sx={{ display: 'flex', flexDirection: 'column' }}>
                   <FormLabel>Task Title:</FormLabel>
-                  <TextField type="text" value={updatedTitle} onChange={e => setUpdatedTitle(e.target.value)}/>
+                  <TextField type="text" value={updatedTitle} onChange={e => setUpdatedTitle(e.target.value)} />
                   <FormLabel>
                     Assign To:
                     <Select value={updatedAssign} onChange={e => setUpdatedAssign(e.target.value)}>
                       {employee.map((em) => {
-                        return(
+                        return (
                           <MenuItem key={em.em_fullname} value={em.em_fullname}>{em.em_fullname}</MenuItem>
                         )
                       })}
                     </Select>
                   </FormLabel>
                   <FormLabel>Task Details:</FormLabel>
-                  <TextField type="text" value={updatedDetail} onChange={e => setUpdatedDetail(e.target.value)}/>
+                  <TextField type="text" value={updatedDetail} onChange={e => setUpdatedDetail(e.target.value)} />
                   <FormLabel>Due Date:</FormLabel>
-                  <TextField type="date" value={updatedDuedate} onChange={e => setUpdatedDuedate(e.target.value)}/>
+                  <TextField type="date" value={updatedDuedate} onChange={e => setUpdatedDuedate(e.target.value)} />
                 </FormControl>
                 <FormControl>
                   <FormLabel>
-                      Task Priority:
-                      <Select value={updatedPriority} onChange={e => setUpdatedPriority(e.target.value)}>
-                        <MenuItem value={'Low'}>Low</MenuItem>
-                        <MenuItem value={'Medium'}>Medium</MenuItem>
-                        <MenuItem value={'High'}>High</MenuItem>
-                      </Select>
-                    </FormLabel>
+                    Task Priority:
+                    <Select value={updatedPriority} onChange={e => setUpdatedPriority(e.target.value)}>
+                      <MenuItem value={'Low'}>Low</MenuItem>
+                      <MenuItem value={'Medium'}>Medium</MenuItem>
+                      <MenuItem value={'High'}>High</MenuItem>
+                    </Select>
+                  </FormLabel>
                 </FormControl>
-                <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt:2 }}>
-                  <Button sx={{ bgcolor:'lightgreen', mr:1 }} variant="contained" onClick={() => { setOpenUpdate(false); setUpdatedTitle(''); setUpdatedDetail(''); setUpdatedAssign(''); setUpdatedDuedate(''); setUpdatedPriority('') }}>Cancel</Button>
-                  <Button sx={{ bgcolor:'lightblue' }} variant="contained" onClick={onUpdateTask}>Update</Button>
+                <Box sx={{ display: 'flex', justifyContent: 'flex-end', pt: 2 }}>
+                  <Button sx={{ bgcolor: 'lightgreen', mr: 1 }} variant="contained" onClick={() => { setOpenUpdate(false); setUpdatedTitle(''); setUpdatedDetail(''); setUpdatedAssign(''); setUpdatedDuedate(''); setUpdatedPriority('') }}>Cancel</Button>
+                  <Button sx={{ bgcolor: 'lightblue' }} variant="contained" onClick={onUpdateTask}>Update</Button>
                 </Box>
               </Box>
             </Modal>

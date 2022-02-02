@@ -6,6 +6,9 @@ import FormatDate from '../components/DateFormatter'
 import { CSVDownload, CSVLink } from "react-csv"
 import { done } from 'nprogress';
 
+import env from '../env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
+
 const bull = (
   <Box
     component="span"
@@ -58,7 +61,7 @@ const Assessment = () => {
     console.log('getKpiData()');
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await axios.get(`http://localhost:5050/api/web/kpi/data/all`)
+        const { data } = await axios.get(`${SERVER_DOMAIN}/api/web/kpi/data/all`)
         // console.log(data)
         resolve(data)
       } catch (error) {
@@ -93,7 +96,7 @@ const Assessment = () => {
     console.log('Calculating Score...');
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await axios.get(`http://localhost:5050/api/web/kpi/newdata/${id}`)
+        const { data } = await axios.get(`${SERVER_DOMAIN}/api/web/kpi/newdata/${id}`)
         console.log(JSON.stringify(data))
         resolve(data)
       } catch (error) {
@@ -108,7 +111,7 @@ const Assessment = () => {
     console.log('id', id);
     return new Promise(async (resolve, reject) => {
       try {
-        const res = await axios.post('http://localhost:5050/api/web/kpi/postdata', {
+        const res = await axios.post(`${SERVER_DOMAIN}/api/web/kpi/postdata`, {
           id: id,
           data: data
         })
