@@ -148,6 +148,7 @@ router.post("/postnewticketwithimage", async (req, res) => {
 router.post("/uploadfile", async (req, res) => {
   try {
     if (!req.files) {
+      console.log("Upload failed")
       res.send({
         status: false,
         message: 'No file uploaded'

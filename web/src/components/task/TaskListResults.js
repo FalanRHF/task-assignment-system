@@ -28,6 +28,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
+import env from '../../env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 function getModalStyle() {
   const top = 50;
@@ -85,7 +87,7 @@ const TaskListResults = () => {
     if(filePath == ""){
       return null;
     }
-    const url = 'http://localhost:5050/' + filePath;
+    const url = SERVER_DOMAIN + '/' + filePath;
     return (<a href={url} target="_blank">Attachment link</a>)
   }
 
@@ -106,7 +108,7 @@ const TaskListResults = () => {
     console.log(`NewTicket.onSubmitTicket.getCurrentDate: called`)
     return new Promise((resolve, reject) => {
       var now = new Date()
-      now.setTime(now.getTime() + 8 * 60 * 60 * 1000)
+      now.setTime(now.getTime() + 0 * 60 * 60 * 1000)
       var y = now.getFullYear()
       var m = now.getMonth() + 1
       var d = now.getDate()
@@ -127,7 +129,7 @@ const TaskListResults = () => {
     console.log(`NewTask.onSubmitTask.getLatestTaskID(${projectID}): called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosGetResponse = await axios.get(`http://localhost:5050/api/web/task/lastid/${projectID}`)
+        const axiosGetResponse = await axios.get(`${SERVER_DOMAIN}/api/web/task/lastid/${projectID}`)
 
         console.log(`NewTask.onSubmitTask.getLatestTaskID(${projectID}).axiosGetResponse: ${JSON.stringify(axiosGetResponse.data)}`)
         if (axiosGetResponse.data == "") {
@@ -154,7 +156,7 @@ const TaskListResults = () => {
 
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/task/postnewticket", {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/task/postnewticket`, {
           tc_id: taskID,
           tc_pjcode: pjcode,
           tc_title: title.trim(),
@@ -182,7 +184,7 @@ const TaskListResults = () => {
     console.log(newduedate)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post(`http://localhost:5050/api/web/task/postnewticketwithfile`, {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/task/postnewticketwithfile`, {
           tc_id: taskID,
           tc_title: title.trim(),
           tc_detail: detail.trim(),
@@ -204,10 +206,10 @@ const TaskListResults = () => {
   const uploadFile = (taskID) => {
     const formData = new FormData();
     formData.append('file', file);
-
+    console.log(file)
     return new Promise(async (resolve, reject) => {
       try {
-        const res = await axios.post(`http://localhost:5050/api/web/task/uploadfile/${taskID}`, formData, {
+        const res = await axios.post(`${SERVER_DOMAIN}/api/web/task/uploadfile/${taskID}`, formData, {
           headers: {
             'Content-Type': 'multipart/form-data'
           },
@@ -268,7 +270,7 @@ const TaskListResults = () => {
     }
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/task/updatetask", {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/task/updatetask`, {
           tc_id: updatedID,
           tc_title: updatedTitle.trim(),
           tc_detail: updatedDetail.trim(),
@@ -295,7 +297,7 @@ const TaskListResults = () => {
 
   const deleteTask = async id => {
     try {
-      const deleteTask = await axios.delete(`http://localhost:5050/api/web/task/deleteticket/${id}`);
+      const deleteTask = await axios.delete(`${SERVER_DOMAIN}/api/web/task/deleteticket/${id}`);
       console.log("Task deleted")
       setTask(task.filter(ta => ta.tc_id !== id));
     } catch (err) {
@@ -308,7 +310,7 @@ const TaskListResults = () => {
 
   const getTask = async () => {
     try {
-      const { data }  = await axios.get(`http://localhost:5050/api/web/task/getticket`)
+      const { data }  = await axios.get(`${SERVER_DOMAIN}/api/web/task/getticket`)
       setTask(data)
     } catch (error) {
       console.error('getTask(): ERROR')
@@ -317,7 +319,7 @@ const TaskListResults = () => {
 
   const getEmployee = async () => {
     try {
-      const { data }  = await axios.get(`http://localhost:5050/api/web/task/getworkload`)
+      const { data }  = await axios.get(`${SERVER_DOMAIN}/api/web/task/getworkload`)
       setEmployee(data)
     } catch (error) {
       console.error('getEmployee(): ERROR')

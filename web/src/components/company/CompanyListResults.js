@@ -26,6 +26,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
+import env from '../../env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 function getModalStyle() {
   const top = 50;
@@ -78,7 +80,7 @@ const CompanyListResults = () => {
     console.log(`onSubmitcompany: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/company/postnewcompany", {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/company/postnewcompany`, {
           cm_name: name,
           cm_code: code.toUpperCase(),
           cm_detail: detail.trim()
@@ -100,7 +102,7 @@ const CompanyListResults = () => {
     console.log(`onUpdatecompany: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/company/updatecompany", {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/company/updatecompany`, {
           cm_name: updatedName,
           cm_code: updatedCode,
           cm_detail: updatedDetail.trim()
@@ -120,7 +122,7 @@ const CompanyListResults = () => {
 
   const deleteCompany = async id => {
     try {
-      const deleteCompany = await axios.delete(`http://localhost:5050/api/web/company/deletecompany/${id}`);
+      const deleteCompany = await axios.delete(`${SERVER_DOMAIN}/api/web/company/deletecompany/${id}`);
       console.log("Company deleted")
       setCompany(company.filter(cm => cm.cm_code !== id));
     } catch (err) {
@@ -132,7 +134,7 @@ const CompanyListResults = () => {
 
   const getCompany = async () => {
       try {
-        const { data }  = await axios.get(`http://localhost:5050/api/web/company/getcompany`)
+        const { data }  = await axios.get(`${SERVER_DOMAIN}/api/web/company/getcompany`)
         setCompany(data)
       } catch (error) {
         console.error('getCompany(): ERROR')

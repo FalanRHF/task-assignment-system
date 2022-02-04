@@ -26,6 +26,8 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import EditIcon from '@material-ui/icons/Edit';
 import { makeStyles } from '@material-ui/styles';
 import axios from 'axios';
+import env from '../../env.json'
+const SERVER_DOMAIN = env.SERVER_DOMAIN
 
 function getModalStyle() {
   const top = 50;
@@ -72,7 +74,7 @@ const EmployeeListResults = () => {
     console.log(`NewTask.onSubmitemployee: called`)
     return new Promise(async (resolve, reject) => {
       try {
-        const axiosPostResponse = await axios.post("http://localhost:5050/api/web/employee/postnewemployee", {
+        const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/web/employee/postnewemployee`, {
           em_email: email,
         })
 
@@ -88,7 +90,7 @@ const EmployeeListResults = () => {
 
   const deleteEmployee = async id => {
     try {
-      const deleteEmployee = await axios.delete(`http://localhost:5050/api/web/employee/deleteemployee/${id}`);
+      const deleteEmployee = await axios.delete(`${SERVER_DOMAIN}/api/web/employee/deleteemployee/${id}`);
       console.log("Employee deleted")
       setEmployee(employee.filter(em => em.em_email !== id));
     } catch (err) {
@@ -100,7 +102,7 @@ const EmployeeListResults = () => {
 
   const getEmployee = async () => {
       try {
-        const { data }  = await axios.get(`http://localhost:5050/api/web/employee/getemployee`)
+        const { data }  = await axios.get(`${SERVER_DOMAIN}/api/web/employee/getemployee`)
         setEmployee(data)
       } catch (error) {
         console.error('getEmployee(): ERROR')
