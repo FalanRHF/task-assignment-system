@@ -78,14 +78,27 @@ const Home = ({ navigation }) => {
             <FlatList style={{ flex: 1, marginBottom: 0, borderWidth: 0 }}
               data={pendingTicket}
               renderItem={({ item }) => (
-                <TouchableOpacity
-                  onPress={() => navigation.navigate('Ticket', {
-                    tc_id: item.tc_id
-                  })}
-                  style={{ ...styles.item, borderColor: item.tc_status == 'IN PROGRESS' ? '#f2bc46' : '#e0e0e0' }}>
-                  <Text style={{ fontSize: 16, fontWeight: 'bold' }}>{item.tc_title}</Text>
-                  <Text style={{ fontSize: 10 }}>{item.tc_createdat.substr(6, 2) + '-' + item.tc_createdat.substr(4, 2) + '-' + item.tc_createdat.substr(0, 4) + ' ' + item.tc_createdat.substr(8, 2) + ':' + item.tc_createdat.substr(10, 2)}</Text>
-                </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => navigation.navigate('Ticket', {
+                  tc_id: item.tc_id
+                })}
+                style={{
+                  ...styles.item,
+                  borderColor: item.tc_status == 'IN PROGRESS' ?
+                    '#f2bc46' : '#e0e0e0'
+                }}>
+                <Text style={{ fontSize: 16, fontWeight: 'bold' }}>
+                  {item.tc_title}
+                </Text>
+                <Text
+                  style={{ fontSize: 10 }}>
+                  {item.tc_createdat.substr(6, 2)
+                    + '-' + item.tc_createdat.substr(4, 2)
+                    + '-' + item.tc_createdat.substr(0, 4)
+                    + ' ' + item.tc_createdat.substr(8, 2)
+                    + ':' + item.tc_createdat.substr(10, 2)}
+                </Text>
+              </TouchableOpacity>
               )}
               keyExtractor={(item) => item.tc_id}
               refreshing={true}

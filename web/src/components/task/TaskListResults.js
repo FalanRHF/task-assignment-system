@@ -217,6 +217,7 @@ const TaskListResults = () => {
   const uploadFile = (taskID) => {
     const formData = new FormData();
     formData.append('file', file);
+    console.log(JSON.stringify(file));
 
     return new Promise(async (resolve, reject) => {
       try {

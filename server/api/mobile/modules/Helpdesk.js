@@ -146,12 +146,15 @@ router.post("/postnewticketwithimage", async (req, res) => {
 })
 
 router.post("/uploadfile", async (req, res) => {
+  console.log(`POST url: ${req.originalUrl}`)
+  // console.log(req.body)
   try {
     if (!req.files) {
-      res.send({
+      console.log('Upload File: Failed');
+      throw ({
         status: false,
         message: 'No file uploaded'
-      });
+      })
     } else {
       let img = req.files.ticketImage;
       console.log(`image.name= ${img.name}`)
@@ -180,8 +183,8 @@ router.post("/uploadfile", async (req, res) => {
 router.post("/updateticketstatus", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
-    const { tc_id, newStatus } = req.body;
-    const queryString = `UPDATE ticket SET tc_status = '${newStatus}' WHERE tc_id = '${tc_id}' RETURNING *`
+    const { tc_id, newStatus, tc_completeddate } = req.body;
+    const queryString = `UPDATE ticket SET tc_status = '${newStatus}', tc_completeddate='${tc_completeddate}' WHERE tc_id = '${tc_id}' RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)
     res.json(query.rows);
@@ -191,10 +194,10 @@ router.post("/updateticketstatus", async (req, res) => {
   }
 });
 
-router.post("/deleteticket", async (req, res) => {
+router.post("/deleteticket/:tc_id", async (req, res) => {
   try {
     console.log(`POST url: ${req.originalUrl}`)
-    const { tc_id } = req.body;
+    const { tc_id } = req.params;
     const queryString = `DELETE FROM ticket WHERE tc_id = '${tc_id}' RETURNING *`
     console.log(queryString)
     const query = await db.query(queryString)

@@ -130,7 +130,7 @@ const Analysis = () => {
         <Grid container justifyContent='right' padding={1}>
           <Grid item>
             <Button><CSVLink filename={`summaryReport_${id}.csv`} data={getCsvString()} asyncOnClick={true}
-              onClick={() => prepareCSV(done, item)}>Download CSV</CSVLink></Button>
+              onClick={() => prepareCSV(item)}>Download CSV</CSVLink></Button>
           </Grid>
         </Grid>
       </Card>
@@ -141,7 +141,7 @@ const Analysis = () => {
     return csvString
   };
 
-  const prepareCSV = (done, item) => {
+  const prepareCSV = (item) => {
     const id = '' + item.id
     const { data } = item
     let csv = '' + csvReportHeader
@@ -154,7 +154,7 @@ const Analysis = () => {
       csv += `${row.tc_id}|${row.tc_cmcode}|${row.tc_title}|${row.tc_detail}|${row.tc_createdat}|${row.tc_status}|${row.tc_filepath}|${row.tc_assignedto}|${row.tc_duedate}|${row.tc_priority}|${row.tc_completeddate}\n`
     })
     setCsvString(csv)
-    done(true)
+    // done(true)
   }
 
   if (!isLoaded) {

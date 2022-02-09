@@ -42,6 +42,29 @@ const Ticket = ({ route, navigation }) => {
     }
   }
 
+  const getCurrentDate = () => {
+    console.log(`NewTicket.onSubmitTicket.getCurrentDate: called`)
+    return new Promise((resolve, reject) => {
+      var now = new Date()
+      var additionalHours = 0
+      now.setTime(now.getTime() + (additionalHours * 60 * 60 * 1000))
+      var y = now.getFullYear()
+      var m = now.getMonth() + 1
+      var d = now.getDate()
+      var hh = now.getHours()
+      var mm = now.getMinutes()
+      var ss = now.getSeconds()
+      var date = '' + y + (m < 10 ? '0' : '') + m + (d < 10 ? '0' : '') + d + (hh < 10 ? '0' : '') + hh + (mm < 10 ? '0' : '') + mm + (ss < 10 ? '0' : '') + ss
+      if (date.length == 14) {
+        console.log(`NewTicket.onSubmitTicket.getCurrentDate: resolve(${date})`)
+        resolve(date)
+      } else {
+        reject(new Error('date.length != 14'))
+      }
+    })
+  }
+
+
   const getTicket = (ticketID) => {
     console.info(`Ticket.getTicket(): called`)
     console.log(`ticketID=${ticketID}`)
@@ -57,7 +80,6 @@ const Ticket = ({ route, navigation }) => {
         console.info(`Ticket.getTicket(): success`)
         resolve(res.data[0].tc_filepath)
       } catch (error) {
-        // console.log(`Ticket.getTicket(): Error: ${error}`)
         console.error(`Ticket.getTicket(): ERROR`)
         reject(error)
       }
@@ -68,13 +90,17 @@ const Ticket = ({ route, navigation }) => {
   const changeTicketStatus = async (update) => {
     console.log(`Ticket.changeTicketStatus: called`)
     console.log(`Ticket.changeTicketStatus: updating status to ${update}...`)
+
     try {
-      // const res = (await firestore().collection('Ticket').where('tc_id', '==', tc_id).get()).docs[0].ref.update({
-      //   'tc_status': update,
-      // })
+      let date = ''
+      if (update == 'RESOLVED') {
+        date = await getCurrentDate()
+        console.log('date: ', date)
+      }
       const res = await axios.post(`${SERVER_DOMAIN}/api/mobile/helpdesk/updateticketstatus`, {
         tc_id: tc_id,
         newStatus: update,
+        tc_completeddate: date
       })
       loadTicket()
 
@@ -147,7 +173,7 @@ const Ticket = ({ route, navigation }) => {
       return (
         <View style={{ height: 200, padding: 0 }}>
           <Image
-            source={{ uri: `http://localhost:5050/${ticket.tc_filepath}` }}
+            source={{ uri: `${SERVER_DOMAIN}/${ticket.tc_filepath}` }}
             style={{ aspectRatio: 1, resizeMode: 'contain', maxHeight: 200 }}
           />
         </View>

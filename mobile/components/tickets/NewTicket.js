@@ -57,16 +57,32 @@ const NewTicket = ({ route, navigation }) => {
   const uploadImage = (imageURI, ticketID) => {
     console.log(`NewTicket.uploadImage: called`)
     console.log(`imageURI: ${imageURI}`)
+    const fakeURI = 'file://data/user/0/com.mobile/cache/rn_image_picker_lib_temp_0f1ada20-921d-4642-8937-852129ffb4a0.jpg'
+    const fakeFD = `"name"="FNEXUS2022020306.jpg"&"type"="image/jpg"&"uri"="file:///data/user/0/com.mobile/cache/rn_image_picker_lib_temp_0f1ada20-921d-4642-8937-852129ffb4a0.jpg"`
     let fd = new FormData()
     const fileName = ticketID + '.jpg'
+    const payload = { uri: imageURI, type: 'image/jpg', name: fileName }
     fd.append('ticketImage', { uri: imageURI, type: 'image/jpg', name: fileName })
+    for (const part of fd.getParts()) {
+      // console.log('check', part[0], part[1]);
+      console.log(part);
+    }
+    fd.append('dummy_name', 'dummy string')
     return new Promise(async (resolve, reject) => {
       try {
-        const { data } = await axios.post(`${SERVER_DOMAIN}/api/mobile/helpdesk/uploadfile`, fd)
+        console.log(`masuk promise`);
+        const { data } = await axios({
+          url: `${SERVER_DOMAIN}/api/mobile/helpdesk/uploadfile`,
+          method: 'POST',
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          },
+          data: fd
+        }) //why????
+        console.log(data.message);
         console.log(`NewTicket.uploadImage: success`)
         // console.log(JSON.stringify(res))
         resolve(data.data.path)
-        resolve(null)
       } catch (error) {
         console.log(`NewTicket.uploadImage: error= ${error}`)
         reject(error)
@@ -75,15 +91,6 @@ const NewTicket = ({ route, navigation }) => {
   }
 
   const pickImageHandler = async () => {
-    // ImagePicker.showImagePicker({ title: 'Pick an Image', maxWidth: 800, maxHeight: 600 },
-    //   response => {
-    //     if (response.error) {
-    //       console.log("image error");
-    //     } else {
-    //       console.log("Image: " + response.uri)
-    //     }
-    //   }
-    // )
     try {
       const res = await launchImageLibrary()
       console.log(`result: ${JSON.stringify(res.assets[0])}`)
@@ -106,15 +113,6 @@ const NewTicket = ({ route, navigation }) => {
     if (imageAsset.imageExist) {
       return (
         <View style={{ flex: 1 }}>
-          {/* <Chip
-            style={{ backgroundColor: 'red', paddingTop: 30, margin: 0, height: 90, borderColor: 'yellow', borderWidth: 2 }}
-            // key={ }
-            mode='outlined'
-            // selected={ }
-            // disabled={ }
-            // onPress={ }
-            onClose={() => console.log('closing?')}
-          > */}
           <View style={{ flex: 1, borderColor: 'black', borderWidth: 0 }}>
             <Image
               style={{ flex: 1 }}
@@ -124,7 +122,6 @@ const NewTicket = ({ route, navigation }) => {
               }}
             />
           </View>
-          {/* </Chip> */}
         </View>
       )
     }

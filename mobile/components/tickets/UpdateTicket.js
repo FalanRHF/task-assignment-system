@@ -62,10 +62,7 @@ const Ticket = ({ route, navigation }) => {
   const deleteTicket = async () => {
     console.log(`UpdateTicket.deleteTicket: called`)
     try {
-      const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/mobile/helpdesk/updateticketstatus`, {
-        tc_id: tc_id,
-        newStatus: 'DELETED',
-      })
+      const axiosPostResponse = await axios.post(`${SERVER_DOMAIN}/api/mobile/helpdesk/deleteticket/${tc_id}`)
       console.log(`UpdateTicket.deleteTicket: axiosPostResponse=${axiosPostResponse.data[0]}`)
       console.log(`UpdateTicket.deleteTicket: Ticket ${tc_id} deleted`)
       console.log(`UpdateTicket.deleteTicket: success`)

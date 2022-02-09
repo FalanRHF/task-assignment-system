@@ -141,7 +141,7 @@ const Assessment = () => {
     console.log('renderGenerateKPIButton()');
     let prevMonth = currentMonth - 1
     prevMonth = prevMonth % 10 > 0 ? prevMonth : (prevMonth - 88)
-    if (isLoaded && (kpiData.length == 0 || kpiData[0].kp_id < prevMonth)) {
+    if (isLoaded && (kpiData.length == 0 || kpiData[0].id < prevMonth)) {
       return (
         <Container sx={{ paddingBottom: 2 }}>
           <Stack sx={{ alignItems: "center" }}>
